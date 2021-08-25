@@ -1,13 +1,7 @@
 package com.einvoive.controller;
 
-import com.einvoive.helper.CustomerHelper;
-import com.einvoive.helper.InvoiceHelper;
-import com.einvoive.helper.ProductHelper;
-import com.einvoive.helper.UserHelper;
-import com.einvoive.model.Customer;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.Product;
-import com.einvoive.model.User;
+import com.einvoive.helper.*;
+import com.einvoive.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +20,16 @@ public class MainController {
     ProductHelper productHelper;
 
     @Autowired
+    ProductMainHelper productMainHelper;
+
+    @Autowired
     InvoiceHelper invoiceHelper;
+
+    @Autowired
+    VatHelper vatHelper;
+
+    @Autowired
+    LocationHelper locationHelper;
 
     @PostMapping("/saveUser")
     public String saveUser(@RequestBody User userEntity) {
@@ -48,6 +51,20 @@ public class MainController {
         return productHelper.save(product);
     }
 
+    @PostMapping("/saveProductMain")
+    public String saveProductMain(@RequestBody ProductMain product) {
+        return productMainHelper.save(product);
+    }
+
+    @PostMapping("/saveVat")
+    public String saveVat(@RequestBody Vat vat) {
+        return vatHelper.save(vat);
+    }
+
+    @PostMapping("/saveLocation")
+    public String saveLocation(@RequestBody Location location) {
+        return locationHelper.save(location);
+    }
 
     @GetMapping("/getCustomers")
     public String getCustomers(@RequestParam String userId) {
@@ -68,5 +85,20 @@ public class MainController {
     @GetMapping("/getProducts")
     public String getProducts(@RequestParam String invoiceId) {
         return productHelper.getProducts(invoiceId);
+    }
+
+    @GetMapping("/getProductsMain")
+    public String getProductsMain(@RequestParam String userId) {
+        return productMainHelper.getProducts(userId);
+    }
+
+    @GetMapping("/getAllVats")
+    public String getAllVats() {
+        return vatHelper.getAllVats();
+    }
+
+    @GetMapping("/getAllLocations")
+    public String getAllLocations() {
+        return locationHelper.getAllLocations();
     }
 }

@@ -1,6 +1,8 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Product;
+import com.einvoive.model.ProductMain;
+import com.einvoive.repository.ProductMainRepository;
 import com.einvoive.repository.ProductRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +14,17 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ProductHelper {
+public class ProductMainHelper {
 
     @Autowired
-    ProductRepository repository;
+    ProductMainRepository repository;
 
     @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
 
-    public String save(Product product){
+    public String save(ProductMain product){
         try {
             repository.save(product);
             return "product saved";
@@ -32,12 +34,13 @@ public class ProductHelper {
 
     }
 
-    public String getProducts(String invoiceId){
-        List<Product> products = null;
+    public String getProducts(String userId){
+        List<ProductMain> products = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("invoiceId").is(invoiceId));
-            products = mongoOperation.find(query, Product.class);
+            if(!userId.isEmpty())
+             query.addCriteria(Criteria.where("userId").is(userId));
+            products = mongoOperation.find(query, ProductMain.class);
         }catch(Exception ex){
             System.out.println("Error in get Products:"+ ex);
         }

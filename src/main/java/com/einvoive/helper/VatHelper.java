@@ -1,7 +1,9 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Product;
-import com.einvoive.repository.ProductRepository;
+import com.einvoive.model.Customer;
+import com.einvoive.model.Vat;
+import com.einvoive.repository.CustomerRepository;
+import com.einvoive.repository.VatRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -10,37 +12,34 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 @Component
-public class ProductHelper {
+public class VatHelper {
 
     @Autowired
-    ProductRepository repository;
-
+    VatRepository repository;
     @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
 
-    public String save(Product product){
+    public String save(Vat vat){
         try {
-            repository.save(product);
-            return "product saved";
-        }catch(Exception ex){
-            return "product Not saved"+ ex;
-        }
 
+            repository.save(vat);
+        }catch(Exception ex){
+            return "vat Not saved"+ ex;
+        }
+        return "vat saved";
     }
 
-    public String getProducts(String invoiceId){
-        List<Product> products = null;
+    public String getAllVats(){
+        List<Vat> vats = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("invoiceId").is(invoiceId));
-            products = mongoOperation.find(query, Product.class);
+            vats = mongoOperation.find(query, Vat.class);
         }catch(Exception ex){
-            System.out.println("Error in get Products:"+ ex);
+            System.out.println("Error in get vats:"+ ex);
         }
-        return gson.toJson(products);
+        return gson.toJson(vats);
     }
 }
