@@ -63,6 +63,7 @@ public class MainController {
 
     @PostMapping("/saveLocation")
     public String saveLocation(@RequestBody Location location) {
+
         return locationHelper.save(location);
     }
 
