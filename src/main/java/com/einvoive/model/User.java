@@ -13,6 +13,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
         private String email;
         private String password;
         private String role;
+        private String location;
+        private String CellNo;
+        private String comapnyID;
+
+        public String getComapnyID() {
+            return comapnyID;
+        }
+
+        public void setComapnyID(String comapnyID) {
+            this.comapnyID = comapnyID;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public String getCellNo() {
+            return CellNo;
+        }
+
+        public void setCellNo(String cellNo) {
+            CellNo = cellNo;
+        }
 
         public String getRole() {
             return role;

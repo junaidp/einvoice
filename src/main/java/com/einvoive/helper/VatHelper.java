@@ -42,4 +42,13 @@ public class VatHelper {
         }
         return gson.toJson(vats);
     }
+
+    public String update(Vat vat) {
+        try {
+            repository.save(vat);
+        }catch(Exception ex){
+            return "vat Not updated"+ ex;
+        }
+        return "vat updated";
+    }
 }

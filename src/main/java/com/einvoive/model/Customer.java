@@ -9,15 +9,6 @@ public class Customer {
     @Id
     private String id;
     private String customerId;
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
     private String firstName;
     private String lastName;
     private String customer;
@@ -39,7 +30,23 @@ public class Customer {
     private String phone;
     private String deliveryInstructions;
     private String userId;
+    private String comapnyID;
 
+    public String getComapnyID() {
+        return comapnyID;
+    }
+
+    public void setComapnyID(String comapnyID) {
+        this.comapnyID = comapnyID;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
 
     public String getUserId() {
         return userId;

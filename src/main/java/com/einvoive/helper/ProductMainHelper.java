@@ -33,16 +33,25 @@ public class ProductMainHelper {
         }
 
     }
-    public String getProducts(String userId){
+    public String getProducts(String companyId){
         List<ProductMain> products = null;
         try {
             Query query = new Query();
-            if(!userId.isEmpty())
-             query.addCriteria(Criteria.where("userId").is(userId));
+            if(!companyId.isEmpty())
+             query.addCriteria(Criteria.where("companyID").is(companyId));
             products = mongoOperation.find(query, ProductMain.class);
         }catch(Exception ex){
             System.out.println("Error in get Products:"+ ex);
         }
         return gson.toJson(products);
+    }
+
+    public String update(ProductMain product) {
+        try {
+            repository.save(product);
+            return "product updated";
+        }catch(Exception ex){
+            return "product Not updated "+ ex;
+        }
     }
 }

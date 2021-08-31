@@ -34,11 +34,20 @@ public class CustomerHelper {
         return "customer saved";
     }
 
-    public String getAllCustomers(String userId){
+    public String update(Customer customer){
+        try {
+            repository.save(customer);
+        }catch(Exception ex){
+            return "Customer Not updated"+ ex;
+        }
+        return "customer updated";
+    }
+
+    public String getAllCustomers(String comapnyID){
         List<Customer> customers = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("userId").is(userId));
+            query.addCriteria(Criteria.where("comapnyID").is(comapnyID));
             System.out.println("QUERY");
             customers = mongoOperation.find(query, Customer.class);
         }catch(Exception ex){

@@ -7,12 +7,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ProductMain {
 
     @Id
+    private String id;
     private String productName;
     private String description;
     private String price;
     private String code;
     private String assignedChartofAccounts;
     private String userId;
+    private String companyID;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(String companyID) {
+        this.companyID = companyID;
+    }
 
     public String getUserId() {
         return userId;

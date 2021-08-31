@@ -43,4 +43,13 @@ public class ProductHelper {
         }
         return gson.toJson(products);
     }
+
+    public String update(Product product) {
+        try {
+            repository.save(product);
+            return "product updated";
+        }catch(Exception ex){
+            return "product Not updated"+ ex;
+        }
+    }
 }

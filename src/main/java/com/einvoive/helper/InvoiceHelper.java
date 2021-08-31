@@ -33,7 +33,6 @@ public class InvoiceHelper {
         }catch(Exception ex){
             return "Invoice Not saved"+ ex;
         }
-
     }
 
     public String getAllInvoices(String userId){
@@ -48,4 +47,12 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
+    public String update(Invoice invoice) {
+        try {
+            repository.save(invoice);
+            return "Invoice Updated";
+        }catch(Exception ex){
+            return "Invoice Not Updated"+ ex;
+        }
+    }
 }

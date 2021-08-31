@@ -48,4 +48,12 @@ public class UserHelper {
         return gson.toJson(savedUser);
     }
 
+    public String updateUser(User userEntity) {
+        try {
+            userRepository.save(userEntity);
+        }catch(Exception ex){
+            return "Use Not updated"+ ex;
+        }
+        return "User updated";
+    }
 }

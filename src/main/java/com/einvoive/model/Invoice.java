@@ -1,8 +1,10 @@
 package com.einvoive.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Document
@@ -21,6 +23,24 @@ public class Invoice {
     private String totalVat;
     private String totalAmountDue;
     private String userId;
+    private String notes;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     public String getUserId() {
         return userId;

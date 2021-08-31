@@ -31,6 +31,16 @@ public class LocationHelper {
         return "location saved";
     }
 
+    public String update(Location location){
+        try {
+
+            repository.save(location);
+        }catch(Exception ex){
+            return "location Not updated"+ ex;
+        }
+        return "location update";
+    }
+
     public String getAllLocations(){
         List<Location> locations = null;
         try {
