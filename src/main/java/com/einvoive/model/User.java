@@ -3,7 +3,10 @@ package com.einvoive.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-    @Document
+import java.util.ArrayList;
+import java.util.List;
+
+@Document
     public class User {
 
         @Id
@@ -12,10 +15,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
         private String name;
         private String email;
         private String password;
-        private String role;
         private String location;
         private String CellNo;
         private String comapnyID;
+        private List<String> listRoles;
+
+    public List<String> getListRoles() {
+        return listRoles;
+    }
+
+    public void setListRoles(List<String> listRoles) {
+        this.listRoles = listRoles;
+    }
 
         public String getComapnyID() {
             return comapnyID;
@@ -39,14 +50,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
         public void setCellNo(String cellNo) {
             CellNo = cellNo;
-        }
-
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(String role) {
-            this.role = role;
         }
 
         public String getUserId() {

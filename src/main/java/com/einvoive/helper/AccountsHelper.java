@@ -1,7 +1,7 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.BankAccount;
-import com.einvoive.repository.BankAccountRepository;
+import com.einvoive.model.Accounts;
+import com.einvoive.repository.AccountsRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -12,41 +12,41 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class BankAccountHelper {
+public class AccountsHelper {
 
     @Autowired
-    BankAccountRepository bankAccountRepository;
+    AccountsRepository accountsRepository;
 
     @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
 
-    public String save(BankAccount bankAccount){
+    public String save(Accounts accounts){
         try {
-            bankAccountRepository.save(bankAccount);
+            accountsRepository.save(accounts);
             return "BankAccount saved";
         }catch(Exception ex){
             return "BankAccount Not saved"+ ex;
         }
 
     }
-    public String getBankAccounts(String code){
-        List<BankAccount> bankAccounts = null;
+    public String getAccounts(String companyID){
+        List<Accounts> accountsList = null;
         try {
             Query query = new Query();
-            if(!code.isEmpty())
-                query.addCriteria(Criteria.where("code").is(code));
-            bankAccounts = mongoOperation.find(query, BankAccount.class);
+            if(!companyID.isEmpty())
+                query.addCriteria(Criteria.where("companyID").is(companyID));
+            accountsList = mongoOperation.find(query, Accounts.class);
         }catch(Exception ex){
             System.out.println("Error in get Bank Account:"+ ex);
         }
-        return gson.toJson(bankAccounts);
+        return gson.toJson(accountsList);
     }
 
-    public String update(BankAccount bankAccount) {
+    public String update(Accounts accounts) {
         try {
-            bankAccountRepository.save(bankAccount);
+            accountsRepository.save(accounts);
             return "BankAccount Updated";
         }catch(Exception ex){
             return "BankAccount Not Updated"+ ex;

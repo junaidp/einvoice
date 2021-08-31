@@ -23,16 +23,16 @@ public class MainController {
     ProductHelper productHelper;
 
     @Autowired
-    BankAccountHelper bankAccountHelper;
-
-    @Autowired
-    RevenueHelper revenueHelper;
+    AccountsHelper accountsHelper;
 
     @Autowired
     ProductMainHelper productMainHelper;
 
     @Autowired
     InvoiceHelper invoiceHelper;
+
+    @Autowired
+    RollsHelper rollsHelper;
 
     @Autowired
     VatHelper vatHelper;
@@ -64,14 +64,9 @@ public class MainController {
         return productHelper.save(product);
     }
 
-    @PostMapping("/saveBankAccount")
-    public String saveBankAccount(@RequestBody BankAccount bankAccount) {
-        return bankAccountHelper.save(bankAccount);
-    }
-
-    @PostMapping("/saveRevenue")
-    public String saveRevenue(@RequestBody Revenue revenue) {
-        return revenueHelper.save(revenue);
+    @PostMapping("/saveAccounts")
+    public String saveAccounts(@RequestBody Accounts accounts) {
+        return accountsHelper.save(accounts);
     }
 
     @PostMapping("/saveProductMain")
@@ -117,14 +112,9 @@ public class MainController {
         return productHelper.update(product);
     }
 
-    @PostMapping("/updateBankAccount")
-    public String updateBankAccount(@RequestBody BankAccount bankAccount) {
-        return bankAccountHelper.update(bankAccount);
-    }
-
-    @PostMapping("/updateRevenue")
-    public String updateRevenue(@RequestBody Revenue revenue) {
-        return revenueHelper.update(revenue);
+    @PostMapping("/updateAccounts")
+    public String updateAccounts(@RequestBody Accounts accounts) {
+        return accountsHelper.update(accounts);
     }
 
     @PostMapping("/updateProductMain")
@@ -223,14 +213,9 @@ public class MainController {
         return productMainHelper.getProducts(companyId);
     }
 
-    @GetMapping("/getBankAccounts")
-    public String getBankAccounts(@RequestParam String code) {
-        return bankAccountHelper.getBankAccounts(code);
-    }
-
-    @GetMapping("/getRevenues")
-    public String getRevenues(@RequestParam String code) {
-        return revenueHelper.getRevenues(code);
+    @GetMapping("/getAccounts")
+    public String getAccounts(@RequestParam String companyID) {
+        return accountsHelper.getAccounts(companyID);
     }
 
     @GetMapping("/getAllVats")

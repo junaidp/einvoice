@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Rolls;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
 import com.google.gson.Gson;
@@ -9,12 +10,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 
 @Component
 public class UserHelper {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RollsHelper rollsHelper;
 
     @Autowired
     MongoOperations mongoOperation;
@@ -24,7 +30,12 @@ public class UserHelper {
     public String saveUser(User userEntity){
         userEntity.setUserId(getAvaiablaeId());
         userRepository.save(userEntity);
-
+        for (String rollName : userEntity.getListRoles()){
+            Rolls rolls = new Rolls();
+            rolls.setUserId(userEntity.getUserId());
+            rolls.setRollName(rollName);
+            rollsHelper.saveRolls(rolls);
+        }
         return "saved";
     }
 
@@ -41,16 +52,21 @@ public class UserHelper {
     }
 
     public String singIn(User user) {
-        System.out.println(user.getName() + "," + user.getPassword());
+        System.out.println(user.getEmail() + "," + user.getPassword());
         Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(user.getName()).and("password").is(user.getPassword()));
+        query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));
         User savedUser = mongoOperation.findOne(query, User.class);
+        rollsHelper.getRolls(savedUser.getUserId());
+        for(Rolls roll:rollsHelper.getRollsArrayList()){
+         savedUser.getListRoles().add(roll.getRollName());
+        }
         return gson.toJson(savedUser);
     }
 
     public String updateUser(User userEntity) {
         try {
             userRepository.save(userEntity);
+            rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
         }catch(Exception ex){
             return "Use Not updated"+ ex;
         }
