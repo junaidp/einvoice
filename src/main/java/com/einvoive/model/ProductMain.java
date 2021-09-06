@@ -16,6 +16,21 @@ public class ProductMain {
     private String userId;
     private String companyID;
 
+    public ProductMain(String id, String productName, String description, String price, String code, String assignedChartofAccounts, String userId, String companyID) {
+        this.id = id;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.code = code;
+        this.assignedChartofAccounts = assignedChartofAccounts;
+        this.userId = userId;
+        this.companyID = companyID;
+    }
+
+    public ProductMain() {
+
+    }
+
     public String getId() {
         return id;
     }

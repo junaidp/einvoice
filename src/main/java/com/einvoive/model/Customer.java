@@ -30,14 +30,14 @@ public class Customer {
     private String phone;
     private String deliveryInstructions;
     private String userId;
-    private String comapnyID;
+    private String companyID;
 
-    public String getComapnyID() {
-        return comapnyID;
+    public String getCompanyID() {
+        return companyID;
     }
 
-    public void setComapnyID(String comapnyID) {
-        this.comapnyID = comapnyID;
+    public void setCompanyID(String companyID) {
+        this.companyID = companyID;
     }
 
     public String getCustomerId() {

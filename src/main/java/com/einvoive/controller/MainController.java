@@ -20,7 +20,7 @@ public class MainController {
     CustomerHelper customerHelper;
 
     @Autowired
-    ProductHelper productHelper;
+    LineItemHelper lineItemHelper;
 
     @Autowired
     AccountsHelper accountsHelper;
@@ -59,9 +59,9 @@ public class MainController {
         return invoiceHelper.save(invoice);
     }
 
-    @PostMapping("/saveProduct")
-    public String saveProduct(@RequestBody Product product) {
-        return productHelper.save(product);
+    @PostMapping("/saveLineItem")
+    public String saveLineItem(@RequestBody LineItem lineItem) {
+        return lineItemHelper.save(lineItem);
     }
 
     @PostMapping("/saveAccounts")
@@ -108,8 +108,8 @@ public class MainController {
     }
 
     @PostMapping("/updateProduct")
-    public String updateProduct(@RequestBody Product product) {
-        return productHelper.update(product);
+    public String updateProduct(@RequestBody LineItem lineItem) {
+        return lineItemHelper.update(lineItem);
     }
 
     @PostMapping("/updateAccounts")
@@ -182,15 +182,14 @@ public class MainController {
 
     //get
 
-    @GetMapping("/getCustomers")
-    public String getCustomers(@RequestParam String comapnyID) {
-
-        return customerHelper.getAllCustomers(comapnyID);
+    @GetMapping("/getAllCustomers")
+    public String getAllCustomers(@RequestParam String companyID) {
+        return customerHelper.getAllCustomers(companyID);
     }
 
     @GetMapping("/getInvoices")
-    public String getInvoices(@RequestParam String userId) {
-        return invoiceHelper.getAllInvoices(userId);
+    public String getInvoices(@RequestParam String companyID) {
+        return invoiceHelper.getAllInvoices(companyID);
     }
 
     @GetMapping("/signIn")
@@ -205,7 +204,7 @@ public class MainController {
 
     @GetMapping("/getProducts")
     public String getProducts(@RequestParam String invoiceId) {
-        return productHelper.getProducts(invoiceId);
+        return lineItemHelper.getItems(invoiceId);
     }
 
     @GetMapping("/getProductsMain")
@@ -219,8 +218,8 @@ public class MainController {
     }
 
     @GetMapping("/getAllVats")
-    public String getAllVats() {
-        return vatHelper.getAllVats();
+    public String getAllVats(@RequestParam String companyID) {
+        return vatHelper.getAllVats(companyID);
     }
 
     @GetMapping("/getAllLocations")

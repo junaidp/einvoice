@@ -1,9 +1,7 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Product;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
-import com.einvoive.repository.ProductRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;

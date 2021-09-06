@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Document
 public class Invoice {
@@ -25,6 +26,24 @@ public class Invoice {
     private String userId;
     private String notes;
     private String status;
+    private String companyID;
+    private List<LineItem> lineItemList;
+
+    public List<LineItem> getLineItemList() {
+        return lineItemList;
+    }
+
+    public void setLineItemList(List<LineItem> lineItemList) {
+        this.lineItemList = lineItemList;
+    }
+
+    public String getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(String companyID) {
+        this.companyID = companyID;
+    }
 
     public String getStatus() {
         return status;

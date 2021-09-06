@@ -47,7 +47,7 @@ public class CustomerHelper {
         List<Customer> customers = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("comapnyID").is(comapnyID));
+            query.addCriteria(Criteria.where("companyID").is(comapnyID));
             System.out.println("QUERY");
             customers = mongoOperation.find(query, Customer.class);
         }catch(Exception ex){

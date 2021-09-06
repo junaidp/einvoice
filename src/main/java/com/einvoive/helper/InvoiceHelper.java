@@ -2,8 +2,10 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Customer;
 import com.einvoive.model.Invoice;
+import com.einvoive.model.LineItem;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.repository.InvoiceRepository;
+import com.einvoive.repository.LineItemRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -20,6 +22,9 @@ public class InvoiceHelper {
     InvoiceRepository repository;
 
     @Autowired
+    LineItemHelper lineItemHelper;
+
+    @Autowired
     MongoOperations mongoOperation;
 
 
@@ -28,19 +33,27 @@ public class InvoiceHelper {
     public String save(Invoice invoice){
         try {
             repository.save(invoice);
-            Invoice savedInvoice = repository.findInvoiceByName(invoice.getInvoiceNumber());
-            return savedInvoice.getId();
+            for(LineItem lineItem : invoice.getLineItemList()){
+                lineItemHelper.save(lineItem);
+            }
+//            Invoice savedInvoice = repository.findInvoiceByName(invoice.getInvoiceNumber());
+//            return savedInvoice.getId();
+            return "Invoice saved";
         }catch(Exception ex){
             return "Invoice Not saved"+ ex;
         }
     }
 
-    public String getAllInvoices(String userId){
+    public String getAllInvoices(String companyID){
         List<Invoice> invoices = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("userId").is(userId));
+            query.addCriteria(Criteria.where("companyID").is(companyID));
             invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
         }

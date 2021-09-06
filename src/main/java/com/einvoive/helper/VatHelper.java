@@ -32,10 +32,11 @@ public class VatHelper {
         return "vat saved";
     }
 
-    public String getAllVats(){
+    public String getAllVats(String companyID){
         List<Vat> vats = null;
         try {
             Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
             vats = mongoOperation.find(query, Vat.class);
         }catch(Exception ex){
             System.out.println("Error in get vats:"+ ex);

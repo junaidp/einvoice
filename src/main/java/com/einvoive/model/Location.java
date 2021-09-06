@@ -9,6 +9,15 @@ public class Location {
     @Id
     private String id;
     private String locationName;
+    private String companyID;
+
+    public String getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(String companyID) {
+        this.companyID = companyID;
+    }
 
     public String getId() {
         return id;

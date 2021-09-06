@@ -1,14 +1,13 @@
 package com.einvoive.repository;
 
-import com.einvoive.model.Product;
-import com.einvoive.model.User;
+import com.einvoive.model.LineItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-public interface ProductRepository extends MongoRepository<Product, String> {
+public interface LineItemRepository extends MongoRepository<LineItem, String> {
 
     @Query("{ 'name' : ?0'}")
-    Product findByName(String name);
+    LineItem findByName(String name);
 
 
 }

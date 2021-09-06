@@ -9,6 +9,8 @@ public class Company {
     @Id
     private String id;
     private String companyID;
+    private String firstName;
+    private String lastName;
     private String companyName;
     private String email;
     private String password;
@@ -23,6 +25,22 @@ public class Company {
     private String city;
     private String postalCode;
     private String userType;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getUserType() {
         return userType;

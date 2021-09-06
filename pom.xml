@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.einvoive</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>eInvoice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>einvoiving</name>
     <description>e invoiving</description>
@@ -49,6 +49,21 @@
             <artifactId>gson</artifactId>
             <version>2.8.6</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
