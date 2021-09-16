@@ -152,7 +152,8 @@ public class UploadCustomersHelper {
                             break;
 
                         case 22:
-                            customer.setDeliveryInstructions(currentCell.getStringCellValue());
+                            int companyID = (int)currentCell.getNumericCellValue();
+                            customer.setCompanyID(String.valueOf(companyID));
                             break;
 
                         default:
