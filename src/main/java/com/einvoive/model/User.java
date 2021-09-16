@@ -3,7 +3,6 @@ package com.einvoive.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -17,23 +16,23 @@ import java.util.List;
         private String password;
         private String location;
         private String CellNo;
-        private String comapnyID;
+        private String companyID;
         private List<String> listRoles;
 
-    public List<String> getListRoles() {
+        public List<String> getListRoles() {
         return listRoles;
     }
 
-    public void setListRoles(List<String> listRoles) {
+        public void setListRoles(List<String> listRoles) {
         this.listRoles = listRoles;
     }
 
-        public String getComapnyID() {
-            return comapnyID;
+        public String getCompanyID() {
+            return companyID;
         }
 
-        public void setComapnyID(String comapnyID) {
-            this.comapnyID = comapnyID;
+        public void setCompanyID(String companyID) {
+            this.companyID = companyID;
         }
 
         public String getLocation() {

@@ -24,7 +24,7 @@ public class UploadProductsHelper {
     ProductMainRepository repository;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "Id", "Title", "Description", "Published" };
-    static String SHEET = "Tutorials";
+    static String SHEET = "Sheet1";
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
@@ -66,32 +66,36 @@ public class UploadProductsHelper {
 //                            productMain.setId(currentCell.getStringCellValue());
 //                            break;
 
-                        case 1:
+                        case 0:
                             productMain.setProductName(currentCell.getStringCellValue());
                             break;
 
-                        case 2:
+                        case 1:
                             productMain.setDescription(currentCell.getStringCellValue());
                             break;
 
+                        case 2:
+                            int value = (int)currentCell.getNumericCellValue();
+                            productMain.setPrice(String.valueOf(value));
+                            break;
+
                         case 3:
-                            productMain.setPrice(currentCell.getStringCellValue());
+                            int valueCode = (int)currentCell.getNumericCellValue();
+                            productMain.setCode(String.valueOf(valueCode));
                             break;
 
                         case 4:
-                            productMain.setCode(currentCell.getStringCellValue());
-                            break;
-
-                        case 5:
                             productMain.setAssignedChartofAccounts(currentCell.getStringCellValue());
                             break;
 
-                        case 6:
-                            productMain.setUserId(currentCell.getStringCellValue());
+                        case 5:
+                            int valueUserID = (int)currentCell.getNumericCellValue();
+                            productMain.setUserId(String.valueOf(valueUserID));
                             break;
 
-                        case 7:
-                            productMain.setCompanyID(currentCell.getStringCellValue());
+                        case 6:
+                            int valueCompanyID = (int)currentCell.getNumericCellValue();
+                            productMain.setCompanyID(String.valueOf(valueCompanyID));
                             break;
 
                         default:

@@ -2,6 +2,7 @@ package com.einvoive.controller;
 
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
+import com.einvoive.repository.TranslationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,9 @@ public class MainController {
     UserHelper userHelper;
 
     @Autowired
+    PaymentCardHelper paymentCardHelper;
+
+    @Autowired
     CompanyHelper companyHelper;
 
     @Autowired
@@ -24,6 +28,9 @@ public class MainController {
 
     @Autowired
     AccountsHelper accountsHelper;
+
+    @Autowired
+    TranslationHelper translationHelper;
 
     @Autowired
     ProductMainHelper productMainHelper;
@@ -69,6 +76,11 @@ public class MainController {
         return accountsHelper.save(accounts);
     }
 
+    @PostMapping("/savePaymentCard")
+    public String savePaymentCard(@RequestBody PaymentCard paymentCard) {
+        return paymentCardHelper.savePaymentCard(paymentCard);
+    }
+
     @PostMapping("/saveProductMain")
     public String saveProductMain(@RequestBody ProductMain product) {
         return productMainHelper.save(product);
@@ -85,11 +97,21 @@ public class MainController {
         return locationHelper.save(location);
     }
 
+    @PostMapping("/saveTranslation")
+    public String saveTranslation(@RequestBody Translation translation) {
+        return translationHelper.saveTranslation(translation);
+    }
+
     //update
 
     @PostMapping("/updateUser")
     public String updateUser(@RequestBody User user) {
         return userHelper.updateUser(user);
+    }
+
+    @PostMapping("/updatePaymentCard")
+    public String updatePaymentCard(@RequestBody PaymentCard paymentCard) {
+        return paymentCardHelper.updatePaymentCard(paymentCard);
     }
 
     @PostMapping("/updateCompany")
@@ -182,6 +204,22 @@ public class MainController {
 
     //get
 
+    @GetMapping("/getAllUsers")
+    public String getAllUsers(@RequestParam String companyID) {
+        return userHelper.getAllUsers(companyID);
+    }
+
+
+    @GetMapping("/getTopSaledProducts")
+    public String getTopSaledProducts(@RequestParam String companyID) {
+        return productMainHelper.getTopSaledProducts(companyID);
+    }
+
+    @GetMapping("/getPaymentCard")
+    public String getPaymentCard(@RequestParam String userId) {
+        return paymentCardHelper.getPaymentCards(userId);
+    }
+
     @GetMapping("/getAllCustomers")
     public String getAllCustomers(@RequestParam String companyID) {
         return customerHelper.getAllCustomers(companyID);
@@ -225,6 +263,11 @@ public class MainController {
     @GetMapping("/getAllLocations")
     public String getAllLocations() {
         return locationHelper.getAllLocations();
+    }
+
+    @GetMapping("/getTranslation")
+    public String getTranslation(@RequestParam String english) {
+        return translationHelper.getTranslation(english);
     }
 
 }

@@ -1,0 +1,56 @@
+package com.einvoive.helper;
+
+import com.einvoive.model.PaymentCard;
+import com.einvoive.repository.PaymentCardRepository;
+import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class PaymentCardHelper {
+
+    @Autowired
+    PaymentCardRepository paymentCardRepository;
+
+    @Autowired
+    MongoOperations mongoOperation;
+
+    Gson gson = new Gson();
+
+    public String savePaymentCard(PaymentCard paymentCard){
+        try {
+            paymentCardRepository.save(paymentCard);
+            return "Card saved";
+        }catch(Exception ex){
+            return "Card Not saved"+ ex;
+        }
+
+    }
+    public String getPaymentCards(String userId){
+        List<PaymentCard> paymentCardList = null;
+        try {
+            Query query = new Query();
+            if(!userId.isEmpty())
+                query.addCriteria(Criteria.where("userId").is(userId));
+            paymentCardList = mongoOperation.find(query, PaymentCard.class);
+        }catch(Exception ex){
+            System.out.println("Error in get paymentCard:"+ ex);
+        }
+        return gson.toJson(paymentCardList);
+    }
+
+    public String updatePaymentCard(PaymentCard paymentCard) {
+        try {
+            paymentCardRepository.save(paymentCard);
+            return "PaymentCard Updated";
+        }catch(Exception ex){
+            return "PaymentCard Not Updated"+ ex;
+        }
+    }
+
+}

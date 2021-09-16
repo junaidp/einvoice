@@ -39,9 +39,17 @@ public class UserHelper {
         return "saved";
     }
 
-    public String getUser(){
-
-        return "saved";
+    public String getAllUsers(String companyID){
+        List<User> userList = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            System.out.println("QUERY");
+            userList = mongoOperation.find(query, User.class);
+        }catch(Exception ex){
+            System.out.println("Error in getting Users:"+ ex);
+        }
+        return gson.toJson(userList);
     }
 
     public String getAvaiablaeId() {
@@ -65,7 +73,7 @@ public class UserHelper {
 
     public String updateUser(User userEntity) {
         try {
-            userRepository.save(userEntity);
+            userRepository.insert(userEntity);
             rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
         }catch(Exception ex){
             return "Use Not updated"+ ex;

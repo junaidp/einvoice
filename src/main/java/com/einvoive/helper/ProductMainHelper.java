@@ -32,6 +32,19 @@ public class ProductMainHelper {
 
     }
 
+    public String getTopSaledProducts(String companyId){
+        List<ProductMain> products = null;
+        try {
+            Query query = new Query();
+            if(!companyId.isEmpty())
+                query.limit(10).addCriteria(Criteria.where("companyID").is(companyId));
+            products = mongoOperation.find(query, ProductMain.class);
+        }catch(Exception ex){
+            System.out.println("Error in get Products:"+ ex);
+        }
+        return gson.toJson(products);
+    }
+
     public String getProducts(String companyId){
         List<ProductMain> products = null;
         try {

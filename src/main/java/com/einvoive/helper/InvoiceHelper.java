@@ -60,6 +60,22 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
+    public String getTopInvoices(){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("totalAmountDue"));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
     public String update(Invoice invoice) {
         try {
             repository.save(invoice);

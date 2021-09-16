@@ -8,28 +8,29 @@ public class Customer {
 
     @Id
     private String id;
-    private String customerId;
+    private String customer;
     private String firstName;
     private String lastName;
-    private String customer;
+    private String email;
+    private String phone;
     private String accountNumber;
     private String website;
     private String notes;
     private String currency;
+    private String billingAddress1;
+    private String billingAddress2;
     private String billingCountry;
     private String billingProvince;
     private String billingCity;
     private String billingPostal;
-    private String shippingName;
-    private String shippingAddress;
-    private String shippingCountry;
-    private String shippingCity;
+    private String shippingAddress1;
     private String shippingAddress2;
+    private String shippingCountry;
     private String shippingProvince;
+    private String shippingCity;
     private String shippingPostal;
-    private String phone;
     private String deliveryInstructions;
-    private String userId;
+//    private String userId;
     private String companyID;
 
     public String getCompanyID() {
@@ -40,20 +41,12 @@ public class Customer {
         this.companyID = companyID;
     }
 
-    public String getCustomerId() {
-        return customerId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getId() {
@@ -152,20 +145,28 @@ public class Customer {
         this.billingPostal = billingPostal;
     }
 
-    public String getShippingName() {
-        return shippingName;
+    public String getBillingAddress1() {
+        return billingAddress1;
     }
 
-    public void setShippingName(String shippingName) {
-        this.shippingName = shippingName;
+    public void setBillingAddress1(String billingAddress1) {
+        this.billingAddress1 = billingAddress1;
     }
 
-    public String getShippingAddress() {
-        return shippingAddress;
+    public String getBillingAddress2() {
+        return billingAddress2;
     }
 
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
+    public void setBillingAddress2(String billingAddress2) {
+        this.billingAddress2 = billingAddress2;
+    }
+
+    public String getShippingAddress1() {
+        return shippingAddress1;
+    }
+
+    public void setShippingAddress1(String shippingAddress) {
+        this.shippingAddress1 = shippingAddress;
     }
 
     public String getShippingCountry() {

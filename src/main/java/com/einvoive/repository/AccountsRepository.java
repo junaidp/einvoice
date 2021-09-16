@@ -13,6 +13,6 @@ import java.util.List;
 public interface AccountsRepository extends MongoRepository<Accounts, String> {
 
     @Query("{ 'code' : ?0'}")
-    List<Customer> findByName(String code);
+    List<Accounts> findByName(String code);
 
 }

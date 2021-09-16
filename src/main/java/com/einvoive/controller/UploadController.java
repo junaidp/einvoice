@@ -1,5 +1,6 @@
 package com.einvoive.controller;
 
+import com.einvoive.helper.UploadCustomersHelper;
 import com.einvoive.helper.UploadProductsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,13 @@ public class UploadController {
     @Autowired
     UploadProductsHelper uploadProductsHelper;
 
+    @Autowired
+    UploadCustomersHelper uploadCustomersHelper;
+
     //Save the uploaded file to this folder
     private static String UPLOADED_FOLDER = "C://help//";
     private static String UPLOAD_Product_FOLDER = "C://products//";
+    private String UPLOAD_Customer_FOLDER = "C://customers//";
 
     @GetMapping("/")
     public String index() {
@@ -58,19 +63,44 @@ public class UploadController {
     }
 
     @PostMapping("/uploadProducts") // //new annotation since 4.3
-    public String uploadProducts(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+    public String uploadProducts(@RequestParam("file") MultipartFile file) {
 
         if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            return "redirect:uploadProducts";
+//            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
+            return "uploadProducts file is empty";
         }
+        String message = null;
         if (uploadProductsHelper.hasExcelFormat(file)) {
             try {
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
                 Files.write(path, bytes);
                 uploadProductsHelper.saveAll(file);
+//                redirectAttributes.addFlashAttribute("message",
+//                        "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
+                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
+            }
+        }
+        return message;
+    }
+
+    @PostMapping("/uploadCustomers") // //new annotation since 4.3
+    public String uploadCustomers(@RequestParam("file") MultipartFile file,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
+            return "redirect:uploadCustomers";
+        }
+        if (uploadProductsHelper.hasExcelFormat(file)) {
+            try {
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
+                Files.write(path, bytes);
+                uploadCustomersHelper.saveAll(file);
                 redirectAttributes.addFlashAttribute("message",
                         "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
 //                message = "Uploaded the file successfully: " + file.getOriginalFilename();
@@ -79,12 +109,17 @@ public class UploadController {
 //                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
             }
         }
-        return "redirect:/uploadProducts";
+        return "Customers uploaded";
     }
 
     @GetMapping("/uploadStatus")
     public String uploadStatus() {
         return "uploadStatus";
+    }
+
+    @GetMapping("/uploadCustomers")
+    public String uploadCustomers() {
+        return "uploadCustomers";
     }
 
     @GetMapping("/uploadProducts")

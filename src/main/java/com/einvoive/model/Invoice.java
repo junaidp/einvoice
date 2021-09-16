@@ -27,7 +27,16 @@ public class Invoice {
     private String notes;
     private String status;
     private String companyID;
+    private String customerID;
     private List<LineItem> lineItemList;
+
+    public String getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(String customerID) {
+        this.customerID = customerID;
+    }
 
     public List<LineItem> getLineItemList() {
         return lineItemList;

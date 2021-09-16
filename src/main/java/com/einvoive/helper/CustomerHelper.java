@@ -26,7 +26,7 @@ public class CustomerHelper {
 
     public String save(Customer customer){
         try {
-            customer.setCustomerId(getAvailableId());
+            customer.setId(getAvailableId());
             repository.save(customer);
         }catch(Exception ex){
             return "Customer Not saved"+ ex;
@@ -55,6 +55,20 @@ public class CustomerHelper {
         }
         return gson.toJson(customers);
     }
+
+  /*  public String getTopCustomers(){
+        List<Customer> customers = null;
+        try {
+            Query query = new Query();
+            query.limit(10)
+                    .addCriteria(Criteria.where("companyID")).ord;
+            System.out.println("QUERY");
+            customers = mongoOperation..find(query, Customer.class);
+        }catch(Exception ex){
+            System.out.println("Error in get Customers:"+ ex);
+        }
+        return gson.toJson(customers);
+    }*/
 
     public String getAvailableId() {
         Long total = repository.count();
