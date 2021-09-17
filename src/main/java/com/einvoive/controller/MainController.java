@@ -151,56 +151,49 @@ public class MainController {
 
     @PostMapping("/updateLocation")
     public String updateLocation(@RequestBody Location location) {
-
         return locationHelper.update(location);
     }
 
     //delete
-//    @GetMapping("/deleteCustomers")
-//    public String deleteCustomers(@RequestParam String userId) {
-//
-//        return customerHelper.deleteCustomers(userId);
-//    }
-//
-//    @GetMapping("/deleteInvoices")
-//    public String deleteInvoices(@RequestParam String userId) {
-//        return invoiceHelper.deleteInvoices(userId);
-//    }
-//
-//    @GetMapping("/deleteUser")
-//    public String singIn(@RequestBody User user){
-//        return userHelper.delete(user);
-//    }
-//
-//    @GetMapping("/deleteProducts")
-//    public String deleteProducts(@RequestParam String invoiceId) {
-//        return productHelper.deleteProducts(invoiceId);
-//    }
-//
-//    @GetMapping("/deleteProductsMain")
-//    public String deleteProductsMain(@RequestParam String userId) {
-//        return productMainHelper.deleteProducts(userId);
-//    }
-//
-//    @GetMapping("/deleteBankAccounts")
-//    public String deleteBankAccounts(@RequestParam String code) {
-//        return bankAccountHelper.deleteBankAccounts(code);
-//    }
-//
-//    @GetMapping("/deleteRevenues")
-//    public String deleteRevenues(@RequestParam String code) {
-//        return revenueHelper.deleteRevenues(code);
-//    }
-//
-//    @GetMapping("/deleteVats")
-//    public String deleteVats() {
-//        return vatHelper.deleteVats();
-//    }
-//
-//    @GetMapping("/deleteLocations")
-//    public String gdeleteLocations() {
-//        return locationHelper.deleteLocations();
-//    }
+    @GetMapping("/deleteCustomers")
+    public String deleteCustomers(@RequestParam String customerID) {
+        return customerHelper.deleteCustomers(customerID);
+    }
+
+    @GetMapping("/deleteInvoices")
+    public String deleteInvoices(@RequestParam String inoviceID) {
+        return invoiceHelper.deleteInvoice(inoviceID);
+    }
+
+    @GetMapping("/deleteUser")
+    public String deleteUser(@RequestBody String userID){
+        return userHelper.deleteUser(userID);
+    }
+
+    @GetMapping("/deleteProduct")
+    public String deleteProduct(@RequestParam String productID) {
+        return productMainHelper.deleteProduct(productID);
+    }
+
+    @GetMapping("/deleteLineItem")
+    public String deleteLineItem(@RequestParam String id) {
+        return lineItemHelper.deleteLineItem(id);
+    }
+
+    @GetMapping("/deleteAccount")
+    public String deleteAccount(@RequestParam String id) {
+        return accountsHelper.deleteAccount(id);
+    }
+
+    @GetMapping("/deleteVats")
+    public String deleteVats(@RequestParam String id) {
+        return vatHelper.deleteVAT(id);
+    }
+
+    @GetMapping("/deleteLocations")
+    public String gdeleteLocations(@RequestParam String id) {
+        return locationHelper.deleteLocation(id);
+    }
 
     //get
 

@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Accounts;
 import com.einvoive.model.Customer;
 import com.einvoive.model.Vat;
 import com.einvoive.repository.CustomerRepository;
@@ -42,6 +43,12 @@ public class VatHelper {
             System.out.println("Error in get vats:"+ ex);
         }
         return gson.toJson(vats);
+    }
+
+    public String deleteVAT(String id){
+        List<Vat> vats = mongoOperation.find(new Query(Criteria.where("id").is(id)), Vat.class);
+        repository.deleteAll(vats);
+        return "VAT deleted";
     }
 
     public String update(Vat vat) {

@@ -30,6 +30,8 @@ public class InvoiceHelper {
 
     Gson gson = new Gson();
 
+    private List<Invoice> invoicesList;
+
     public String save(Invoice invoice){
         try {
             repository.save(invoice);
@@ -60,6 +62,18 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
+    public String getInvoices(String invoiceID){
+        invoicesList = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("id").is(invoiceID));
+            invoicesList = mongoOperation.find(query, Invoice.class);
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoicesList);
+    }
+
     public String getTopInvoices(){
         List<Invoice> invoices = null;
         try {
@@ -74,6 +88,12 @@ public class InvoiceHelper {
             System.out.println("Error in get invoices:"+ ex);
         }
         return gson.toJson(invoices);
+    }
+
+    public String deleteInvoice(String invoiceID){
+        getAllInvoices(invoiceID);
+        repository.deleteAll(invoicesList);
+        return "Invoice deleted";
     }
 
     public String update(Invoice invoice) {

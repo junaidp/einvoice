@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Accounts;
+import com.einvoive.model.ProductMain;
 import com.einvoive.repository.AccountsRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class AccountsHelper {
             System.out.println("Error in get Bank Account:"+ ex);
         }
         return gson.toJson(accountsList);
+    }
+
+    public String deleteAccount(String id){
+        List<Accounts> accounts = mongoOperation.find(new Query(Criteria.where("id").is(id)), Accounts.class);
+        accountsRepository.deleteAll(accounts);
+        return "Account deleted";
     }
 
     public String update(Accounts accounts) {

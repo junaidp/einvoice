@@ -58,6 +58,12 @@ public class ProductMainHelper {
         return gson.toJson(products);
     }
 
+    public String deleteProduct(String productID){
+        List<ProductMain> products = mongoOperation.find(new Query(Criteria.where("id").is(productID)), ProductMain.class);
+        repository.deleteAll(products);
+        return "product deleted";
+    }
+
     public String update(ProductMain product) {
         try {
             repository.save(product);

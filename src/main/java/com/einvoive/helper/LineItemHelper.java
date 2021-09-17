@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.LineItem;
+import com.einvoive.model.ProductMain;
 import com.einvoive.repository.LineItemRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,12 @@ public class LineItemHelper {
         }catch(Exception ex){
             return "product Not updated "+ ex;
         }
+    }
+
+    public String deleteLineItem(String id){
+        List<LineItem> lineItemList = mongoOperation.find(new Query(Criteria.where("id").is(id)), LineItem.class);
+        repository.deleteAll(lineItemList);
+        return "Line Item deleted";
     }
 
     public List<LineItem> getLineItems() {

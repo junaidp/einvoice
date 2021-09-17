@@ -24,6 +24,8 @@ public class CustomerHelper {
 
     Gson gson = new Gson();
 
+    List<Customer> listCustomers = null;
+
     public String save(Customer customer){
         try {
             customer.setId(getAvailableId());
@@ -44,7 +46,7 @@ public class CustomerHelper {
     }
 
     public String getAllCustomers(String comapnyID){
-        List<Customer> customers = null;
+        List<Customer>customers = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(comapnyID));
@@ -54,6 +56,19 @@ public class CustomerHelper {
             System.out.println("Error in get Customers:"+ ex);
         }
         return gson.toJson(customers);
+    }
+
+    public String getCustomer(String customerID){
+        listCustomers = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("id").is(customerID));
+            System.out.println("QUERY");
+            listCustomers = mongoOperation.find(query, Customer.class);
+        }catch(Exception ex){
+            System.out.println("Error in get Customers:"+ ex);
+        }
+        return gson.toJson(listCustomers);
     }
 
   /*  public String getTopCustomers(){
@@ -76,7 +91,15 @@ public class CustomerHelper {
         return count+1+"";
 
     }
+
+    public String deleteCustomers(String customerID){
+        getCustomer(customerID);
+        repository.deleteAll(listCustomers);
+        return "Customer deleted";
+    }
+
 }
+
 
 
    /* Query query = new Query();

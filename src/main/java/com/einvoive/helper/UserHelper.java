@@ -27,6 +27,8 @@ public class UserHelper {
 
     Gson gson = new Gson();
 
+    private List<User> users;
+
     public String saveUser(User userEntity){
         userEntity.setUserId(getAvaiablaeId());
         userRepository.save(userEntity);
@@ -50,6 +52,25 @@ public class UserHelper {
             System.out.println("Error in getting Users:"+ ex);
         }
         return gson.toJson(userList);
+    }
+
+    public String getUser(String userID){
+        users = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("id").is(userID));
+            System.out.println("QUERY");
+            users = mongoOperation.find(query, User.class);
+        }catch(Exception ex){
+            System.out.println("Error in getting Users:"+ ex);
+        }
+        return gson.toJson(users);
+    }
+
+    public String deleteUser(String userID){
+        getUser(userID);
+        userRepository.deleteAll(users);
+        return "User deleted";
     }
 
     public String getAvaiablaeId() {

@@ -7,6 +7,7 @@ import com.einvoive.repository.VatRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
@@ -33,12 +34,17 @@ public class LocationHelper {
 
     public String update(Location location){
         try {
-
             repository.save(location);
         }catch(Exception ex){
             return "location Not updated"+ ex;
         }
         return "location update";
+    }
+
+    public String deleteLocation(String id){
+        List<Location> locationList = mongoOperation.find(new Query(Criteria.where("id").is(id)), Location.class);
+        repository.deleteAll(locationList);
+        return "Location deleted";
     }
 
     public String getAllLocations(){

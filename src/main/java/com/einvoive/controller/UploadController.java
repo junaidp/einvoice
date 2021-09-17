@@ -27,9 +27,9 @@ public class UploadController {
     UploadCustomersHelper uploadCustomersHelper;
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = "C://help//";
-    private static String UPLOAD_Product_FOLDER = "C://products//";
-    private String UPLOAD_Customer_FOLDER = "C://customers//";
+    private static String UPLOADED_FOLDER = "D://Envoice//help//";
+    private static String UPLOAD_Product_FOLDER = "D://Envoice//products//";
+    private static String UPLOAD_Customer_FOLDER = "D://Envoice//customers//";
 
     @GetMapping("/")
     public String index() {
