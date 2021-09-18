@@ -91,8 +91,8 @@ public class InvoiceHelper {
     }
 
     public String deleteInvoice(String invoiceID){
-        getAllInvoices(invoiceID);
-        repository.deleteAll(invoicesList);
+        List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);
+        repository.deleteAll(invoices);
         return "Invoice deleted";
     }
 

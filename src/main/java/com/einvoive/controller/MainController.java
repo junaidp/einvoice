@@ -166,8 +166,8 @@ public class MainController {
     }
 
     @GetMapping("/deleteUser")
-    public String deleteUser(@RequestBody String userID){
-        return userHelper.deleteUser(userID);
+    public String deleteUser(@RequestParam String id){
+        return userHelper.deleteUser(id);
     }
 
     @GetMapping("/deleteProduct")

@@ -32,12 +32,12 @@ public class UserHelper {
     public String saveUser(User userEntity){
         userEntity.setUserId(getAvaiablaeId());
         userRepository.save(userEntity);
-        for (String rollName : userEntity.getListRoles()){
-            Rolls rolls = new Rolls();
-            rolls.setUserId(userEntity.getUserId());
-            rolls.setRollName(rollName);
-            rollsHelper.saveRolls(rolls);
-        }
+//        for (String rollName : userEntity.getListRoles()){
+//            Rolls rolls = new Rolls();
+//            rolls.setUserId(userEntity.getUserId());
+//            rolls.setRollName(rollName);
+//            rollsHelper.saveRolls(rolls);
+//        }
         return "saved";
     }
 
@@ -85,17 +85,17 @@ public class UserHelper {
         Query query = new Query();
         query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));
         User savedUser = mongoOperation.findOne(query, User.class);
-        rollsHelper.getRolls(savedUser.getUserId());
-        for(Rolls roll:rollsHelper.getRollsArrayList()){
-         savedUser.getListRoles().add(roll.getRollName());
-        }
+//        rollsHelper.getRolls(savedUser.getUserId());
+//        for(Rolls roll:rollsHelper.getRollsArrayList()){
+//         savedUser.getListRoles().add(roll.getRollName());
+//        }
         return gson.toJson(savedUser);
     }
 
     public String updateUser(User userEntity) {
         try {
             userRepository.insert(userEntity);
-            rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
+//            rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
         }catch(Exception ex){
             return "Use Not updated"+ ex;
         }

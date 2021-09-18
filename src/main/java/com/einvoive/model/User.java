@@ -17,17 +17,44 @@ import java.util.List;
         private String location;
         private String CellNo;
         private String companyID;
-        private List<String> listRoles;
+        private boolean approve;
+        private boolean productSetup;
+        private boolean invoiceRaise;
+        private boolean paymentReceipt;
 
-        public List<String> getListRoles() {
-        return listRoles;
+    public boolean isApprove() {
+        return approve;
     }
 
-        public void setListRoles(List<String> listRoles) {
-        this.listRoles = listRoles;
+    public void setApprove(boolean approve) {
+        this.approve = approve;
     }
 
-        public String getCompanyID() {
+    public boolean isProductSetup() {
+        return productSetup;
+    }
+
+    public void setProductSetup(boolean productSetup) {
+        this.productSetup = productSetup;
+    }
+
+    public boolean isInvoiceRaise() {
+        return invoiceRaise;
+    }
+
+    public void setInvoiceRaise(boolean invoiceRaise) {
+        this.invoiceRaise = invoiceRaise;
+    }
+
+    public boolean isPaymentReceipt() {
+        return paymentReceipt;
+    }
+
+    public void setPaymentReceipt(boolean paymentReceipt) {
+        this.paymentReceipt = paymentReceipt;
+    }
+
+    public String getCompanyID() {
             return companyID;
         }
 
