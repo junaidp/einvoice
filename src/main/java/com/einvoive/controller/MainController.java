@@ -218,8 +218,8 @@ public class MainController {
         return customerHelper.getAllCustomers(companyID);
     }
 
-    @GetMapping("/getInvoices")
-    public String getInvoices(@RequestParam String companyID) {
+    @GetMapping("/getAllInvoices")
+    public String getAllInvoices(@RequestParam String companyID) {
         return invoiceHelper.getAllInvoices(companyID);
     }
 

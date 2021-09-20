@@ -34,8 +34,10 @@ public class InvoiceHelper {
 
     public String save(Invoice invoice){
         try {
+            invoice.setId(getAvaiablaeId());
             repository.save(invoice);
             for(LineItem lineItem : invoice.getLineItemList()){
+                lineItem.setInvoiceId(invoice.getId());
                 lineItemHelper.save(lineItem);
             }
 //            Invoice savedInvoice = repository.findInvoiceByName(invoice.getInvoiceNumber());
@@ -94,6 +96,12 @@ public class InvoiceHelper {
         List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);
         repository.deleteAll(invoices);
         return "Invoice deleted";
+    }
+
+    public String getAvaiablaeId() {
+        Long total = repository.count();
+        int count = total.intValue();
+        return count+1+"";
     }
 
     public String update(Invoice invoice) {

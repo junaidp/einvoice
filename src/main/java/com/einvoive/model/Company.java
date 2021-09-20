@@ -25,6 +25,15 @@ public class Company {
     private String city;
     private String postalCode;
     private String userType;
+    private String logo;
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
 
     public String getFirstName() {
         return firstName;

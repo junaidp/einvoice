@@ -77,7 +77,6 @@ public class UserHelper {
         Long total = userRepository.count();
         int count = total.intValue();
         return count+1+"";
-
     }
 
     public String singIn(User user) {
@@ -94,7 +93,7 @@ public class UserHelper {
 
     public String updateUser(User userEntity) {
         try {
-            userRepository.insert(userEntity);
+            userRepository.save(userEntity);
 //            rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
         }catch(Exception ex){
             return "Use Not updated"+ ex;
