@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.Accounts;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.AccountsRepository;
+import com.einvoive.repository.ProductMainRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -47,7 +48,14 @@ public class AccountsHelper {
 
     public String deleteAccount(String id){
         List<Accounts> accounts = mongoOperation.find(new Query(Criteria.where("id").is(id)), Accounts.class);
-        accountsRepository.deleteAll(accounts);
+        for(Accounts account : accounts) {
+            List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("assignedChartofAccounts").is(account.getName())), ProductMain.class);
+            if (productMainList.isEmpty())
+                accountsRepository.delete(account);
+        else
+            return account.getName() + " Exists in Products";
+        }
+//        accountsRepository.deleteAll(accounts);
         return "Account deleted";
     }
 

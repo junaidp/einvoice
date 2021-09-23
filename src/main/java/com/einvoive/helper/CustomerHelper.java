@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Company;
 import com.einvoive.model.Customer;
 import com.einvoive.model.User;
 import com.einvoive.repository.CustomerRepository;
@@ -26,14 +27,31 @@ public class CustomerHelper {
 
     List<Customer> listCustomers = null;
 
-    public String save(Customer customer){
-        try {
-            customer.setId(getAvailableId());
+    public String save(Customer customer) {
+        String msg = validationBeforeSave(customer);
+        if(msg == null || msg.isEmpty()) {
             repository.save(customer);
-        }catch(Exception ex){
-            return "Customer Not saved"+ ex;
+            return "Customer Saved";
         }
-        return "customer saved";
+        return msg+"--Already Exists";
+    }
+
+    private String validationBeforeSave(Customer customer) {
+        String msg = null;
+        String msg1 = "";
+        String msg2 = "";
+        String msg3 = "";
+        List<Customer> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(customer.getPhone())), Customer.class);
+        List<Customer> phoneMainList = mongoOperation.find(new Query(Criteria.where("phoneMain").is(customer.getPhoneMain())), Customer.class);
+        List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())), Customer.class);
+        if(phoneList.size() > 0)
+            msg1 = "--Customer Phone No";
+        if(emailList.size() > 0)
+            msg2 = "--Customer Email";
+        if(phoneMainList.size() > 0)
+            msg3 = "--Customer Phone Main No";
+        msg = msg1 + msg2 + msg3;
+        return msg;
     }
 
     public String update(Customer customer){

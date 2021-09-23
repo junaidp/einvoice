@@ -13,6 +13,8 @@ public class Customer {
     private String lastName;
     private String email;
     private String phone;
+    private String phoneMain;
+    private String relatedParty;
     private String accountNumber;
     private String website;
     private String notes;
@@ -23,6 +25,7 @@ public class Customer {
     private String billingProvince;
     private String billingCity;
     private String billingPostal;
+    private String shippingName;
     private String shippingAddress1;
     private String shippingAddress2;
     private String shippingCountry;
@@ -31,6 +34,31 @@ public class Customer {
     private String shippingPostal;
     private String deliveryInstructions;
 //    private String userId;
+
+    public String isRelatedParty() {
+        return relatedParty;
+    }
+
+    public void setRelatedParty(String relatedParty) {
+        this.relatedParty = relatedParty;
+    }
+
+    public String getShippingName() {
+        return shippingName;
+    }
+
+    public void setShippingName(String shippingName) {
+        this.shippingName = shippingName;
+    }
+
+    public String getPhoneMain() {
+        return phoneMain;
+    }
+
+    public void setPhoneMain(String phoneMain) {
+        this.phoneMain = phoneMain;
+    }
+
     private String companyID;
 
     public String getCompanyID() {

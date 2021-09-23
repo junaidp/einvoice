@@ -15,12 +15,20 @@ import java.util.List;
         private String email;
         private String password;
         private String location;
-        private String CellNo;
         private String companyID;
+        private String phone;
         private boolean approve;
         private boolean productSetup;
         private boolean invoiceRaise;
         private boolean paymentReceipt;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public boolean isApprove() {
         return approve;
@@ -68,14 +76,6 @@ import java.util.List;
 
         public void setLocation(String location) {
             this.location = location;
-        }
-
-        public String getCellNo() {
-            return CellNo;
-        }
-
-        public void setCellNo(String cellNo) {
-            CellNo = cellNo;
         }
 
         public String getUserId() {

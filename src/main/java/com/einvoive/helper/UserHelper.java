@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Customer;
 import com.einvoive.model.Rolls;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
@@ -30,16 +31,33 @@ public class UserHelper {
     private List<User> users;
 
     public String saveUser(User userEntity){
-        userEntity.setUserId(getAvaiablaeId());
-        userRepository.save(userEntity);
-//        for (String rollName : userEntity.getListRoles()){
-//            Rolls rolls = new Rolls();
-//            rolls.setUserId(userEntity.getUserId());
-//            rolls.setRollName(rollName);
-//            rollsHelper.saveRolls(rolls);
-//        }
-        return "saved";
+        String msg = validationBeforeSave(userEntity);
+        if(msg == null || msg.isEmpty()) {
+//            userEntity.setUserId(getAvaiablaeId());
+            userRepository.save(userEntity);
+            return "User Saved";
+        }
+        return msg+"--Already Exists";
     }
+
+    private String validationBeforeSave(User user) {
+        String msg = null;
+        String msg1 = "";
+        String msg2 = "";
+        String msg3 = "";
+        List<User> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(user.getPhone())), User.class);
+        List<User> userId = mongoOperation.find(new Query(Criteria.where("userId").is(user.getUserId())), User.class);
+        List<User> emailList = mongoOperation.find(new Query(Criteria.where("email").is(user.getEmail())), User.class);
+        if(phoneList.size() > 0)
+            msg1 = "--User Phone No";
+        if(emailList.size() > 0)
+            msg2 = "--User Email";
+        if(userId.size() > 0)
+            msg3 = "--User ID";
+        msg = msg1 + msg2 + msg3;
+        return msg;
+    }
+
 
     public String getAllUsers(String companyID){
         List<User> userList = null;
@@ -79,7 +97,7 @@ public class UserHelper {
         return count+1+"";
     }
 
-    public String singIn(User user) {
+    public String signInUser(User user) {
         System.out.println(user.getEmail() + "," + user.getPassword());
         Query query = new Query();
         query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));

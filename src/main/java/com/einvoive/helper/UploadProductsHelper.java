@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class UploadProductsHelper {
     @Autowired
-    ProductMainRepository repository;
+    ProductMainHelper productMainHelper;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "Id", "Title", "Description", "Published" };
     static String SHEET = "Sheet1";
@@ -119,7 +119,9 @@ public class UploadProductsHelper {
     public void saveAll(MultipartFile file) {
         try {
             List<ProductMain> productMainList = excelToProductList(file.getInputStream());
-            repository.saveAll(productMainList);
+            for (ProductMain productMain : productMainList ) {
+                productMainHelper.save(productMain);
+            }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }

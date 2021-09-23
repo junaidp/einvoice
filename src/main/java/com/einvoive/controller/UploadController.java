@@ -1,10 +1,15 @@
 package com.einvoive.controller;
 
 import com.einvoive.helper.CompanyHelper;
+import com.einvoive.helper.LogoHelper;
 import com.einvoive.helper.UploadCustomersHelper;
 import com.einvoive.helper.UploadProductsHelper;
+import com.einvoive.model.Logo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +34,9 @@ public class UploadController {
 
     @Autowired
     CompanyHelper companyHelper;
+
+    @Autowired
+    LogoHelper logoHelper;
 
     //Save the uploaded file to this folder
     private static String UPLOADED_FOLDER = "D://Envoice//help//";
@@ -67,30 +75,30 @@ public class UploadController {
         return "redirect:/uploadStatus";
     }
 
-    @PostMapping("/uploadLogo") // //new annotation since 4.3
-    public String uploadLogo(@RequestParam("file") MultipartFile file, String companyID) {
-
-        if (file.isEmpty()) {
-//            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            return "uploadProducts file is empty";
-        }
-        String message = null;
-//        if (uploadProductsHelper.hasExcelFormat(file)) {
-            try {
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(UPLOAD_Logos_FOLDER + file.getOriginalFilename());
-                Files.write(path, bytes);
-                companyHelper.uploadCompanyLogo(UPLOAD_Logos_FOLDER + file.getOriginalFilename(), companyID);
-//                redirectAttributes.addFlashAttribute("message",
-//                        "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
-                message = "Uploaded the file successfully: " + file.getOriginalFilename();
-            } catch (Exception e) {
-                e.printStackTrace();
-                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
-            }
+//    @PostMapping("/uploadLogo") // //new annotation since 4.3
+//    public String uploadLogo(@RequestParam("file") MultipartFile file, String companyID) {
+//
+//        if (file.isEmpty()) {
+////            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
+//            return "uploadProducts file is empty";
 //        }
-        return message;
-    }
+//        String message = null;
+////        if (uploadProductsHelper.hasExcelFormat(file)) {
+//            try {
+//                byte[] bytes = file.getBytes();
+//                Path path = Paths.get(UPLOAD_Logos_FOLDER + file.getOriginalFilename());
+//                Files.write(path, bytes);
+//                companyHelper.uploadCompanyLogo(UPLOAD_Logos_FOLDER + file.getOriginalFilename(), companyID);
+////                redirectAttributes.addFlashAttribute("message",
+////                        "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
+//                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
+//            }
+////        }
+//        return message;
+//    }
 
     @PostMapping("/uploadProducts") // //new annotation since 4.3
     public String uploadProducts(@RequestParam("file") MultipartFile file) {
@@ -140,6 +148,20 @@ public class UploadController {
             }
         }
         return "Customers uploaded";
+    }
+
+    @PostMapping("/uploadLogo")
+    public ResponseEntity<?> uploadLogo(@RequestParam("file")MultipartFile file) throws IOException {
+        return new ResponseEntity<>(logoHelper.uploadLogo(file), HttpStatus.OK);
+    }
+
+    @GetMapping("/getLogo/{id}")
+    public ResponseEntity<ByteArrayResource> getLogo(@PathVariable String id) throws IOException {
+        Logo logo = logoHelper.getLogo(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(logo.getFileType() ))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + logo.getFilename() + "\"")
+                .body(new ByteArrayResource(logo.getFile()));
     }
 
     @GetMapping("/uploadStatus")

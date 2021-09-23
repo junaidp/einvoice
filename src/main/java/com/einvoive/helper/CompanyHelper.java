@@ -24,19 +24,29 @@ public class CompanyHelper {
     Gson gson = new Gson();
 
     public String saveCompany(Company company){
-        if(validationBeforeSave(company) != null) {
+        String msg = validationBeforeSave(company);
+        if(msg == null || msg.isEmpty()) {
             companyRepository.save(company);
+            return "Company Saved";
         }
-        return "saved";
+        return msg+"--Already Exists";
     }
 
     private String validationBeforeSave(Company company) {
         String msg = null;
+        String msg1 = "";
+        String msg2 = "";
+        String msg3 = "";
         List<Company> companyIDList = mongoOperation.find(new Query(Criteria.where("companyID").is(company.getCompanyID())), Company.class);
         List<Company> companyNamesList = mongoOperation.find(new Query(Criteria.where("companyName").is(company.getCompanyName())), Company.class);
         List<Company> companyEmailList = mongoOperation.find(new Query(Criteria.where("email").is(company.getEmail())), Company.class);
-        if(companyList.size() > 0)
-            msg = true;
+        if(companyIDList.size() > 0)
+            msg1 = "--Company ID";
+        if(companyEmailList.size() > 0)
+            msg2 = "--Company Email";
+        if(companyNamesList.size() > 0)
+            msg3 = "--Company Name";
+        msg = msg1 + msg2 + msg3;
         return msg;
     }
 

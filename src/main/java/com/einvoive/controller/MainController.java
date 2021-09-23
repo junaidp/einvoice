@@ -2,7 +2,6 @@ package com.einvoive.controller;
 
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
-import com.einvoive.repository.TranslationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +12,9 @@ public class MainController {
 
     @Autowired
     UserHelper userHelper;
+
+    @Autowired
+    LoginHelper loginHelper;
 
     @Autowired
     PaymentCardHelper paymentCardHelper;
@@ -223,12 +225,15 @@ public class MainController {
         return invoiceHelper.getAllInvoices(companyID);
     }
 
-    @GetMapping("/signIn")
-    public String singIn(@RequestBody User user){
-        return userHelper.singIn(user);
+    @PostMapping("/signIn")
+    public String signIn(@RequestBody Login login){ return loginHelper.signIn(login); }
+
+    @PostMapping("/signInUser")
+    public String signInUser(@RequestBody User user){
+        return userHelper.signInUser(user);
     }
 
-    @GetMapping("/signInCompany")
+    @PostMapping("/signInCompany")
     public String signInCompany(@RequestBody Company company){
         return companyHelper.singIn(company);
     }

@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Company;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
 import com.google.gson.Gson;
@@ -23,13 +24,18 @@ public class ProductMainHelper {
     Gson gson = new Gson();
 
     public String save(ProductMain product){
-        try {
-            repository.save(product);
-            return "product saved";
-        }catch(Exception ex){
-            return "product Not saved"+ ex;
+        List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("productName").is(product.getProductName())), ProductMain.class);
+        if(productMainList.size() > 0){
+            return "Product Name Already Exists";
         }
-
+        else {
+            try {
+                repository.save(product);
+                return "product saved";
+            } catch (Exception ex) {
+                return "product Not saved" + ex;
+            }
+        }
     }
 
     public String getTopSaledProducts(String companyId){
