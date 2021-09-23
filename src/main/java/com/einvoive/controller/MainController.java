@@ -228,15 +228,15 @@ public class MainController {
     @PostMapping("/signIn")
     public String signIn(@RequestBody Login login){ return loginHelper.signIn(login); }
 
-    @PostMapping("/signInUser")
-    public String signInUser(@RequestBody User user){
-        return userHelper.signInUser(user);
-    }
-
-    @PostMapping("/signInCompany")
-    public String signInCompany(@RequestBody Company company){
-        return companyHelper.singIn(company);
-    }
+//    @PostMapping("/signInUser")
+//    public String signInUser(@RequestBody User user){
+//        return userHelper.signInUser(user);
+//    }
+//
+//    @PostMapping("/signInCompany")
+//    public String signInCompany(@RequestBody Company company){
+//        return companyHelper.singIn(company);
+//    }
 
     @GetMapping("/getProducts")
     public String getProducts(@RequestParam String invoiceId) {
