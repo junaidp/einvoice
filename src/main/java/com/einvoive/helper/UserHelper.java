@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Customer;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Rolls;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
@@ -32,12 +33,28 @@ public class UserHelper {
 
     public String saveUser(User userEntity){
         String msg = validationBeforeSave(userEntity);
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         if(msg == null || msg.isEmpty()) {
 //            userEntity.setUserId(getAvaiablaeId());
-            userRepository.save(userEntity);
-            return "User Saved";
+            try {
+                userRepository.save(userEntity);
+                return "User Saved";
+            }
+            catch (Exception ex){
+                error.setErrorStatus("error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
-        return msg+"--Already Exists";
+        else{
+            error.setErrorStatus("Error");
+            error.setError(msg+"--Already Exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
+//        return msg+"--Already Exists";
     }
 
     private String validationBeforeSave(User user) {
