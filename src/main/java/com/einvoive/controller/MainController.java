@@ -215,14 +215,33 @@ public class MainController {
         return paymentCardHelper.getPaymentCards(userId);
     }
 
+    @GetMapping("/getCompany")
+    public String getCompany(@RequestParam String companyID) {
+        return companyHelper.getCompany(companyID);
+    }
+
     @GetMapping("/getAllCustomers")
     public String getAllCustomers(@RequestParam String companyID) {
         return customerHelper.getAllCustomers(companyID);
     }
 
+    @GetMapping("/getCustomer")
+    public String getCustomer(@RequestParam String customerID) {
+        return customerHelper.getCustomer(customerID);}
+
     @GetMapping("/getAllInvoices")
     public String getAllInvoices(@RequestParam String companyID) {
         return invoiceHelper.getAllInvoices(companyID);
+    }
+
+    @GetMapping("/getInvoiceStatus")
+    public String getInvoiceStatus(@RequestParam String id) {
+        return invoiceHelper.getInvoiceStatus(id);
+    }
+
+    @PostMapping("/setInvoiceStatus")
+    public String setInvoiceStatus(@RequestBody String id, String status) {
+        return invoiceHelper.setInvoiceStatus(id, status);
     }
 
     @PostMapping("/signIn")

@@ -112,4 +112,26 @@ public class InvoiceHelper {
             return "Invoice Not Updated"+ ex;
         }
     }
+
+    public String getInvoiceStatus(String id) {
+        Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
+        return invoice.getStatus();
+    }
+
+    public String setInvoiceStatus(String id, String status) {
+        try {
+            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
+            if(invoice != null){
+                invoice.setStatus(status);
+                repository.save(invoice);
+                return "Invoice Status Updated";
+            }
+            else
+                return "No Invoice against this ID";
+        }
+        catch (Exception ex){
+            return ex.getMessage();
+        }
+    }
+
 }

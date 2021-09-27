@@ -28,7 +28,16 @@ public class Invoice {
     private String status;
     private String companyID;
     private String customerID;
+    private String totalExcludingVAT;
     private List<LineItem> lineItemList;
+
+    public String getTotalExcludingVAT() {
+        return totalExcludingVAT;
+    }
+
+    public void setTotalExcludingVAT(String totalExcludingVAT) {
+        this.totalExcludingVAT = totalExcludingVAT;
+    }
 
     public String getCustomerID() {
         return customerID;

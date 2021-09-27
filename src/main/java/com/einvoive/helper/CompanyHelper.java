@@ -83,4 +83,14 @@ public class CompanyHelper {
         return msg;
     }
 
+    public String getCompany(String companyID) {
+        try{
+            Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)),Company.class);
+            return gson.toJson(company);
+        }
+        catch (Exception ex){
+            System.out.println("Error in getting Company:"+ ex);
+            return gson.toJson(ex.getMessage());
+        }
+    }
 }
