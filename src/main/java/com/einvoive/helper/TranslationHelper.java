@@ -1,5 +1,7 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Rolls;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.TranslationRepository;
 import com.google.gson.Gson;
@@ -23,9 +25,20 @@ public class TranslationHelper {
     Gson gson = new Gson();
 
     public String saveTranslation(Translation translation){
-        translation.setId(getAvaiablaeId());
-        translationRepository.save(translation);
-        return "Translation saved";
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Translation translation1 = mongoOperation.findOne(new Query(Criteria.where("english").is(translation.getEnglish())), Translation.class);
+        if(translation1 != null){
+            translation.setId(getAvaiablaeId());
+            translationRepository.save(translation);
+            return "Translation saved";
+        }
+        else{
+            error.setErrorStatus("error");
+            error.setError("English text already saved");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     public String getAvaiablaeId() {

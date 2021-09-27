@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Company;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
 import com.google.gson.Gson;
@@ -24,16 +25,24 @@ public class ProductMainHelper {
     Gson gson = new Gson();
 
     public String save(ProductMain product){
-        List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("productName").is(product.getProductName())), ProductMain.class);
-        if(productMainList.size() > 0){
-            return "Product Name Already Exists";
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(product.getProductName())), ProductMain.class);
+        if(productMain != null){
+            error.setErrorStatus("Error");
+            error.setError("Product Name Already Exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
         else {
             try {
                 repository.save(product);
                 return "product saved";
             } catch (Exception ex) {
-                return "product Not saved" + ex;
+                error.setErrorStatus("error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
             }
         }
     }

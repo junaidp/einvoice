@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Company;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Location;
 import com.einvoive.repository.CompanyRepository;
 import com.google.gson.Gson;
@@ -25,11 +26,25 @@ public class CompanyHelper {
 
     public String saveCompany(Company company){
         String msg = validationBeforeSave(company);
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         if(msg == null || msg.isEmpty()) {
-            companyRepository.save(company);
-            return "Company Saved";
+            try {
+                companyRepository.save(company);
+                return "Company Saved";
+            } catch (Exception ex) {
+                error.setErrorStatus("error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
-        return msg+"--Already Exists";
+        else{
+            error.setErrorStatus("Error");
+            error.setError(msg+"--Already Exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
+         }
     }
 
     private String validationBeforeSave(Company company) {

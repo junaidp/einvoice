@@ -1,8 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Accounts;
-import com.einvoive.model.Customer;
-import com.einvoive.model.Vat;
+import com.einvoive.model.*;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.repository.VatRepository;
 import com.google.gson.Gson;
@@ -24,13 +22,19 @@ public class VatHelper {
     Gson gson = new Gson();
 
     public String save(Vat vat){
-        try {
-
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Vat vAT = mongoOperation.findOne(new Query(Criteria.where("vatRates").is(vat.getVatRates())), Vat.class);
+        if(vAT != null){
             repository.save(vat);
-        }catch(Exception ex){
-            return "vat Not saved"+ ex;
+            return "VAT saved";
         }
-        return "vat saved";
+        else{
+            error.setErrorStatus("error");
+            error.setError("VAT already saved");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     public String getAllVats(String companyID){

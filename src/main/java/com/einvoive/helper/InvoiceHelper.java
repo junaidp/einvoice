@@ -40,8 +40,6 @@ public class InvoiceHelper {
                 lineItem.setInvoiceId(invoice.getId());
                 lineItemHelper.save(lineItem);
             }
-//            Invoice savedInvoice = repository.findInvoiceByName(invoice.getInvoiceNumber());
-//            return savedInvoice.getId();
             return "Invoice saved";
         }catch(Exception ex){
             return "Invoice Not saved"+ ex;

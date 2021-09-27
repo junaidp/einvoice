@@ -278,8 +278,8 @@ public class MainController {
     }
 
     @GetMapping("/getAllLocations")
-    public String getAllLocations() {
-        return locationHelper.getAllLocations();
+    public String getAllLocations(@RequestParam String companyID) {
+        return locationHelper.getAllLocations(companyID);
     }
 
     @GetMapping("/getTranslation")

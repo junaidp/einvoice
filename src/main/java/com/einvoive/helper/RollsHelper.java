@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Rolls;
 import com.einvoive.model.User;
 import com.einvoive.repository.RollsRepository;
@@ -31,9 +32,20 @@ public class RollsHelper {
     List<Rolls> rollsArrayList;
 
     public String saveRolls(Rolls rolls){
-        rolls.setId(getAvaiableId());
-        rollsRepository.save(rolls);
-        return "saved";
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Rolls roll = mongoOperation.findOne(new Query(Criteria.where("rollName").is(rolls.getRollName())), Rolls.class);
+        if(roll != null){
+            rolls.setId(getAvaiableId());
+            rollsRepository.save(rolls);
+            return "saved";
+        }
+        else{
+            error.setErrorStatus("error");
+            error.setError("Roll Name already saved");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     public String getAvaiableId() {

@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Location;
 import com.einvoive.model.Vat;
 import com.einvoive.repository.LocationRepository;
@@ -23,14 +24,22 @@ public class LocationHelper {
     Gson gson = new Gson();
 
     public String save(Location location){
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         try {
-
             repository.save(location);
-        }catch(Exception ex){
-            return "location Not saved"+ ex;
+            return "Location Saved";
+        }catch (Exception ex) {
+            error.setErrorStatus("error");
+            error.setError(ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
-        return "location saved";
-    }
+//        error.setErrorStatus("Error");
+//        error.setError(msg+"--Already Exists");
+//        jsonError = gson.toJson(error);
+//        return jsonError;
+  }
 
     public String update(Location location){
         try {
@@ -47,11 +56,10 @@ public class LocationHelper {
         return "Location deleted";
     }
 
-    public String getAllLocations(){
+    public String getAllLocations(String companyId){
         List<Location> locations = null;
         try {
-            Query query = new Query();
-            locations = mongoOperation.find(query, Location.class);
+            locations = mongoOperation.find(new Query(Criteria.where("companyID").is(companyId)), Location.class);
         }catch(Exception ex){
             System.out.println("Error in get locations:"+ ex);
         }
