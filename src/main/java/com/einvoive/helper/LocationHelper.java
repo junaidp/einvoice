@@ -23,23 +23,27 @@ public class LocationHelper {
 
     Gson gson = new Gson();
 
-    public String save(Location location){
-        ErrorCustom error = new ErrorCustom();
-        String jsonError;
-        try {
-            repository.save(location);
-            return "Location Saved";
-        }catch (Exception ex) {
-            error.setErrorStatus("error");
-            error.setError(ex.getMessage());
-            jsonError = gson.toJson(error);
-            return jsonError;
+    public String save(Location location) {
+            ErrorCustom error = new ErrorCustom();
+            String jsonError;
+            Location loc = mongoOperation.findOne(new Query(Criteria.where("name").is(location.getLocationName())), Location.class);
+            if (loc != null) {
+                try {
+                    repository.save(location);
+                    return "Location saved";
+                } catch (Exception ex) {
+                    error.setErrorStatus("error");
+                    error.setError(ex.getMessage());
+                    jsonError = gson.toJson(error);
+                    return jsonError;
+                }
+            } else {
+                error.setErrorStatus("Error");
+                error.setError("Location Name Already Exists");
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
-//        error.setErrorStatus("Error");
-//        error.setError(msg+"--Already Exists");
-//        jsonError = gson.toJson(error);
-//        return jsonError;
-  }
 
     public String update(Location location){
         try {

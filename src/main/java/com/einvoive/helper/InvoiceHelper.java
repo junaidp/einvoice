@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Customer;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Invoice;
 import com.einvoive.model.LineItem;
 import com.einvoive.repository.CustomerRepository;
@@ -33,6 +34,8 @@ public class InvoiceHelper {
     private List<Invoice> invoicesList;
 
     public String save(Invoice invoice){
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         try {
             invoice.setId(getAvaiablaeId());
             repository.save(invoice);
@@ -42,7 +45,10 @@ public class InvoiceHelper {
             }
             return "Invoice saved";
         }catch(Exception ex){
-            return "Invoice Not saved"+ ex;
+            error.setErrorStatus("error");
+            error.setError(ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
     }
 

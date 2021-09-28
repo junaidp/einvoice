@@ -1,6 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.Accounts;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.AccountsRepository;
 import com.einvoive.repository.ProductMainRepository;
@@ -25,14 +26,28 @@ public class AccountsHelper {
     Gson gson = new Gson();
 
     public String save(Accounts accounts){
-        try {
-            accountsRepository.save(accounts);
-            return "BankAccount saved";
-        }catch(Exception ex){
-            return "BankAccount Not saved"+ ex;
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Accounts accounts1 = mongoOperation.findOne(new Query(Criteria.where("name").is(accounts.getName())), Accounts.class);
+        if(accounts1 != null){
+            try {
+                accountsRepository.save(accounts);
+                return "BankAccount saved";
+            }catch(Exception ex){
+                error.setErrorStatus("error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
-
+        else{
+            error.setErrorStatus("Error");
+            error.setError("Name Already Exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
+
     public String getAccounts(String companyID){
         List<Accounts> accountsList = null;
         try {
