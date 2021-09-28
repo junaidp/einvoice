@@ -27,7 +27,7 @@ public class LocationHelper {
             ErrorCustom error = new ErrorCustom();
             String jsonError;
             Location loc = mongoOperation.findOne(new Query(Criteria.where("name").is(location.getLocationName())), Location.class);
-            if (loc != null) {
+            if (loc == null) {
                 try {
                     repository.save(location);
                     return "Location saved";

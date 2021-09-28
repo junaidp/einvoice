@@ -25,7 +25,7 @@ public class VatHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         Vat vAT = mongoOperation.findOne(new Query(Criteria.where("vatRates").is(vat.getVatRates())), Vat.class);
-        if(vAT != null){
+        if(vAT == null){
             repository.save(vat);
             return "VAT saved";
         }

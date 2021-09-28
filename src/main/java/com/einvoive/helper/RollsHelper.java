@@ -35,7 +35,7 @@ public class RollsHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         Rolls roll = mongoOperation.findOne(new Query(Criteria.where("rollName").is(rolls.getRollName())), Rolls.class);
-        if(roll != null){
+        if(roll == null){
             rolls.setId(getAvaiableId());
             rollsRepository.save(rolls);
             return "saved";

@@ -29,7 +29,7 @@ public class AccountsHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         Accounts accounts1 = mongoOperation.findOne(new Query(Criteria.where("name").is(accounts.getName())), Accounts.class);
-        if(accounts1 != null){
+        if(accounts1 == null){
             try {
                 accountsRepository.save(accounts);
                 return "BankAccount saved";
