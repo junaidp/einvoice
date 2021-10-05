@@ -21,6 +21,9 @@ public class AccountsHelper {
     AccountsRepository accountsRepository;
 
     @Autowired
+    ProductMainRepository productMainRepository;
+
+    @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
@@ -28,13 +31,16 @@ public class AccountsHelper {
     public String save(Accounts accounts){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        Accounts accounts1 = mongoOperation.findOne(new Query(Criteria.where("name").is(accounts.getName())), Accounts.class);
-        if(accounts1 == null){
+        Accounts accounts1 = mongoOperation.findOne(new Query(Criteria.where("name").is(accounts.getName())
+                .and("companyID").is(accounts.getCompanyID())), Accounts.class);
+        Accounts accounts2 = mongoOperation.findOne(new Query(Criteria.where("code").is(accounts.getCode())
+                .and("companyID").is(accounts.getCompanyID())), Accounts.class);
+        if(accounts1 == null && accounts2 == null){
             try {
                 accountsRepository.save(accounts);
                 return "BankAccount saved";
             }catch(Exception ex){
-                error.setErrorStatus("error");
+                error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
                 return jsonError;
@@ -42,7 +48,12 @@ public class AccountsHelper {
         }
         else{
             error.setErrorStatus("Error");
-            error.setError("Name Already Exists");
+            if(accounts1 != null) {
+                error.setError("Name Already Exists");
+            }
+            else {
+                error.setError("Code Already Exists");
+            }
             jsonError = gson.toJson(error);
             return jsonError;
         }
@@ -62,24 +73,40 @@ public class AccountsHelper {
     }
 
     public String deleteAccount(String id){
-        List<Accounts> accounts = mongoOperation.find(new Query(Criteria.where("id").is(id)), Accounts.class);
-        for(Accounts account : accounts) {
-            List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("assignedChartofAccounts").is(account.getName())), ProductMain.class);
-            if (productMainList.isEmpty())
-                accountsRepository.delete(account);
-        else
-            return account.getName() + " Exists in Products";
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Accounts accounts = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Accounts.class);
+        if(accounts != null){
+            List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("assignedChartofAccounts").is(accounts.getName())), ProductMain.class);
+            if (productMainList.isEmpty()) {
+                accountsRepository.delete(accounts);
+                return "Account deleted";
+            }
+            else{
+               error.setErrorStatus("Error");
+               error.setError(accounts.getName() + " Exists in Products");
+               jsonError = gson.toJson(error);
+               return jsonError;
+                }
         }
-//        accountsRepository.deleteAll(accounts);
-        return "Account deleted";
+        else {
+            error.setErrorStatus("Error");
+            error.setError("This account :" + accounts.getName() + ": does not exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     public String update(Accounts accounts) {
-        try {
-            accountsRepository.save(accounts);
-            return "BankAccount Updated";
-        }catch(Exception ex){
-            return "BankAccount Not Updated"+ ex;
+        Accounts accountExist = mongoOperation.findOne(new Query(Criteria.where("id").is(accounts.getId())), Accounts.class);
+        accountsRepository.delete(accountExist);
+        if(!accounts.getName().equalsIgnoreCase(accountExist.getName())) {
+            List<ProductMain> productMainList = mongoOperation.find(new Query(Criteria.where("assignedChartofAccounts").is(accountExist.getName())), ProductMain.class);
+            for(ProductMain product : productMainList){
+                product.setAssignedChartofAccounts(accounts.getName());
+                productMainRepository.save(product);
+            }
         }
+        return save(accounts);
     }
 }

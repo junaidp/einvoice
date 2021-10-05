@@ -41,7 +41,7 @@ public class RollsHelper {
             return "saved";
         }
         else{
-            error.setErrorStatus("error");
+            error.setErrorStatus("Error");
             error.setError("Roll Name already saved");
             jsonError = gson.toJson(error);
             return jsonError;

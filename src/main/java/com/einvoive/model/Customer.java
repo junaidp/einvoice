@@ -33,7 +33,38 @@ public class Customer {
     private String shippingCity;
     private String shippingPostal;
     private String deliveryInstructions;
-//    private String userId;
+    private String companyID;
+    private String vatNumber_Customer;
+    private String additionalNumber_Customer;
+    private String otherSellerid_Customer;
+
+    public String getRelatedParty() {
+        return relatedParty;
+    }
+
+    public String getVatNumber_Customer() {
+        return vatNumber_Customer;
+    }
+
+    public void setVatNumber_Customer(String vatNumber_Customer) {
+        this.vatNumber_Customer = vatNumber_Customer;
+    }
+
+    public String getAdditionalNumber_Customer() {
+        return additionalNumber_Customer;
+    }
+
+    public void setAdditionalNumber_Customer(String additionalNumber_Customer) {
+        this.additionalNumber_Customer = additionalNumber_Customer;
+    }
+
+    public String getOtherSellerid_Customer() {
+        return otherSellerid_Customer;
+    }
+
+    public void setOtherSellerid_Customer(String otherSellerid_Customer) {
+        this.otherSellerid_Customer = otherSellerid_Customer;
+    }
 
     public String isRelatedParty() {
         return relatedParty;
@@ -58,8 +89,6 @@ public class Customer {
     public void setPhoneMain(String phoneMain) {
         this.phoneMain = phoneMain;
     }
-
-    private String companyID;
 
     public String getCompanyID() {
         return companyID;

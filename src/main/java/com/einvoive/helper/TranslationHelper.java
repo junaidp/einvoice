@@ -34,11 +34,15 @@ public class TranslationHelper {
             return "Translation saved";
         }
         else{
-            error.setErrorStatus("error");
+            error.setErrorStatus("Error");
             error.setError("English text already saved");
             jsonError = gson.toJson(error);
             return jsonError;
         }
+    }
+
+    public String updateTranslation(Translation translation){
+        return saveTranslation(translation);
     }
 
     public String getAvaiablaeId() {

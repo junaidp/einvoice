@@ -48,12 +48,7 @@ public class LineItemHelper {
     }
 
     public String update(LineItem lineItem) {
-        try {
-            repository.save(lineItem);
-            return "product updated";
-        }catch(Exception ex){
-            return "product Not updated "+ ex;
-        }
+        return save(lineItem);
     }
 
     public String deleteLineItem(String id){

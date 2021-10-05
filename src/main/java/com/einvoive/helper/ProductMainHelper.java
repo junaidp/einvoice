@@ -27,7 +27,8 @@ public class ProductMainHelper {
     public String save(ProductMain product){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(product.getProductName())), ProductMain.class);
+        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(product.getProductName())
+                .and("companyID").is(product.getCompanyID())), ProductMain.class);
         if(productMain != null){
             error.setErrorStatus("Error");
             error.setError("Product Name Already Exists");
@@ -39,7 +40,7 @@ public class ProductMainHelper {
                 repository.save(product);
                 return "product saved";
             } catch (Exception ex) {
-                error.setErrorStatus("error");
+                error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
                 return jsonError;
@@ -80,11 +81,7 @@ public class ProductMainHelper {
     }
 
     public String update(ProductMain product) {
-        try {
-            repository.save(product);
-            return "product updated";
-        }catch(Exception ex){
-            return "product Not updated "+ ex;
-        }
+        return save(product);
     }
+
 }

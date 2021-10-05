@@ -26,13 +26,14 @@ public class LocationHelper {
     public String save(Location location) {
             ErrorCustom error = new ErrorCustom();
             String jsonError;
-            Location loc = mongoOperation.findOne(new Query(Criteria.where("name").is(location.getLocationName())), Location.class);
+            Location loc = mongoOperation.findOne(new Query(Criteria.where("locationName").is(location.getLocationName())
+                    .and("companyID").is(location.getCompanyID())), Location.class);
             if (loc == null) {
                 try {
                     repository.save(location);
                     return "Location saved";
                 } catch (Exception ex) {
-                    error.setErrorStatus("error");
+                    error.setErrorStatus("Error");
                     error.setError(ex.getMessage());
                     jsonError = gson.toJson(error);
                     return jsonError;
@@ -46,12 +47,8 @@ public class LocationHelper {
         }
 
     public String update(Location location){
-        try {
-            repository.save(location);
-        }catch(Exception ex){
-            return "location Not updated"+ ex;
-        }
-        return "location update";
+        deleteLocation(location.getId());
+        return save(location);
     }
 
     public String deleteLocation(String id){

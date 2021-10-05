@@ -33,7 +33,7 @@ public class CompanyHelper {
                 companyRepository.save(company);
                 return "Company Saved";
             } catch (Exception ex) {
-                error.setErrorStatus("error");
+                error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
                 return jsonError;
@@ -80,23 +80,18 @@ public class CompanyHelper {
     }
 
     public String updateCompany(Company userCompany) {
-        try {
-            companyRepository.save(userCompany);
-        }catch(Exception ex){
-            return "Company Not Updated"+ ex;
-        }
-        return "Company updated";
+        return saveCompany(userCompany);
     }
 
-    public String uploadCompanyLogo(String filePath, String companyID){
-        String msg = "Unsuccessfull";
-        List<Company> companyList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Company.class);
-        for(Company company : companyList)    {
-            company.setLogo(filePath);
-            msg = "Successfully Uploaded LOGO";
-        }
-        return msg;
-    }
+//    public String uploadCompanyLogo(String filePath, String companyID){
+//        String msg = "Unsuccessfull";
+//        List<Company> companyList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Company.class);
+//        for(Company company : companyList)    {
+//            company.setLogo(filePath);
+//            msg = "Successfully Uploaded LOGO";
+//        }
+//        return msg;
+//    }
 
     public String getCompany(String companyID) {
         try{

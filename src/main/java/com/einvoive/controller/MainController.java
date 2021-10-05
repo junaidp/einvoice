@@ -5,6 +5,8 @@ import com.einvoive.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @RequestMapping("control")
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -95,7 +97,6 @@ public class MainController {
 
     @PostMapping("/saveLocation")
     public String saveLocation(@RequestBody Location location) {
-
         return locationHelper.save(location);
     }
 
@@ -105,6 +106,10 @@ public class MainController {
     }
 
     //update
+    @PostMapping("/updateTranslation")
+    public String updateTranslation(@RequestBody Translation translation) {
+        return translationHelper.updateTranslation(translation);
+    }
 
     @PostMapping("/updateUser")
     public String updateUser(@RequestBody User user) {
@@ -229,10 +234,14 @@ public class MainController {
     public String getCustomer(@RequestParam String customerID) {
         return customerHelper.getCustomer(customerID);}
 
-    @GetMapping("/getAllInvoices")
-    public String getAllInvoices(@RequestParam String companyID) {
-        return invoiceHelper.getAllInvoices(companyID);
-    }
+    @GetMapping("/getInvoicesByID")
+    public String getInvoicesByID(@RequestParam String id) { return invoiceHelper.getInvoicesByID(id); }
+
+    @GetMapping("/getTopCustomerInvoices")
+    public void getTopCustomerInvoices(@RequestParam Date start, Date end)  { invoiceHelper.getTopCustomerInvoices(start, end);  }
+
+    @GetMapping("/getInvoicesByCompany")
+    public String getInvoicesByCompany(@RequestParam String companyID) { return invoiceHelper.getInvoicesByCompany(companyID); }
 
     @GetMapping("/getInvoiceStatus")
     public String getInvoiceStatus(@RequestParam String id) {
@@ -240,7 +249,7 @@ public class MainController {
     }
 
     @PostMapping("/setInvoiceStatus")
-    public String setInvoiceStatus(@RequestBody String id, String status) {
+    public String setInvoiceStatus(@RequestParam String id, String status) {
         return invoiceHelper.setInvoiceStatus(id, status);
     }
 

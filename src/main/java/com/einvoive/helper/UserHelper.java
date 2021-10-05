@@ -42,7 +42,7 @@ public class UserHelper {
                 return "User Saved";
             }
             catch (Exception ex){
-                error.setErrorStatus("error");
+                error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
                 return jsonError;
@@ -62,9 +62,12 @@ public class UserHelper {
         String msg1 = "";
         String msg2 = "";
         String msg3 = "";
-        List<User> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(user.getPhone())), User.class);
-        List<User> userId = mongoOperation.find(new Query(Criteria.where("userId").is(user.getUserId())), User.class);
-        List<User> emailList = mongoOperation.find(new Query(Criteria.where("email").is(user.getEmail())), User.class);
+        List<User> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(user.getPhone())
+                .and("companyID").is(user.getCompanyID())), User.class);
+        List<User> userId = mongoOperation.find(new Query(Criteria.where("userId").is(user.getUserId())
+                .and("companyID").is(user.getCompanyID())), User.class);
+        List<User> emailList = mongoOperation.find(new Query(Criteria.where("email").is(user.getEmail())
+                .and("companyID").is(user.getCompanyID())), User.class);
         if(phoneList.size() > 0)
             msg1 = "--User Phone No";
         if(emailList.size() > 0)
@@ -127,12 +130,6 @@ public class UserHelper {
     }
 
     public String updateUser(User userEntity) {
-        try {
-            userRepository.save(userEntity);
-//            rollsHelper.updateRolls(userEntity.getListRoles(), userEntity.getUserId());
-        }catch(Exception ex){
-            return "Use Not updated"+ ex;
-        }
-        return "User updated";
+        return saveUser(userEntity);
     }
 }

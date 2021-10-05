@@ -4,6 +4,7 @@ import com.einvoive.model.Logo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -32,14 +33,15 @@ public class LogoHelper {
 
 
     public Logo getLogo(String id) throws IOException {
-        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("id").is(id)) );
-        Logo logo = new Logo();
+        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("_id").is(id)) );
+        Logo loadFile = new Logo();
         if (gridFSFile != null && gridFSFile.getMetadata() != null) {
-            logo.setFilename( gridFSFile.getFilename() );
-            logo.setFileType( gridFSFile.getMetadata().get("_contentType").toString() );
-            logo.setFileSize( gridFSFile.getMetadata().get("fileSize").toString() );
+            loadFile.setFilename( gridFSFile.getFilename() );
+            loadFile.setFileType( gridFSFile.getMetadata().get("_contentType").toString() );
+            loadFile.setFileSize( gridFSFile.getMetadata().get("fileSize").toString() );
+            loadFile.setFile( IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()) );
         }
-        return logo;
+        return loadFile;
     }
 
 }

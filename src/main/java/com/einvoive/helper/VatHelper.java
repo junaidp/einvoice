@@ -16,6 +16,7 @@ public class VatHelper {
 
     @Autowired
     VatRepository repository;
+
     @Autowired
     MongoOperations mongoOperation;
 
@@ -24,14 +25,22 @@ public class VatHelper {
     public String save(Vat vat){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        Vat vAT = mongoOperation.findOne(new Query(Criteria.where("vatRates").is(vat.getVatRates())), Vat.class);
+        Vat vAT = mongoOperation.findOne(new Query(Criteria.where("vatRates").is(vat.getVatRates())
+                .and("companyID").is(vat.getCompanyID())), Vat.class);
         if(vAT == null){
-            repository.save(vat);
-            return "VAT saved";
+            try {
+                repository.save(vat);
+                return "VAT saved";
+            }catch (Exception ex) {
+                error.setErrorStatus("Error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
         else{
-            error.setErrorStatus("error");
-            error.setError("VAT already saved");
+            error.setErrorStatus("Error");
+            error.setError("VAT already exists");
             jsonError = gson.toJson(error);
             return jsonError;
         }
@@ -56,11 +65,7 @@ public class VatHelper {
     }
 
     public String update(Vat vat) {
-        try {
-            repository.save(vat);
-        }catch(Exception ex){
-            return "vat Not updated"+ ex;
-        }
-        return "vat updated";
+        deleteVAT(vat.getId());
+        return save(vat);
     }
 }

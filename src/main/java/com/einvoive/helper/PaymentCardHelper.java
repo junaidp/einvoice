@@ -33,7 +33,7 @@ public class PaymentCardHelper {
                 paymentCardRepository.save(paymentCard);
                 return "Payment Card Saved";
             } catch (Exception ex) {
-                error.setErrorStatus("error");
+                error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
                 return jsonError;
@@ -70,12 +70,7 @@ public class PaymentCardHelper {
     }
 
     public String updatePaymentCard(PaymentCard paymentCard) {
-        try {
-            paymentCardRepository.save(paymentCard);
-            return "PaymentCard Updated";
-        }catch(Exception ex){
-            return "PaymentCard Not Updated"+ ex;
-        }
+        return savePaymentCard(paymentCard);
     }
 
 }

@@ -2,6 +2,7 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Company;
 import com.einvoive.model.Customer;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.User;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.repository.UserRepository;
@@ -28,12 +29,26 @@ public class CustomerHelper {
     List<Customer> listCustomers = null;
 
     public String save(Customer customer) {
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         String msg = validationBeforeSave(customer);
         if(msg == null || msg.isEmpty()) {
-            repository.save(customer);
-            return "Customer Saved";
+            try {
+                repository.save(customer);
+                return "Customer Saved";
+            } catch (Exception ex) {
+                error.setErrorStatus("Error");
+                error.setError(ex.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
-        return msg+"--Already Exists";
+        else{
+            error.setErrorStatus("Error");
+            error.setError(msg+"--Already Exists");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     private String validationBeforeSave(Customer customer) {
@@ -41,9 +56,12 @@ public class CustomerHelper {
         String msg1 = "";
         String msg2 = "";
         String msg3 = "";
-        List<Customer> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(customer.getPhone())), Customer.class);
-        List<Customer> phoneMainList = mongoOperation.find(new Query(Criteria.where("phoneMain").is(customer.getPhoneMain())), Customer.class);
-        List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())), Customer.class);
+        List<Customer> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(customer.getPhone())
+                .and("companyID").is(customer.getCompanyID())), Customer.class);
+        List<Customer> phoneMainList = mongoOperation.find(new Query(Criteria.where("phoneMain").is(customer.getPhoneMain())
+                .and("companyID").is(customer.getCompanyID())), Customer.class);
+        List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())
+                .and("companyID").is(customer.getCompanyID())), Customer.class);
         if(phoneList.size() > 0)
             msg1 = "--Customer Phone No";
         if(emailList.size() > 0)
@@ -55,12 +73,8 @@ public class CustomerHelper {
     }
 
     public String update(Customer customer){
-        try {
-            repository.save(customer);
-        }catch(Exception ex){
-            return "Customer Not updated"+ ex;
-        }
-        return "customer updated";
+        deleteCustomers(customer.getId());
+        return save(customer);
     }
 
     public String getAllCustomers(String comapnyID){

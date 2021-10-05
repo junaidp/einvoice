@@ -25,14 +25,32 @@ public class Company {
     private String city;
     private String postalCode;
     private String userType;
-    private String logo;
+    private String vatNumber_Company;
+    private String additionalNumber_Company;
+    private String otherSellerid_Company;
 
-    public String getLogo() {
-        return logo;
+    public String getVatNumber_Company() {
+        return vatNumber_Company;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setVatNumber_Company(String vatNumber_Company) {
+        this.vatNumber_Company = vatNumber_Company;
+    }
+
+    public String getAdditionalNumber_Company() {
+        return additionalNumber_Company;
+    }
+
+    public void setAdditionalNumber_Company(String additionalNumber_Company) {
+        this.additionalNumber_Company = additionalNumber_Company;
+    }
+
+    public String getOtherSellerid_Company() {
+        return otherSellerid_Company;
+    }
+
+    public void setOtherSellerid_Company(String otherSellerid_Company) {
+        this.otherSellerid_Company = otherSellerid_Company;
     }
 
     public String getFirstName() {

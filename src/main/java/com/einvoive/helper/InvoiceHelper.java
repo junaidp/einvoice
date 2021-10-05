@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -28,12 +29,9 @@ public class InvoiceHelper {
     @Autowired
     MongoOperations mongoOperation;
 
-
     Gson gson = new Gson();
 
-    private List<Invoice> invoicesList;
-
-    public String save(Invoice invoice){
+   public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
@@ -45,14 +43,14 @@ public class InvoiceHelper {
             }
             return "Invoice saved";
         }catch(Exception ex){
-            error.setErrorStatus("error");
+            error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
             return jsonError;
         }
     }
 
-    public String getAllInvoices(String companyID){
+    public String getInvoicesByCompany(String companyID){
         List<Invoice> invoices = null;
         try {
             Query query = new Query();
@@ -68,28 +66,12 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-    public String getInvoices(String invoiceID){
-        invoicesList = null;
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("id").is(invoiceID));
-            invoicesList = mongoOperation.find(query, Invoice.class);
-        }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
-        }
-        return gson.toJson(invoicesList);
-    }
-
-    public String getTopInvoices(){
+    public String getTopCustomerInvoices(Date start, Date end){
         List<Invoice> invoices = null;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("totalAmountDue"));
+            query.addCriteria(Criteria.where("invoiceDate").gt(start).lt(end));
             invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
-            }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
         }
@@ -109,12 +91,7 @@ public class InvoiceHelper {
     }
 
     public String update(Invoice invoice) {
-        try {
-            repository.save(invoice);
-            return "Invoice Updated";
-        }catch(Exception ex){
-            return "Invoice Not Updated"+ ex;
-        }
+            return save(invoice);
     }
 
     public String getInvoiceStatus(String id) {
@@ -138,4 +115,15 @@ public class InvoiceHelper {
         }
     }
 
+    public String getInvoicesByID(String id) {
+        List<Invoice> invoicesList = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("id").is(id));
+            invoicesList = mongoOperation.find(query, Invoice.class);
+        }catch(Exception ex){
+            System.out.println("Error in get invoices By ID :"+ ex);
+        }
+        return gson.toJson(invoicesList);
+    }
 }
