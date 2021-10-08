@@ -1,7 +1,6 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Rolls;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.TranslationRepository;
 import com.google.gson.Gson;
@@ -53,14 +52,28 @@ public class TranslationHelper {
     }
 
     public String getTranslation(String english) {
-        List<Translation> translationList = null;
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        Translation translation = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("english").is(english));
-            translationList = mongoOperation.find(query, Translation.class);
+            translation = mongoOperation.findOne(query, Translation.class);
+            if(translation != null)
+                return gson.toJson(translation);
+            else {
+                error.setErrorStatus("Error");
+                error.setError("Translation not found");
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }catch(Exception ex){
             System.out.println("Error in get Translation:"+ ex);
+            error.setErrorStatus("Error");
+            error.setError(ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
-        return gson.toJson(translationList);
     }
+
 }

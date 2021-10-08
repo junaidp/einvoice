@@ -1,11 +1,14 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Company;
 import com.einvoive.model.Logo;
+import com.einvoive.repository.CompanyRepository;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
@@ -22,19 +25,28 @@ public class LogoHelper {
     private GridFsTemplate template;
 
     @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private MongoOperations mongoOperation;
+
+    @Autowired
     private GridFsOperations operations;
 
-    public String uploadLogo(MultipartFile upload) throws IOException {
+    public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
         DBObject metadata = new BasicDBObject();
+        String logoName =  getCompanyName(companyID)+"_logo";
         metadata.put("fileSize", upload.getSize());
-        Object fileID = template.store(upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
+        Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
         return fileID.toString();
     }
 
 
-    public Logo getLogo(String id) throws IOException {
-        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("_id").is(id)) );
+    public Logo getLogo(String companyID) throws IOException {
+        String logoName =  getCompanyName(companyID)+"_logo";
+        GridFSFile gridFSFile = template.findOne( new Query(Criteria.where("filename").is(logoName)) );
         Logo loadFile = new Logo();
+
         if (gridFSFile != null && gridFSFile.getMetadata() != null) {
             loadFile.setFilename( gridFSFile.getFilename() );
             loadFile.setFileType( gridFSFile.getMetadata().get("_contentType").toString() );
@@ -44,4 +56,8 @@ public class LogoHelper {
         return loadFile;
     }
 
+    private String getCompanyName(String companyID){
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)),Company.class);
+        return company.getCompanyName();
+    }
 }

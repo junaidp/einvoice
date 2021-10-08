@@ -10,5 +10,7 @@ public interface InvoiceRepository extends MongoRepository<Invoice, String> {
     @Query("{ 'name' : ?0'}")
     Invoice findInvoiceByName(String name);
 
+    @Query("{ 'customerID' : ?0'}")
+    Invoice findInvoiceBycustomerID(String customerID);
 
 }

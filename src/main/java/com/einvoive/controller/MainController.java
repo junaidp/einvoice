@@ -43,9 +43,6 @@ public class MainController {
     InvoiceHelper invoiceHelper;
 
     @Autowired
-    RollsHelper rollsHelper;
-
-    @Autowired
     VatHelper vatHelper;
 
     @Autowired
@@ -238,7 +235,9 @@ public class MainController {
     public String getInvoicesByID(@RequestParam String id) { return invoiceHelper.getInvoicesByID(id); }
 
     @GetMapping("/getTopCustomerInvoices")
-    public void getTopCustomerInvoices(@RequestParam Date start, Date end)  { invoiceHelper.getTopCustomerInvoices(start, end);  }
+    public void getTopCustomerInvoices(@RequestParam String companyID)  {
+        invoiceHelper.getTopCustomerInvoices(companyID);
+    }
 
     @GetMapping("/getInvoicesByCompany")
     public String getInvoicesByCompany(@RequestParam String companyID) { return invoiceHelper.getInvoicesByCompany(companyID); }

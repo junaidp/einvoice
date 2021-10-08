@@ -14,6 +14,8 @@ public class Invoice {
     @Id
     private String id;
     private String invoiceNumber;
+    private String invoiceName;
+    private String invoiceDescription;
     private String posoNumber;
     private String billTo;
     private Date invoiceDate;
@@ -30,6 +32,22 @@ public class Invoice {
     private String customerID;
     private String totalExcludingVAT;
     private List<LineItem> lineItemList;
+
+    public String getInvoiceName() {
+        return invoiceName;
+    }
+
+    public void setInvoiceName(String invoiceName) {
+        this.invoiceName = invoiceName;
+    }
+
+    public String getInvoiceDescription() {
+        return invoiceDescription;
+    }
+
+    public void setInvoiceDescription(String invoiceDescription) {
+        this.invoiceDescription = invoiceDescription;
+    }
 
     public String getTotalExcludingVAT() {
         return totalExcludingVAT;

@@ -1,8 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Customer;
 import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Rolls;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
 import com.google.gson.Gson;
@@ -20,9 +18,6 @@ public class UserHelper {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    RollsHelper rollsHelper;
 
     @Autowired
     MongoOperations mongoOperation;

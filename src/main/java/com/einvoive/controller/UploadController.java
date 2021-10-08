@@ -151,13 +151,13 @@ public class UploadController {
     }
 
     @PostMapping("/uploadLogo")
-    public ResponseEntity<?> uploadLogo(@RequestParam("file")MultipartFile file) throws IOException {
-        return new ResponseEntity<>(logoHelper.uploadLogo(file), HttpStatus.OK);
+    public ResponseEntity<?> uploadLogo(@RequestParam("file")MultipartFile file, String companyID) throws IOException {
+        return new ResponseEntity<>(logoHelper.uploadLogo(file, companyID), HttpStatus.OK);
     }
 
-    @GetMapping("/getLogo/{id}")
-    public ResponseEntity<ByteArrayResource> getLogo(@PathVariable String id) throws IOException {
-        Logo logo = logoHelper.getLogo(id);
+    @GetMapping("/getLogo")
+    public ResponseEntity<ByteArrayResource> getLogo(@RequestParam String companyID) throws IOException {
+        Logo logo = logoHelper.getLogo(companyID);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(logo.getFileType() ))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + logo.getFilename() + "\"")

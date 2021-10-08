@@ -1,12 +1,12 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Customer;
-import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.LineItem;
-import com.einvoive.repository.CustomerRepository;
+import com.einvoive.model.*;
 import com.einvoive.repository.InvoiceRepository;
-import com.einvoive.repository.LineItemRepository;
+import com.mongodb.client.MongoCollection;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -14,8 +14,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 @Component
 public class InvoiceHelper {
@@ -29,13 +30,18 @@ public class InvoiceHelper {
     @Autowired
     MongoOperations mongoOperation;
 
+    @Autowired
+     InvoiceRepository invoiceRepository;
+
     Gson gson = new Gson();
 
-   public String save(Invoice invoice){
+    private  List<Invoice> invoiceListMain = null;
+
+    public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-            invoice.setId(getAvaiablaeId());
+//            invoice.setId(getAvaiablaeId());
             repository.save(invoice);
             for(LineItem lineItem : invoice.getLineItemList()){
                 lineItem.setInvoiceId(invoice.getId());
@@ -66,16 +72,52 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-    public String getTopCustomerInvoices(Date start, Date end){
-        List<Invoice> invoices = null;
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("invoiceDate").gt(start).lt(end));
-            invoices = mongoOperation.find(query, Invoice.class);
+//    public String getTopCustomerInvoices(Date start, Date end){
+//        for()
+//    }
+
+    public String getTopCustomerInvoices(String companyID){
+       List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
+        try{
+            List<Invoice> invoiceList = null;
+            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Invoice.class);
+            while (invoiceListMain.size() != 0){
+                invoiceList = null;
+                invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerID())
+                        .and("companyID").is(companyID)), Invoice.class);
+                TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
+                if(topCustomersInvoices != null)
+                    topCustomersInvoicesList.add(topCustomersInvoices);
+                checkRemoveExisting(invoiceList);
+           }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
         }
-        return gson.toJson(invoices);
+        String test = gson.toJson(topCustomersInvoicesList);
+        return test;
+    }
+
+    private TopCustomersInvoices computeInvoiceSum(List<Invoice> invoiceList) {
+        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
+        int sum = 0;
+        for(Invoice invoice:invoiceList){
+            sum += Integer.parseInt(invoice.getTotalAmountDue());
+        }
+        Customer customer = mongoOperation.findOne(new Query(Criteria.where("_id").is(invoiceList.get(0).getCustomerID())), Customer.class);
+        topCustomersInvoices.setCustomerName(customer.getCustomer());
+        topCustomersInvoices.setInvoiceTotal(String.valueOf(sum));
+        return topCustomersInvoices;
+    }
+
+    private void checkRemoveExisting(List<Invoice> invoiceList){
+        for(Invoice invoiceToRemove : invoiceList){
+            for(int i=0; i< invoiceListMain.size(); i++){
+                Invoice inv = invoiceListMain.get(i);
+                if(inv.getId().equals(invoiceToRemove.getId()))
+                    invoiceListMain.remove(inv);
+
+            }
+        }
     }
 
     public String deleteInvoice(String invoiceID){
@@ -100,6 +142,8 @@ public class InvoiceHelper {
     }
 
     public String setInvoiceStatus(String id, String status) {
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         try {
             Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
             if(invoice != null){
@@ -107,11 +151,18 @@ public class InvoiceHelper {
                 repository.save(invoice);
                 return "Invoice Status Updated";
             }
-            else
-                return "No Invoice against this ID";
+            else{
+                error.setErrorStatus("Error");
+                error.setError("No Invoice against this ID");
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
         }
         catch (Exception ex){
-            return ex.getMessage();
+            error.setErrorStatus("Error");
+            error.setError(ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
     }
 

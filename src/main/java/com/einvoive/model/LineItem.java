@@ -8,12 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
         @Id
         private String id;
-        private String name;
+        private String productName;
         private String price;
         private String quantity;
         private String taxableAmount;
         private String discount;
-        private String taxRate;
+        private String vat;
         private String taxAmount;
         private String itemSubTotal;
         private String invoiceId;
@@ -44,12 +44,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
             this.invoiceId = invoiceId;
         }
 
-        public String getName() {
-            return name;
+        public String getProductName() {
+            return productName;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setProductName(String productName) {
+            this.productName = productName;
         }
 
         public String getPrice() {
@@ -76,12 +76,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
             this.discount = discount;
         }
 
-        public String getTaxRate() {
-            return taxRate;
+        public String getVat() {
+            return vat;
         }
 
-        public void setTaxRate(String taxRate) {
-            this.taxRate = taxRate;
+        public void setVat(String vat) {
+            this.vat = vat;
         }
 
         public String getTaxAmount() {

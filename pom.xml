@@ -66,6 +66,12 @@
 
     </dependencies>
 
+    <mongo:db-factory id="mongoDbFactory" host="localhost" port="27017" dbname="test" />
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref="mongoDbFactory" />
+    </bean>
+
     <build>
         <plugins>
             <plugin>
