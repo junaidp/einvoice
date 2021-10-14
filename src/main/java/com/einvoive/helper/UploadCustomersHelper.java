@@ -152,8 +152,14 @@ public class UploadCustomersHelper {
                             break;
 
                         case 22:
-                            int companyID = (int)currentCell.getNumericCellValue();
-                            customer.setCompanyID(String.valueOf(companyID));
+//                            int companyID = (int)currentCell.getNumericCellValue();
+//                            customer.setCompanyID(String.valueOf(companyID));
+                            customer.setCompanyID(currentCell.getStringCellValue());
+                            break;
+
+                        case 23:
+                            int vat = (int)currentCell.getNumericCellValue();
+                            customer.setVatNumber_Customer(String.valueOf(vat));
                             break;
 
                         default:

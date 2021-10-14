@@ -80,6 +80,8 @@ public class CompanyHelper {
     }
 
     public String updateCompany(Company userCompany) {
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(userCompany.getCompanyID())),Company.class);
+        companyRepository.delete(company);
         return saveCompany(userCompany);
     }
 

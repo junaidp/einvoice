@@ -5,6 +5,7 @@ import com.einvoive.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.Date;
 
 @RequestMapping("control")
@@ -32,6 +33,9 @@ public class MainController {
 
     @Autowired
     AccountsHelper accountsHelper;
+
+    @Autowired
+    ReportsHelper reportsHelper;
 
     @Autowired
     TranslationHelper translationHelper;
@@ -235,8 +239,23 @@ public class MainController {
     public String getInvoicesByID(@RequestParam String id) { return invoiceHelper.getInvoicesByID(id); }
 
     @GetMapping("/getTopCustomerInvoices")
-    public void getTopCustomerInvoices(@RequestParam String companyID)  {
-        invoiceHelper.getTopCustomerInvoices(companyID);
+    public String getTopCustomerInvoices(@RequestParam String companyID)  {
+        return reportsHelper.getTopCustomerInvoices(companyID);
+    }
+
+    @GetMapping("/getTopSoldProducts")
+    public String getTopSoldProducts(@RequestParam String companyID)  {
+        return reportsHelper.getTopSoldProducts(companyID);
+    }
+
+    @GetMapping("/getTopCustomerInvoicesByDates")
+    public String getTopCustomerInvoicesByDates(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
+        return reportsHelper.getTopCustomerInvoicesByDates(startDate, endDate, companyID);
+    }
+
+    @GetMapping("/getInvoicesByYear")
+    public String getInvoicesByYear(@RequestParam String companyID) {
+        return reportsHelper.getInvoicesByYear(companyID);
     }
 
     @GetMapping("/getInvoicesByCompany")

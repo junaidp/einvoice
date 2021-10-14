@@ -14,6 +14,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -37,6 +42,12 @@ public class InvoiceHelper {
 
     private  List<Invoice> invoiceListMain = null;
 
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    private List<Invoice> invoices;
+
     public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -57,7 +68,7 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByCompany(String companyID){
-        List<Invoice> invoices = null;
+        invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
@@ -75,50 +86,6 @@ public class InvoiceHelper {
 //    public String getTopCustomerInvoices(Date start, Date end){
 //        for()
 //    }
-
-    public String getTopCustomerInvoices(String companyID){
-       List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
-        try{
-            List<Invoice> invoiceList = null;
-            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Invoice.class);
-            while (invoiceListMain.size() != 0){
-                invoiceList = null;
-                invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerID())
-                        .and("companyID").is(companyID)), Invoice.class);
-                TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
-                if(topCustomersInvoices != null)
-                    topCustomersInvoicesList.add(topCustomersInvoices);
-                checkRemoveExisting(invoiceList);
-           }
-        }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
-        }
-        String test = gson.toJson(topCustomersInvoicesList);
-        return test;
-    }
-
-    private TopCustomersInvoices computeInvoiceSum(List<Invoice> invoiceList) {
-        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
-        int sum = 0;
-        for(Invoice invoice:invoiceList){
-            sum += Integer.parseInt(invoice.getTotalAmountDue());
-        }
-        Customer customer = mongoOperation.findOne(new Query(Criteria.where("_id").is(invoiceList.get(0).getCustomerID())), Customer.class);
-        topCustomersInvoices.setCustomerName(customer.getCustomer());
-        topCustomersInvoices.setInvoiceTotal(String.valueOf(sum));
-        return topCustomersInvoices;
-    }
-
-    private void checkRemoveExisting(List<Invoice> invoiceList){
-        for(Invoice invoiceToRemove : invoiceList){
-            for(int i=0; i< invoiceListMain.size(); i++){
-                Invoice inv = invoiceListMain.get(i);
-                if(inv.getId().equals(invoiceToRemove.getId()))
-                    invoiceListMain.remove(inv);
-
-            }
-        }
-    }
 
     public String deleteInvoice(String invoiceID){
         List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);

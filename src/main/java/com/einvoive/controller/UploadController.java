@@ -4,7 +4,9 @@ import com.einvoive.helper.CompanyHelper;
 import com.einvoive.helper.LogoHelper;
 import com.einvoive.helper.UploadCustomersHelper;
 import com.einvoive.helper.UploadProductsHelper;
+import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Logo;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -39,10 +41,12 @@ public class UploadController {
     LogoHelper logoHelper;
 
     //Save the uploaded file to this folder
+    private static String UPLOADED_INVOICE_FOLDER = "D://Envoice//invoice//";
     private static String UPLOADED_FOLDER = "D://Envoice//help//";
     private static String UPLOAD_Product_FOLDER = "D://Envoice//products//";
     private static String UPLOAD_Customer_FOLDER = "D://Envoice//customers//";
     private static String UPLOAD_Logos_FOLDER = "D://Envoice//logos//";
+    private Gson gson;
 
     @GetMapping("/")
     public String index() {
@@ -62,7 +66,7 @@ public class UploadController {
 
             // Get the file and save it somewhere
             byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+            Path path = Paths.get(UPLOADED_INVOICE_FOLDER + file.getOriginalFilename());
             Files.write(path, bytes);
 
             redirectAttributes.addFlashAttribute("message",
@@ -74,6 +78,22 @@ public class UploadController {
 
         return "redirect:/uploadStatus";
     }
+
+    public String uploadInvoice(@RequestParam("file") MultipartFile file) {
+
+        if (file.isEmpty())
+            return "Attached file is empty";
+
+        try {
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(UPLOADED_INVOICE_FOLDER + file.getOriginalFilename());
+            Files.write(path, bytes);
+            return "You successfully uploaded " + file.getOriginalFilename();
+        } catch (IOException e) {
+            return e.getMessage();
+        }
+    }
+
 
 //    @PostMapping("/uploadLogo") // //new annotation since 4.3
 //    public String uploadLogo(@RequestParam("file") MultipartFile file, String companyID) {
@@ -102,36 +122,45 @@ public class UploadController {
 
     @PostMapping("/uploadProducts") // //new annotation since 4.3
     public String uploadProducts(@RequestParam("file") MultipartFile file) {
-
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         if (file.isEmpty()) {
-//            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            return "uploadProducts file is empty";
+            error.setErrorStatus("Error");
+            error.setError("Attach file is empty");
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
-        String message = null;
         if (uploadProductsHelper.hasExcelFormat(file)) {
             try {
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
                 Files.write(path, bytes);
                 uploadProductsHelper.saveAll(file);
-//                redirectAttributes.addFlashAttribute("message",
-//                        "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
-                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
             } catch (Exception e) {
-                e.printStackTrace();
-                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
+                error.setErrorStatus("Error");
+                error.setError(e.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
             }
         }
-        return message;
+        else {
+            error.setErrorStatus("Error");
+            error.setError("Attach file format is not excell");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     @PostMapping("/uploadCustomers") // //new annotation since 4.3
-    public String uploadCustomers(@RequestParam("file") MultipartFile file,
-                                 RedirectAttributes redirectAttributes) {
-
+    public String uploadCustomers(@RequestParam("file") MultipartFile file) {
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
         if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            return "redirect:uploadCustomers";
+            error.setErrorStatus("Error");
+            error.setError("Attach file is empty");
+            jsonError = gson.toJson(error);
+            return jsonError;
         }
         if (uploadProductsHelper.hasExcelFormat(file)) {
             try {
@@ -139,15 +168,22 @@ public class UploadController {
                 Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
                 Files.write(path, bytes);
                 uploadCustomersHelper.saveAll(file);
-                redirectAttributes.addFlashAttribute("message",
-                        "Uploaded the file successfully: '" + file.getOriginalFilename() + "'");
+                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
 //                message = "Uploaded the file successfully: " + file.getOriginalFilename();
             } catch (Exception e) {
-                e.printStackTrace();
+                error.setErrorStatus("Error");
+                error.setError(e.getMessage());
+                jsonError = gson.toJson(error);
+                return jsonError;
 //                message = "Sorry!!! Could not upload the file: " + file.getOriginalFilename() + "!";
             }
         }
-        return "Customers uploaded";
+        else {
+            error.setErrorStatus("Error");
+            error.setError("Attach file format is not excell");
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     @PostMapping("/uploadLogo")

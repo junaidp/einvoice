@@ -1,7 +1,9 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Invoice;
 import com.einvoive.model.LineItem;
 import com.einvoive.model.ProductMain;
+import com.einvoive.model.TopCustomersInvoices;
 import com.einvoive.repository.LineItemRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -32,7 +36,6 @@ public class LineItemHelper {
         } catch (Exception ex) {
             return "product Not saved" + ex;
         }
-
     }
 
     public String getItems(String invoiceId) {

@@ -89,13 +89,15 @@ public class UploadProductsHelper {
                             break;
 
                         case 5:
-                            int valueUserID = (int)currentCell.getNumericCellValue();
-                            productMain.setUserId(String.valueOf(valueUserID));
+//                            int valueUserID = (int)currentCell.getNumericCellValue();
+//                            productMain.setUserId(String.valueOf(valueUserID));
+                            productMain.setUserId(currentCell.getStringCellValue());
                             break;
 
                         case 6:
-                            int valueCompanyID = (int)currentCell.getNumericCellValue();
-                            productMain.setCompanyID(String.valueOf(valueCompanyID));
+//                            int valueCompanyID = (int)currentCell.getNumericCellValue();
+//                            productMain.setCompanyID(String.valueOf(valueCompanyID));
+                            productMain.setCompanyID(currentCell.getStringCellValue());
                             break;
 
                         default:
