@@ -10,8 +10,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class TranslationHelper {
 
@@ -51,6 +49,13 @@ public class TranslationHelper {
 
     }
 
+    public String mergeAndSave(String english, String arabic){
+        Translation translationSave = new Translation();
+        translationSave.setEnglish(english);
+        translationSave.setArabic(arabic);
+        return saveTranslation(translationSave);
+    }
+
     public String getTranslation(String english) {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -76,4 +81,8 @@ public class TranslationHelper {
         }
     }
 
+    public String getTranslationMain(String english) {
+        Translation translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+        return translation.getArabic();
+    }
 }

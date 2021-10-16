@@ -58,7 +58,7 @@ public class MainController {
     }
 
     @PostMapping("/saveCompany")
-    public String saveCompany(@RequestBody Company company) { return companyHelper.saveCompany(company);
+    public String saveCompany(@RequestBody Company companyEnglish, Company companyArabic) { return companyHelper.saveCompany(companyEnglish, companyArabic);
     }
 
     @PostMapping("/saveCustomer")
@@ -121,11 +121,11 @@ public class MainController {
     public String updatePaymentCard(@RequestBody PaymentCard paymentCard) {
         return paymentCardHelper.updatePaymentCard(paymentCard);
     }
-
-    @PostMapping("/updateCompany")
-    public String updateCompany(@RequestBody Company company) {
-        return companyHelper.updateCompany(company);
-    }
+//
+//    @PostMapping("/updateCompany")
+//    public String updateCompany(@RequestBody Company company) {
+//        return companyHelper.updateCompany(company);
+//    }
 
     @PostMapping("/updateCustomer")
     public String updateCustomer(@RequestBody Customer customer) {
@@ -251,6 +251,16 @@ public class MainController {
     @GetMapping("/getTopCustomerInvoicesByDates")
     public String getTopCustomerInvoicesByDates(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
         return reportsHelper.getTopCustomerInvoicesByDates(startDate, endDate, companyID);
+    }
+
+    @GetMapping("/getTopSoldProductsByDate")
+    public String getTopSoldProductsByDate(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
+        return reportsHelper.getTopSoldProductsByDate(startDate, endDate, companyID);
+    }
+
+    @GetMapping("/getTotalSalesByDate")
+    public String getTotalSalesByDate(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
+        return reportsHelper.getTotalSalesByDate(startDate, endDate, companyID);
     }
 
     @GetMapping("/getInvoicesByYear")

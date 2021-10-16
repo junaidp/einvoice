@@ -13,6 +13,9 @@ public class Invoice {
 
     @Id
     private String id;
+    private String uuid;
+    private String OriginalRefNo;
+    private String type;
     private String invoiceNumber;
     private String invoiceName;
     private String invoiceDescription;
@@ -193,6 +196,27 @@ public class Invoice {
         this.paymentDue = paymentDue;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
+    public String getOriginalRefNo() {
+        return OriginalRefNo;
+    }
+
+    public void setOriginalRefNo(String originalRefNo) {
+        OriginalRefNo = originalRefNo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

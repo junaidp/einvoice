@@ -42,12 +42,6 @@ public class InvoiceHelper {
 
     private  List<Invoice> invoiceListMain = null;
 
-    public List<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    private List<Invoice> invoices;
-
     public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -68,7 +62,7 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByCompany(String companyID){
-        invoices = null;
+        List<Invoice> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));

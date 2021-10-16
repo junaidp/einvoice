@@ -2,7 +2,7 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Company;
 import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Location;
+import com.einvoive.model.Translation;
 import com.einvoive.repository.CompanyRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,21 @@ public class CompanyHelper {
     CompanyRepository companyRepository;
 
     @Autowired
+    TranslationHelper translationHelper;
+
+    @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
 
-    public String saveCompany(Company company){
-        String msg = validationBeforeSave(company);
+    public String saveCompany(Company companyEnglish, Company companyArabic){
+        String msg = validationBeforeSave(companyEnglish);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
-                companyRepository.save(company);
+                saveCompanyArabic(companyEnglish, companyArabic);
+                companyRepository.save(companyEnglish);
                 return "Company Saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");
@@ -46,6 +50,19 @@ public class CompanyHelper {
             return jsonError;
          }
     }
+
+    private void saveCompanyArabic(Company companyEnglish, Company companyArabic){
+        translationHelper.mergeAndSave(companyEnglish.getFirstName(), companyArabic.getFirstName());
+        translationHelper.mergeAndSave(companyEnglish.getLastName(), companyArabic.getLastName());
+        translationHelper.mergeAndSave(companyEnglish.getCompanyName(), companyArabic.getCompanyName());
+        translationHelper.mergeAndSave(companyEnglish.getAddress1(), companyArabic.getAddress1());
+        translationHelper.mergeAndSave(companyEnglish.getAddress2(), companyArabic.getAddress2());
+        translationHelper.mergeAndSave(companyEnglish.getNotes(), companyArabic.getNotes());
+        translationHelper.mergeAndSave(companyEnglish.getCountry(), companyArabic.getCountry());
+        translationHelper.mergeAndSave(companyEnglish.getState(), companyArabic.getState());
+        translationHelper.mergeAndSave(companyEnglish.getCity(), companyArabic.getCity());
+    }
+
 
     private String validationBeforeSave(Company company) {
         String msg = null;
@@ -75,15 +92,30 @@ public class CompanyHelper {
         System.out.println(company.getCompanyID() + "," + company.getPassword());
         Query query = new Query();
         query.addCriteria(Criteria.where("email").is(company.getEmail()).and("password").is(company.getPassword()));
-        Company savedCompany = mongoOperation.findOne(query, Company.class);
-        return gson.toJson(savedCompany);
+        Company companyEnglish = mongoOperation.findOne(query, Company.class);
+        Company companyArabic = getCompanyArabic(companyEnglish);
+        return gson.toJson(companyEnglish);
     }
 
-    public String updateCompany(Company userCompany) {
-        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(userCompany.getCompanyID())),Company.class);
-        companyRepository.delete(company);
-        return saveCompany(userCompany);
+    private Company getCompanyArabic(Company companyEnglish) {
+        Company companyArabic = new Company();
+        companyArabic.setFirstName(translationHelper.getTranslationMain(companyEnglish.getFirstName()));
+        companyArabic.setLastName(translationHelper.getTranslationMain(companyEnglish.getLastName()));
+        companyArabic.setCompanyName(translationHelper.getTranslationMain(companyEnglish.getCompanyName()));
+        companyArabic.setNotes(translationHelper.getTranslationMain(companyEnglish.getNotes()));
+        companyArabic.setCountry(translationHelper.getTranslationMain(companyEnglish.getCountry()));
+        companyArabic.setState(translationHelper.getTranslationMain(companyEnglish.getState()));
+        companyArabic.setCity(translationHelper.getTranslationMain(companyEnglish.getCity()));
+        companyArabic.setAddress1(translationHelper.getTranslationMain(companyEnglish.getAddress1()));
+        companyArabic.setAddress2(translationHelper.getTranslationMain(companyEnglish.getAddress2()));
+        return companyArabic;
     }
+
+//    public String updateCompany(Company userCompany) {
+//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(userCompany.getCompanyID())),Company.class);
+//        companyRepository.delete(company);
+//        return saveCompany(companyEnglish, userCompanyArabic);
+//    }
 
 //    public String uploadCompanyLogo(String filePath, String companyID){
 //        String msg = "Unsuccessfull";

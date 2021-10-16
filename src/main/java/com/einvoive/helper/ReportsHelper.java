@@ -5,6 +5,7 @@ import com.einvoive.model.Invoice;
 import com.einvoive.model.LineItem;
 import com.einvoive.model.TopCustomersInvoices;
 import com.einvoive.repository.LineItemRepository;
+import com.einvoive.constants.Constant;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -31,14 +32,47 @@ public class ReportsHelper {
     private List<Invoice> invoiceListMain;
     private int year;
 
+    //product sales year wise
+
+    public String getTopSoldProductsByDate(String startDate, String endDate, String companyID) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateFinal = df.parse(startDate);
+        Date endDateFinal = df.parse(endDate);
+        List<LineItem> lineItemList = null;
+        List<LineItem> topLineItemsList = new ArrayList<LineItem>();
+        try{
+            lineItemList = mongoOperation.findAll(LineItem.class);
+            invoiceHelper.getInvoicesByCompany(companyID);
+            List<Invoice> invoiceList =  mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal).
+                    and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+            int count = 0;
+            while (lineItemList.size() != 0){
+                for(Invoice invoice : invoiceList){
+                    for(int k=0; k<invoice.getLineItemList().size(); k++){
+                        if(lineItemList.get(count).getProductName().equals(invoice.getLineItemList().get(k).getProductName()
+                        ))
+                            topLineItemsList.add(lineItemList.get(count));
+                    }
+                }
+                lineItemList.remove(count);
+                count = 0;
+            }
+            topLineItemsList = mergeAndCompute(topLineItemsList);
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(topLineItemsList);
+    }
+
     //Product Sales
     public String getTopSoldProducts(String companyID){
         List<LineItem> lineItemList = null;
         List<LineItem> topLineItemsList = new ArrayList<LineItem>();
         try{
             lineItemList = mongoOperation.findAll(LineItem.class);
-            invoiceHelper.getInvoicesByCompany(companyID);
-            List<Invoice> invoiceList = invoiceHelper.getInvoices();
+            List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             int count = 0;
             while (lineItemList.size() != 0){
                for(Invoice invoice : invoiceList){
@@ -60,7 +94,7 @@ public class ReportsHelper {
     private List<LineItem> mergeAndCompute(List<LineItem> topLineItemsList) {
         for(int i=0; i<topLineItemsList.size(); i++)
             for(int j=1; j<topLineItemsList.size()-1; j++)
-                if(topLineItemsList.get(i).getId() == topLineItemsList.get(j).getId()){
+                if(topLineItemsList.get(i).getId().equals(topLineItemsList.get(j).getId())){
                     int quantity = Integer.parseInt(topLineItemsList.get(i).getQuantity()) + Integer.parseInt(topLineItemsList.get(j).getQuantity());
                     topLineItemsList.get(i).setQuantity(String.valueOf(quantity));
                     topLineItemsList.remove(j);
@@ -68,14 +102,14 @@ public class ReportsHelper {
         return topLineItemsList;
     }
                                     //Product Sales end
-
     //yearWIse Sales
 
     public String getInvoicesByYear(String companyID){
         List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
         TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
         try{
-            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Invoice.class);
+            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             year = Calendar.getInstance().get(Calendar.YEAR);
             while (invoiceListMain.size() != 0){
                 TopCustomersInvoices topInvoices = computeInvoicesTotal();
@@ -115,11 +149,12 @@ public class ReportsHelper {
         List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
         try{
             List<Invoice> invoiceList = null;
-            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Invoice.class);
+            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
                 invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerID())
-                        .and("companyID").is(companyID)), Invoice.class);
+                        .and("companyID").is(companyID).and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
                 if(topCustomersInvoices != null)
                     topCustomersInvoicesList.add(topCustomersInvoices);
@@ -158,16 +193,17 @@ public class ReportsHelper {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date startDateFinal = df.parse(startDate);
         Date endDateFinal = df.parse(endDate);
-
         List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
         try{
             List<Invoice> invoiceList = null;
             invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
-                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)), Invoice.class);
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
                 invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerID())
-                        .and("companyID").is(companyID).and("invoiceDate").gte(startDateFinal).lte(endDateFinal)), Invoice.class);
+                        .and("companyID").is(companyID).and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
+                        .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
                 if(topCustomersInvoices != null)
                     topCustomersInvoicesList.add(topCustomersInvoices);
@@ -205,6 +241,27 @@ public class ReportsHelper {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         int year  = localDate.getYear();
         return year;
+    }
+
+    public String getTotalSalesByDate(String startDate, String endDate, String companyID) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateFinal = df.parse(startDate);
+        Date endDateFinal = df.parse(endDate);
+        TopCustomersInvoices topCustomersInvoice = new TopCustomersInvoices ();
+        try{
+            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                int sum = 0;
+                for(Invoice invoice:invoiceListMain){
+                    sum += Integer.parseInt(invoice.getTotalAmountDue());
+                }
+                topCustomersInvoice.setInvoiceTotal(String.valueOf(sum));
+                topCustomersInvoice.setCustomerName(startDate + " - " + endDate);
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(topCustomersInvoice);
     }
 
 }
