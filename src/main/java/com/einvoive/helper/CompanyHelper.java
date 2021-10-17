@@ -63,7 +63,6 @@ public class CompanyHelper {
         translationHelper.mergeAndSave(companyEnglish.getCity(), companyArabic.getCity());
     }
 
-
     private String validationBeforeSave(Company company) {
         String msg = null;
         String msg1 = "";
@@ -111,11 +110,11 @@ public class CompanyHelper {
         return companyArabic;
     }
 
-//    public String updateCompany(Company userCompany) {
-//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(userCompany.getCompanyID())),Company.class);
-//        companyRepository.delete(company);
-//        return saveCompany(companyEnglish, userCompanyArabic);
-//    }
+    public String updateCompany(Company companyEnglish, Company userCompanyArabic) {
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
+        companyRepository.delete(company);
+        return saveCompany(company, userCompanyArabic);
+    }
 
 //    public String uploadCompanyLogo(String filePath, String companyID){
 //        String msg = "Unsuccessfull";

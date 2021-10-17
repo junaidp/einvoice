@@ -1,6 +1,5 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Company;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
@@ -18,17 +17,17 @@ public class ProductMainHelper {
 
     @Autowired
     ProductMainRepository repository;
-
+    @Autowired
+    TranslationHelper translationHelper;
     @Autowired
     MongoOperations mongoOperation;
-
     Gson gson = new Gson();
 
-    public String save(ProductMain product){
+    public String save(ProductMain productEnglish, ProductMain productArabic){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(product.getProductName())
-                .and("companyID").is(product.getCompanyID())), ProductMain.class);
+        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(productEnglish.getProductName())
+                .and("companyID").is(productEnglish.getCompanyID())), ProductMain.class);
         if(productMain != null){
             error.setErrorStatus("Error");
             error.setError("Product Name Already Exists");
@@ -37,7 +36,8 @@ public class ProductMainHelper {
         }
         else {
             try {
-                repository.save(product);
+                repository.save(productEnglish);
+                saveProductArabic(productEnglish, productArabic);
                 return "product saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");
@@ -46,6 +46,18 @@ public class ProductMainHelper {
                 return jsonError;
             }
         }
+    }
+
+    private void saveProductArabic(ProductMain productEnglish, ProductMain productArabic){
+        translationHelper.mergeAndSave(productEnglish.getProductName(), productArabic.getProductName());
+        translationHelper.mergeAndSave(productEnglish.getDescription(), productArabic.getDescription());
+    }
+
+    private ProductMain getProductArabic(ProductMain productEnglish) {
+        ProductMain productArabic = new ProductMain();
+        productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
+        productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
+        return productArabic;
     }
 
     public String getTopSaledProducts(String companyId){
@@ -62,16 +74,24 @@ public class ProductMainHelper {
     }
 
     public String getProducts(String companyId){
-        List<ProductMain> products = null;
+        List<List<ProductMain>> productsMain = null;
+        List<ProductMain> productsEnglish = null;
+        List<ProductMain> productsArabic = null;
         try {
             Query query = new Query();
             if(!companyId.isEmpty())
              query.addCriteria(Criteria.where("companyID").is(companyId));
-            products = mongoOperation.find(query, ProductMain.class);
+            productsEnglish = mongoOperation.find(query, ProductMain.class);
+            for(ProductMain productMainEnglish : productsEnglish)
+                productsArabic.add(getProductArabic(productMainEnglish));
+            if(productsEnglish != null && productsArabic != null){
+                productsMain.add(productsEnglish);
+                productsMain.add(productsArabic);
+            }
         }catch(Exception ex){
             System.out.println("Error in get Products:"+ ex);
         }
-        return gson.toJson(products);
+        return gson.toJson(productsMain);
     }
 
     public String deleteProduct(String productID){
@@ -80,8 +100,8 @@ public class ProductMainHelper {
         return "product deleted";
     }
 
-    public String update(ProductMain product) {
-        return save(product);
+    public String update(ProductMain productEnglish, ProductMain productArabic) {
+        return save(productEnglish, productArabic);
     }
 
 }

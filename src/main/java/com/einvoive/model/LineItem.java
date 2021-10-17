@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
         private String taxAmount;
         private String itemSubTotal;
         private String invoiceId;
+        private String amountBeforeTax;
 
 
         public String getId() {
@@ -99,4 +100,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
         public void setItemSubTotal(String itemSubTotal) {
             this.itemSubTotal = itemSubTotal;
         }
-}
+
+        public String getAmountBeforeTax() {
+            return amountBeforeTax;
+        }
+
+        public void setAmountBeforeTax(String amountBeforeTax) {
+            this.amountBeforeTax = amountBeforeTax;
+        }
+    }

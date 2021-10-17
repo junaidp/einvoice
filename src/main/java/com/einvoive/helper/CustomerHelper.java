@@ -3,9 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.Company;
 import com.einvoive.model.Customer;
 import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.User;
 import com.einvoive.repository.CustomerRepository;
-import com.einvoive.repository.UserRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -22,19 +20,21 @@ public class CustomerHelper {
     @Autowired
     CustomerRepository repository;
     @Autowired
+    TranslationHelper translationHelper;
+    @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
+    private List<Customer> customers;
 
-    List<Customer> listCustomers = null;
-
-    public String save(Customer customer) {
+    public String save(Customer customerEnglish, Customer customerArabic) {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        String msg = validationBeforeSave(customer);
+        String msg = validationBeforeSave(customerEnglish);
         if(msg == null || msg.isEmpty()) {
             try {
-                repository.save(customer);
+                saveCustomerArabic(customerEnglish, customerArabic);
+                repository.save(customerEnglish);
                 return "Customer Saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");
@@ -72,13 +72,57 @@ public class CustomerHelper {
         return msg;
     }
 
-    public String update(Customer customer){
-        deleteCustomers(customer.getId());
-        return save(customer);
+    public String update(Customer customerEnglish, Customer customerArabic){
+        deleteCustomers(customerEnglish.getId());
+        return save(customerEnglish, customerArabic);
+    }
+
+    private void saveCustomerArabic(Customer customerEnglish, Customer customerArabic){
+        translationHelper.mergeAndSave(customerEnglish.getFirstName(), customerArabic.getFirstName());
+        translationHelper.mergeAndSave(customerEnglish.getLastName(), customerArabic.getLastName());
+        translationHelper.mergeAndSave(customerEnglish.getCustomer(), customerArabic.getCustomer());
+        translationHelper.mergeAndSave(customerEnglish.getBillingAddress1(), customerArabic.getBillingAddress1());
+        translationHelper.mergeAndSave(customerEnglish.getBillingAddress2(), customerArabic.getBillingAddress2());
+        translationHelper.mergeAndSave(customerEnglish.getNotes(), customerArabic.getNotes());
+        translationHelper.mergeAndSave(customerEnglish.getBillingCountry(), customerArabic.getBillingCountry());
+        translationHelper.mergeAndSave(customerEnglish.getBillingProvince(), customerArabic.getBillingProvince());
+        translationHelper.mergeAndSave(customerEnglish.getBillingCity(), customerArabic.getBillingCity());
+        translationHelper.mergeAndSave(customerEnglish.getBillingPostal(), customerArabic.getBillingPostal());
+        translationHelper.mergeAndSave(customerEnglish.getShippingAddress1(), customerArabic.getShippingAddress1());
+        translationHelper.mergeAndSave(customerEnglish.getShippingAddress2(), customerArabic.getShippingAddress2());
+        translationHelper.mergeAndSave(customerEnglish.getShippingName(), customerArabic.getShippingName());
+        translationHelper.mergeAndSave(customerEnglish.getShippingCountry(), customerArabic.getShippingCountry());
+        translationHelper.mergeAndSave(customerEnglish.getShippingProvince(), customerArabic.getShippingProvince());
+        translationHelper.mergeAndSave(customerEnglish.getShippingCity(), customerArabic.getShippingCity());
+        translationHelper.mergeAndSave(customerEnglish.getShippingPostal(), customerArabic.getShippingPostal());
+        translationHelper.mergeAndSave(customerEnglish.getDeliveryInstructions(), customerArabic.getDeliveryInstructions());
+    }
+
+    private Customer getCustomerArabic(Customer customerEnglish) {
+        Customer customerArabic = new Customer();
+        customerArabic.setFirstName(translationHelper.getTranslationMain(customerEnglish.getFirstName()));
+        customerArabic.setLastName(translationHelper.getTranslationMain(customerEnglish.getLastName()));
+        customerArabic.setCustomer(translationHelper.getTranslationMain(customerEnglish.getCustomer()));
+        customerArabic.setBillingAddress1(translationHelper.getTranslationMain(customerEnglish.getBillingAddress1()));
+        customerArabic.setBillingAddress2(translationHelper.getTranslationMain(customerEnglish.getBillingAddress2()));
+        customerArabic.setNotes(translationHelper.getTranslationMain(customerEnglish.getNotes()));
+        customerArabic.setBillingCountry(translationHelper.getTranslationMain(customerEnglish.getBillingCountry()));
+        customerArabic.setBillingProvince(translationHelper.getTranslationMain(customerEnglish.getBillingProvince()));
+        customerArabic.setBillingCity(translationHelper.getTranslationMain(customerEnglish.getBillingCity()));
+        customerArabic.setBillingPostal(translationHelper.getTranslationMain(customerEnglish.getBillingPostal()));
+        customerArabic.setShippingAddress1(translationHelper.getTranslationMain(customerEnglish.getShippingAddress1()));
+        customerArabic.setShippingAddress2(translationHelper.getTranslationMain(customerEnglish.getShippingAddress2()));
+        customerArabic.setShippingName(translationHelper.getTranslationMain(customerEnglish.getShippingName()));
+        customerArabic.setShippingCountry(translationHelper.getTranslationMain(customerEnglish.getShippingCountry()));
+        customerArabic.setShippingProvince(translationHelper.getTranslationMain(customerEnglish.getShippingProvince()));
+        customerArabic.setShippingCity(translationHelper.getTranslationMain(customerEnglish.getShippingCity()));
+        customerArabic.setShippingPostal(translationHelper.getTranslationMain(customerEnglish.getShippingPostal()));
+        customerArabic.setDeliveryInstructions(translationHelper.getTranslationMain(customerEnglish.getDeliveryInstructions()));
+        return customerArabic;
     }
 
     public String getAllCustomers(String comapnyID){
-        List<Customer>customers = null;
+        customers = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(comapnyID));
@@ -91,15 +135,21 @@ public class CustomerHelper {
     }
 
     public String getCustomer(String customerID){
-        listCustomers = null;
+        Customer customerEnglish = null;
+        Customer customerArabic = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("id").is(customerID));
             System.out.println("QUERY");
-            listCustomers = mongoOperation.find(query, Customer.class);
+            customerEnglish = mongoOperation.findOne(query, Customer.class);
+            if(customerEnglish != null)
+                getCustomerArabic(customerEnglish);
         }catch(Exception ex){
             System.out.println("Error in get Customers:"+ ex);
         }
+        List<Customer> listCustomers = new ArrayList<>();
+        listCustomers.add(customerEnglish);
+        listCustomers.add(customerArabic);
         return gson.toJson(listCustomers);
     }
 
@@ -126,7 +176,7 @@ public class CustomerHelper {
 
     public String deleteCustomers(String customerID){
         getCustomer(customerID);
-        repository.deleteAll(listCustomers);
+        repository.deleteAll(customers);
         return "Customer deleted";
     }
 

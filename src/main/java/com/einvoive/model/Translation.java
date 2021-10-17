@@ -9,6 +9,7 @@ public class Translation {
     private String id;
     private String arabic;
     private String english;
+    private String loggedInID;
 
     public String getId() {
         return id;
@@ -32,5 +33,13 @@ public class Translation {
 
     public void setArabic(String arabic) {
         this.arabic = arabic;
+    }
+
+    public String getLoggedInID() {
+        return loggedInID;
+    }
+
+    public void setLoggedInID(String loggedInID) {
+        this.loggedInID = loggedInID;
     }
 }

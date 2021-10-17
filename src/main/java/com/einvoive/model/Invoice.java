@@ -16,6 +16,8 @@ public class Invoice {
     private String uuid;
     private String OriginalRefNo;
     private String type;
+    private Date supplyDate;
+    private String reasonChangingStandard;
     private String invoiceNumber;
     private String invoiceName;
     private String invoiceDescription;
@@ -218,5 +220,21 @@ public class Invoice {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Date getSupplyDate() {
+        return supplyDate;
+    }
+
+    public void setSupplyDate(Date supplyDate) {
+        this.supplyDate = supplyDate;
+    }
+
+    public String getReasonChangingStandard() {
+        return reasonChangingStandard;
+    }
+
+    public void setReasonChangingStandard(String reasonChangingStandard) {
+        this.reasonChangingStandard = reasonChangingStandard;
     }
 }

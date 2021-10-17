@@ -62,8 +62,8 @@ public class MainController {
     }
 
     @PostMapping("/saveCustomer")
-    public String saveCustomer(@RequestBody Customer customer) {
-        return customerHelper.save(customer);
+    public String saveCustomer(@RequestBody Customer customerEnglish, Customer customerArabic) {
+        return customerHelper.save(customerEnglish, customerArabic);
     }
 
     @PostMapping("/saveInvoice")
@@ -87,8 +87,8 @@ public class MainController {
     }
 
     @PostMapping("/saveProductMain")
-    public String saveProductMain(@RequestBody ProductMain product) {
-        return productMainHelper.save(product);
+    public String saveProductMain(@RequestBody ProductMain productEnglish, ProductMain productArabic) {
+        return productMainHelper.save(productEnglish, productArabic);
     }
 
     @PostMapping("/saveVat")
@@ -121,15 +121,15 @@ public class MainController {
     public String updatePaymentCard(@RequestBody PaymentCard paymentCard) {
         return paymentCardHelper.updatePaymentCard(paymentCard);
     }
-//
-//    @PostMapping("/updateCompany")
-//    public String updateCompany(@RequestBody Company company) {
-//        return companyHelper.updateCompany(company);
-//    }
+
+    @PostMapping("/updateCompany")
+    public String updateCompany(@RequestBody Company companyEnglish, Company companyArabic) {
+        return companyHelper.updateCompany(companyEnglish, companyArabic);
+    }
 
     @PostMapping("/updateCustomer")
-    public String updateCustomer(@RequestBody Customer customer) {
-        return customerHelper.update(customer);
+    public String updateCustomer(@RequestBody Customer customerEnglish, Customer customerArabic) {
+        return customerHelper.update(customerEnglish, customerArabic);
     }
 
     @PostMapping("/updateInvoice")
@@ -148,8 +148,8 @@ public class MainController {
     }
 
     @PostMapping("/updateProductMain")
-    public String updateProductMain(@RequestBody ProductMain product) {
-        return productMainHelper.update(product);
+    public String updateProductMain(@RequestBody ProductMain productEnglish, ProductMain productArabic) {
+        return productMainHelper.update(productEnglish, productArabic);
     }
 
     @PostMapping("/updateVat")

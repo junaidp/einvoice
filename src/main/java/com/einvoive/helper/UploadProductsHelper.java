@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.einvoive.repository.ProductMainRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,7 +14,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.einvoive.model.ProductMain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
@@ -122,7 +120,7 @@ public class UploadProductsHelper {
         try {
             List<ProductMain> productMainList = excelToProductList(file.getInputStream());
             for (ProductMain productMain : productMainList ) {
-                productMainHelper.save(productMain);
+                productMainHelper.save(productEnglish, productMain);
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
