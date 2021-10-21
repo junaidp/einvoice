@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -53,7 +54,7 @@ public class ProductMainHelper {
         translationHelper.mergeAndSave(productEnglish.getDescription(), productArabic.getDescription());
     }
 
-    private ProductMain getProductArabic(ProductMain productEnglish) {
+    public ProductMain getProductArabic(ProductMain productEnglish) {
         ProductMain productArabic = new ProductMain();
         productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
         productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
@@ -74,9 +75,9 @@ public class ProductMainHelper {
     }
 
     public String getProducts(String companyId){
-        List<List<ProductMain>> productsMain = null;
+        List<List<ProductMain>> productsMain = new ArrayList<>();
         List<ProductMain> productsEnglish = null;
-        List<ProductMain> productsArabic = null;
+        List<ProductMain> productsArabic = new ArrayList<>();
         try {
             Query query = new Query();
             if(!companyId.isEmpty())

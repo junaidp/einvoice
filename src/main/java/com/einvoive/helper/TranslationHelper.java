@@ -64,7 +64,7 @@ public class TranslationHelper {
             Query query = new Query();
             query.addCriteria(Criteria.where("english").is(english));
             translation = mongoOperation.findOne(query, Translation.class);
-            if(translation != null)
+            if(translation.getArabic() != null)
                 return gson.toJson(translation);
             else {
                 error.setErrorStatus("Error");

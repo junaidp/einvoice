@@ -119,8 +119,9 @@ public class UploadProductsHelper {
     public void saveAll(MultipartFile file) {
         try {
             List<ProductMain> productMainList = excelToProductList(file.getInputStream());
-            for (ProductMain productMain : productMainList ) {
-                productMainHelper.save(productEnglish, productMain);
+            for (ProductMain productEnglish : productMainList ) {
+                ProductMain productArabic = productMainHelper.getProductArabic(productEnglish);
+                productMainHelper.save(productEnglish, productArabic);
             }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());

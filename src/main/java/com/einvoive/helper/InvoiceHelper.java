@@ -2,11 +2,6 @@ package com.einvoive.helper;
 
 import com.einvoive.model.*;
 import com.einvoive.repository.InvoiceRepository;
-import com.mongodb.client.MongoCollection;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -14,14 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 @Component
 public class InvoiceHelper {
@@ -61,6 +49,54 @@ public class InvoiceHelper {
         }
     }
 
+    public String getInvoicesByCustomer(String customerName){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("customerName").is(customerName));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
+    public String getInvoicesByInvoiceNo(String invoiceNo){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("invoiceNumber").is(invoiceNo));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
+    public String getInvoicesByStatus(String status){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("status").is(status));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
     public String getInvoicesByCompany(String companyID){
         List<Invoice> invoices = null;
         try {
@@ -68,7 +104,7 @@ public class InvoiceHelper {
             query.addCriteria(Criteria.where("companyID").is(companyID));
             invoices = mongoOperation.find(query, Invoice.class);
             for(Invoice invoice : invoices) {
-                lineItemHelper.getItems(invoice.getId());
+                lineItemHelper.getLineItems(invoice.getId());
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){

@@ -1,10 +1,8 @@
 package com.einvoive.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,10 +31,19 @@ public class Invoice {
     private String userId;
     private String notes;
     private String status;
+    private String currency;
     private String companyID;
-    private String customerID;
+    private String customerName;
     private String totalExcludingVAT;
     private List<LineItem> lineItemList;
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
 
     public String getInvoiceName() {
         return invoiceName;
@@ -62,12 +69,12 @@ public class Invoice {
         this.totalExcludingVAT = totalExcludingVAT;
     }
 
-    public String getCustomerID() {
-        return customerID;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    public void setCustomerID(String customerID) {
-        this.customerID = customerID;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public List<LineItem> getLineItemList() {

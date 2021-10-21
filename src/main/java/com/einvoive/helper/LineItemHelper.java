@@ -38,7 +38,7 @@ public class LineItemHelper {
         }
     }
 
-    public String getItems(String invoiceId) {
+    public String getLineItems(String invoiceId) {
         lineItems = null;
         try {
             Query query = new Query();

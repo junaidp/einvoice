@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.Date;
+import java.util.List;
 
 @RequestMapping("control")
 @RestController
@@ -87,8 +87,8 @@ public class MainController {
     }
 
     @PostMapping("/saveProductMain")
-    public String saveProductMain(@RequestBody ProductMain productEnglish, ProductMain productArabic) {
-        return productMainHelper.save(productEnglish, productArabic);
+    public String saveProductMain(@RequestBody List<ProductMain> products) {
+        return productMainHelper.save(products.get(0), products.get(1));
     }
 
     @PostMapping("/saveVat")
@@ -148,8 +148,8 @@ public class MainController {
     }
 
     @PostMapping("/updateProductMain")
-    public String updateProductMain(@RequestBody ProductMain productEnglish, ProductMain productArabic) {
-        return productMainHelper.update(productEnglish, productArabic);
+    public String updateProductMain(@RequestBody List<ProductMain> products) {
+        return productMainHelper.update(products.get(0), products.get(1));
     }
 
     @PostMapping("/updateVat")
@@ -268,6 +268,15 @@ public class MainController {
         return reportsHelper.getInvoicesByYear(companyID);
     }
 
+    @GetMapping("/getInvoicesByCustomer")
+    public String getInvoicesByCustomer(@RequestParam String customerName) { return invoiceHelper.getInvoicesByCustomer(customerName); }
+
+    @GetMapping("/getInvoicesByInvoiceNo")
+    public String getInvoicesByInvoiceNo(@RequestParam String invoiceNo) { return invoiceHelper.getInvoicesByInvoiceNo(invoiceNo); }
+
+    @GetMapping("/getInvoicesByStatus")
+    public String getInvoicesByStatus(@RequestParam String status) { return invoiceHelper.getInvoicesByStatus(status); }
+
     @GetMapping("/getInvoicesByCompany")
     public String getInvoicesByCompany(@RequestParam String companyID) { return invoiceHelper.getInvoicesByCompany(companyID); }
 
@@ -294,13 +303,13 @@ public class MainController {
 //        return companyHelper.singIn(company);
 //    }
 
-    @GetMapping("/getProducts")
-    public String getProducts(@RequestParam String invoiceId) {
-        return lineItemHelper.getItems(invoiceId);
+    @GetMapping("/getLineItems")
+    public String getLineItems(@RequestParam String invoiceId) {
+        return lineItemHelper.getLineItems(invoiceId);
     }
 
-    @GetMapping("/getProductsMain")
-    public String getProductsMain(@RequestParam String companyId) {
+    @GetMapping("/getProducts")
+    public String getProducts(@RequestParam String companyId) {
         return productMainHelper.getProducts(companyId);
     }
 
