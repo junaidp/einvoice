@@ -1,17 +1,18 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.*;
-import com.einvoive.other.Encryption;
+import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Component
@@ -37,11 +38,7 @@ public class InvoiceHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-            invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
-//            UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
-            invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
-            invoice.setHash(Encryption.encrypt(invoice.getId()));
-            setPreviousHash(invoice);
+            setInvoice(invoice);
             repository.save(invoice);
             for(LineItem lineItem : invoice.getLineItemList()){
                 lineItem.setInvoiceId(invoice.getId());
@@ -56,14 +53,25 @@ public class InvoiceHelper {
         }
     }
 
-    private void setPreviousHash(Invoice invoice) {
-//        Query query = new Query();
-//        query.with(new Sort(Sort.Direction.DESC, "invoiceDate"));
+    private void setInvoice(Invoice invoice) throws NoSuchAlgorithmException {
+        invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
+//      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
+        invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
+        invoice.setHash(Utility.encrypt(invoice.getId()));
+        invoice.setPreviousHash(getPreviousHash(invoice));
+        String lastCompanyInvoiceNumber = getLastInvoiceByCompany(invoice.getCompanyID());
+        System.out.println(lastCompanyInvoiceNumber);
+    }
+
+    private String getPreviousHash(Invoice invoice) {
         List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
+        String previousHash = "";
         if(invoiceList.size() > 0)
-            invoice.setPreviousHash(invoiceList.get(invoiceList.size()-1).getHash());
+            previousHash = invoiceList.get(invoiceList.size()-1).getHash();
         else
-            invoice.setPreviousHash("00809e66-36d5-436f-93c4-e4e2c76cce0d");
+            previousHash = "";
+
+        return previousHash;
     }
 
     public String getInvoicesByCustomer(String customerName){
@@ -130,9 +138,21 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-//    public String getTopCustomerInvoices(Date start, Date end){
-//        for()
-//    }
+    public String getLastInvoiceByCompany(String companyID) {
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber")).limit(1);
+           // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            invoices = mongoOperation.find(query, Invoice.class);
+            return invoices.get(0).getInvoiceNumber();
+        }catch(Exception ex){
+            System.out.println("Error in getLastInvoiceByCompany:"+ ex);
+            throw ex;
+        }
+
+    }
 
     public String deleteInvoice(String invoiceID){
         List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);
