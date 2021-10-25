@@ -35,6 +35,9 @@ public class MainController {
     AccountsHelper accountsHelper;
 
     @Autowired
+    RecordPaymentHelper recordPaymentHelper;
+
+    @Autowired
     ReportsHelper reportsHelper;
 
     @Autowired
@@ -79,6 +82,11 @@ public class MainController {
     @PostMapping("/saveAccounts")
     public String saveAccounts(@RequestBody Accounts accounts) {
         return accountsHelper.save(accounts);
+    }
+
+    @PostMapping("/saveRecordPayment")
+    public String saveRecordPayment(@RequestBody RecordPayment recordPayment) {
+        return recordPaymentHelper.save(recordPayment);
     }
 
     @PostMapping("/savePaymentCard")
@@ -145,6 +153,11 @@ public class MainController {
     @PostMapping("/updateAccounts")
     public String updateAccounts(@RequestBody Accounts accounts) {
         return accountsHelper.update(accounts);
+    }
+
+    @PostMapping("/updateRecordPayment")
+    public String updateRecordPayment(@RequestBody RecordPayment recordPayment) {
+        return recordPaymentHelper.update(recordPayment);
     }
 
     @PostMapping("/updateProductMain")
@@ -273,6 +286,10 @@ public class MainController {
 
     @GetMapping("/getInvoicesByInvoiceNo")
     public String getInvoicesByInvoiceNo(@RequestParam String invoiceNo) { return invoiceHelper.getInvoicesByInvoiceNo(invoiceNo); }
+
+    @GetMapping("/getInvoicesByDuration")
+    public String getInvoicesByDuration(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
+        return reportsHelper.getInvoicesByDuration(startDate, endDate, companyID);}
 
     @GetMapping("/getInvoicesByStatus")
     public String getInvoicesByStatus(@RequestParam String status) { return invoiceHelper.getInvoicesByStatus(status); }

@@ -96,8 +96,10 @@ public class ProductMainHelper {
     }
 
     public String deleteProduct(String productID){
-        List<ProductMain> products = mongoOperation.find(new Query(Criteria.where("id").is(productID)), ProductMain.class);
-        repository.deleteAll(products);
+        ProductMain product = mongoOperation.findOne(new Query(Criteria.where("id").is(productID)), ProductMain.class);
+        repository.delete(product);
+        translationHelper.deleteTranslation(product.getProductName());
+        translationHelper.deleteTranslation(product.getDescription());
         return "product deleted";
     }
 

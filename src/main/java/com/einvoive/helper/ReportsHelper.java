@@ -206,6 +206,22 @@ public class ReportsHelper {
         }
     }
 
+        public String getInvoicesByDuration(String startDate, String endDate, String companyID) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateFinal = df.parse(startDate);
+        Date endDateFinal = df.parse(endDate);
+        List<Invoice> invoicesList;
+        try{
+            invoicesList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
+                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+        } catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+            return gson.toJson(ex.getMessage());
+        }
+        return gson.toJson(invoicesList);
+    }
+
     public String getTopCustomerInvoicesByDates(String startDate, String endDate, String companyID) throws ParseException {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date startDateFinal = df.parse(startDate);

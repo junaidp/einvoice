@@ -85,4 +85,10 @@ public class TranslationHelper {
         Translation translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
         return translation.getArabic();
     }
+
+    public String deleteTranslation(String english) {
+        Translation translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+        translationRepository.delete(translation);
+        return translation.getEnglish() + "deleted";
+    }
 }

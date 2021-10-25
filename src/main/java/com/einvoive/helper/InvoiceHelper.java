@@ -1,10 +1,13 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.*;
+import com.einvoive.other.Encryption;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -34,7 +37,11 @@ public class InvoiceHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-//            invoice.setId(getAvaiablaeId());
+            invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
+//            UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
+            invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
+            invoice.setHash(Encryption.encrypt(invoice.getId()));
+            setPreviousHash(invoice);
             repository.save(invoice);
             for(LineItem lineItem : invoice.getLineItemList()){
                 lineItem.setInvoiceId(invoice.getId());
@@ -47,6 +54,16 @@ public class InvoiceHelper {
             jsonError = gson.toJson(error);
             return jsonError;
         }
+    }
+
+    private void setPreviousHash(Invoice invoice) {
+//        Query query = new Query();
+//        query.with(new Sort(Sort.Direction.DESC, "invoiceDate"));
+        List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
+        if(invoiceList.size() > 0)
+            invoice.setPreviousHash(invoiceList.get(invoiceList.size()-1).getHash());
+        else
+            invoice.setPreviousHash("00809e66-36d5-436f-93c4-e4e2c76cce0d");
     }
 
     public String getInvoicesByCustomer(String customerName){
@@ -123,10 +140,9 @@ public class InvoiceHelper {
         return "Invoice deleted";
     }
 
-    public String getAvaiablaeId() {
-        Long total = repository.count();
-        int count = total.intValue();
-        return count+1+"";
+    public String getAvaiablaeId(String companyID) {
+        List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Invoice.class);
+        return String.valueOf(invoiceList.size()+1);
     }
 
     public String update(Invoice invoice) {

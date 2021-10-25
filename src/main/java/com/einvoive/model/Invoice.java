@@ -11,8 +11,11 @@ public class Invoice {
 
     @Id
     private String id;
-    private String uuid;
-    private String OriginalRefNo;
+    private String serialNo;
+    private String hash;
+    private String previousHash;
+    private String paymentType;
+    private String originalRefNo;
     private String type;
     private Date supplyDate;
     private String reasonChangingStandard;
@@ -39,6 +42,14 @@ public class Invoice {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
     }
 
     public void setCurrency(String currency) {
@@ -105,6 +116,14 @@ public class Invoice {
         return notes;
     }
 
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo;
+    }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -169,8 +188,9 @@ public class Invoice {
         return id;
     }
 
-    public void setId(String id) {
+    public String setId(String id) {
         this.id = id;
+        return id;
     }
 
     public String getInvoiceNumber() {
@@ -205,20 +225,12 @@ public class Invoice {
         this.paymentDue = paymentDue;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getOriginalRefNo() {
-        return OriginalRefNo;
+        return originalRefNo;
     }
 
     public void setOriginalRefNo(String originalRefNo) {
-        OriginalRefNo = originalRefNo;
+        this.originalRefNo = originalRefNo;
     }
 
     public String getType() {
@@ -243,5 +255,21 @@ public class Invoice {
 
     public void setReasonChangingStandard(String reasonChangingStandard) {
         this.reasonChangingStandard = reasonChangingStandard;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(String previousHash) {
+        this.previousHash = previousHash;
     }
 }
