@@ -2,10 +2,12 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Company;
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Invoice;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.CompanyRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,6 +35,7 @@ public class CompanyHelper {
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
+
                 saveCompanyArabic(companyEnglish, companyArabic);
                 companyRepository.save(companyEnglish);
                 return "Company Saved";
@@ -49,6 +52,21 @@ public class CompanyHelper {
             jsonError = gson.toJson(error);
             return jsonError;
          }
+    }
+
+    public String getLastCompanyId() {
+        String company = null;
+        try {
+            Query query = new Query();
+            query.with(Sort.by(Sort.Direction.DESC, "companyID")).limit(1);
+            // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            company = mongoOperation.find(query, Company.class).get(0).getCompanyID();
+            return company;
+        }catch(Exception ex){
+            System.out.println("Error in getLastCompanyId:"+ ex);
+            return "";
+        }
+
     }
 
     private void saveCompanyArabic(Company companyEnglish, Company companyArabic){

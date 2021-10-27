@@ -4,6 +4,7 @@ import com.einvoive.model.*;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -31,6 +33,8 @@ public class InvoiceHelper {
      InvoiceRepository invoiceRepository;
 
     Gson gson = new Gson();
+
+    private String INVOICE_SEPARATOR = "-";
 
     private  List<Invoice> invoiceListMain = null;
 
@@ -59,8 +63,28 @@ public class InvoiceHelper {
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
         invoice.setPreviousHash(getPreviousHash(invoice));
-        String lastCompanyInvoiceNumber = getLastInvoiceByCompany(invoice.getCompanyID());
-        System.out.println(lastCompanyInvoiceNumber);
+        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
+    }
+
+    private String getNextInvoiceNumber(String companyID) {
+
+        String lastCompanyInvoiceNumber = getLastInvoiceByCompany(companyID);
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+                invoiceNumber = companyID + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = companyID + INVOICE_SEPARATOR + invoiceNum;
+        }
+         return invoiceNumber;
     }
 
     private String getPreviousHash(Invoice invoice) {
@@ -149,7 +173,7 @@ public class InvoiceHelper {
             return invoices.get(0).getInvoiceNumber();
         }catch(Exception ex){
             System.out.println("Error in getLastInvoiceByCompany:"+ ex);
-            throw ex;
+            return "";
         }
 
     }
