@@ -2,6 +2,7 @@ package com.einvoive.controller;
 
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
+import com.einvoive.util.Translator;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -356,5 +357,9 @@ public class MainController {
         return translationHelper.getTranslation(english);
     }
 
+    @GetMapping("/getTranslationFromApi")
+    public String getTranslationFromApi(@RequestParam String english) {
+        return Translator.getTranslation(english);
+    }
 
 }
