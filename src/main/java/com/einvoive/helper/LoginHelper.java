@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.einvoive.constants.Constant;
 
 @Component
 public class LoginHelper {
@@ -25,16 +26,31 @@ public class LoginHelper {
 
     Gson gson = new Gson();
 
+//    private String companyID;
+//
+//    private String loggedInUserID;
+
     public String signIn(Login login) {
         System.out.println(login.getEmail() + "," + login.getPassword());
         Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword()))), Company.class);
         if(loginCompany != null){
+            Constant.COMPANY_ID = loginCompany.getCompanyID();
+            Constant.LOGGED_IN_USER_ID = loginCompany.getId();
             return gson.toJson(loginCompany);
         }
         else{
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
+//        companyID = savedUser.getCompanyID();
+//        loggedInUserID = savedUser.getId();
         return gson.toJson(savedUser);
         }
     }
 
+//    public String getCompanyID() {
+//        return companyID;
+//    }
+//
+//    public String getLoggedInUserID() {
+//        return loggedInUserID;
+//    }
 }

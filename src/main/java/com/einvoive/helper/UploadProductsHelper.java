@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class UploadProductsHelper {
+    private static LoginHelper loginHelper;
     @Autowired
     ProductMainHelper productMainHelper;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -33,7 +34,7 @@ public class UploadProductsHelper {
         return true;
     }
 
-    public static List<ProductMain> excelToProductList(InputStream is) {
+    public static List<ProductMain> excelToProductList(InputStream is, String companyID, String loggedInUserID) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(SHEET);
@@ -86,17 +87,19 @@ public class UploadProductsHelper {
                             productMain.setAssignedChartofAccounts(currentCell.getStringCellValue());
                             break;
 
-                        case 5:
-//                            int valueUserID = (int)currentCell.getNumericCellValue();
-//                            productMain.setUserId(String.valueOf(valueUserID));
-                            productMain.setUserId(currentCell.getStringCellValue());
-                            break;
+//                        case 5:
+////                            int valueUserID = (int)currentCell.getNumericCellValue();
+////                            productMain.setUserId(String.valueOf(valueUserID));
+////                            productMain.setUserId(currentCell.getStringCellValue());
+//                            productMain.setUserId(loginHelper.getLoggedInUserID());
+//                            break;
 
-                        case 6:
-//                            int valueCompanyID = (int)currentCell.getNumericCellValue();
-//                            productMain.setCompanyID(String.valueOf(valueCompanyID));
-                            productMain.setCompanyID(currentCell.getStringCellValue());
-                            break;
+//                        case 6:
+////                            int valueCompanyID = (int)currentCell.getNumericCellValue();
+////                            productMain.setCompanyID(String.valueOf(valueCompanyID));
+////                            productMain.setCompanyID(currentCell.getStringCellValue());
+//                            productMain.setCompanyID(loginHelper.getCompanyID());
+//                            break;
 
                         default:
                             break;
@@ -104,7 +107,8 @@ public class UploadProductsHelper {
 
                     cellIdx++;
                 }
-
+                productMain.setUserId(loggedInUserID);
+                productMain.setCompanyID(companyID);
                 productMainList.add(productMain);
             }
 
@@ -116,11 +120,12 @@ public class UploadProductsHelper {
         }
     }
 
-    public void saveAll(MultipartFile file) {
+    public void saveAll(MultipartFile file, String companyID, String loggedInUserID) {
         try {
-            List<ProductMain> productMainList = excelToProductList(file.getInputStream());
+            List<ProductMain> productMainList = excelToProductList(file.getInputStream(), companyID, loggedInUserID);
+//            productMainHelper.repository.saveAll(productMainList);
             for (ProductMain productEnglish : productMainList ) {
-                ProductMain productArabic = productMainHelper.getProductArabic(productEnglish);
+                ProductMain productArabic = productMainHelper.getProductArabicOnline(productEnglish);
                 productMainHelper.save(productEnglish, productArabic);
             }
         } catch (IOException e) {

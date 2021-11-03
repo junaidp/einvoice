@@ -175,8 +175,9 @@ public class CustomerHelper {
     }
 
     public String deleteCustomers(String customerID){
-        getCustomer(customerID);
-        repository.deleteAll(customers);
+        Customer customer = mongoOperation.findOne(new Query(Criteria.where("id").is(customerID)), Customer.class);
+        assert customer != null;
+        repository.delete(customer);
         return "Customer deleted";
     }
 

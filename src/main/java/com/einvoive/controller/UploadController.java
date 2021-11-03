@@ -1,5 +1,6 @@
 package com.einvoive.controller;
 
+import com.einvoive.constants.Constant;
 import com.einvoive.helper.CompanyHelper;
 import com.einvoive.helper.LogoHelper;
 import com.einvoive.helper.UploadCustomersHelper;
@@ -135,7 +136,7 @@ public class UploadController {
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
                 Files.write(path, bytes);
-                uploadProductsHelper.saveAll(file);
+                uploadProductsHelper.saveAll(file, Constant.COMPANY_ID, Constant.LOGGED_IN_USER_ID);
                 return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
             } catch (Exception e) {
                 error.setErrorStatus("Error");

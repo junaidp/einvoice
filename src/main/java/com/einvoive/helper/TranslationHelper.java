@@ -26,7 +26,7 @@ public class TranslationHelper {
         String jsonError;
         Translation translation1 = mongoOperation.findOne(new Query(Criteria.where("english").is(translation.getEnglish())), Translation.class);
         if(translation1 == null){
-            translation.setId(getAvaiablaeId());
+//            translation.setId(getAvaiablaeId());
             translationRepository.save(translation);
             return "Translation saved";
         }

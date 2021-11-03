@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.einvoive.constants.Constant;
 import com.einvoive.model.Customer;
+import com.einvoive.model.ProductMain;
 import com.einvoive.repository.CustomerRepository;
+import com.einvoive.util.Translator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadCustomersHelper {
     @Autowired
     CustomerRepository repository;
+    @Autowired
+    CustomerHelper customerHelper;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    static String[] HEADERs = { "Id", "Title", "Description", "Published" };
     static String SHEET = "Sheet1";
@@ -78,88 +83,105 @@ public class UploadCustomersHelper {
                             break;
 
                         case 4:
+                            int valuePhoneMain = (int)currentCell.getNumericCellValue();
+                            customer.setPhoneMain(String.valueOf(valuePhoneMain));
+                            break;
+
+                        case 5:
                             int valuePhone = (int)currentCell.getNumericCellValue();
                             customer.setPhone(String.valueOf(valuePhone));
                             break;
 
-                        case 5:
+                        case 6:
                             int valueAccountNo = (int)currentCell.getNumericCellValue();
                             customer.setAccountNumber(String.valueOf(valueAccountNo));
                             break;
 
-                        case 6:
+                        case 7:
                             customer.setWebsite(currentCell.getStringCellValue());
                             break;
 
-                        case 7:
-                            customer.setNotes(currentCell.getStringCellValue());
-                            break;
-
                         case 8:
-                            customer.setCurrency(currentCell.getStringCellValue());
+                            customer.setRelatedParty(currentCell.getStringCellValue());
                             break;
 
                         case 9:
-                            customer.setBillingAddress1(currentCell.getStringCellValue());
+                            customer.setNotes(currentCell.getStringCellValue());
                             break;
 
                         case 10:
-                            customer.setBillingAddress2(currentCell.getStringCellValue());
+                            customer.setCurrency(currentCell.getStringCellValue());
                             break;
 
                         case 11:
-                            customer.setBillingCountry(currentCell.getStringCellValue());
+                            customer.setBillingAddress1(currentCell.getStringCellValue());
                             break;
 
                         case 12:
-                            customer.setBillingProvince(currentCell.getStringCellValue());
+                            customer.setBillingAddress2(currentCell.getStringCellValue());
                             break;
 
                         case 13:
-                            customer.setBillingCity(currentCell.getStringCellValue());
+                            customer.setBillingCountry(currentCell.getStringCellValue());
                             break;
 
                         case 14:
-                            customer.setBillingPostal(currentCell.getStringCellValue());
+                            customer.setBillingProvince(currentCell.getStringCellValue());
                             break;
 
                         case 15:
-                            customer.setShippingAddress1(currentCell.getStringCellValue());
+                            customer.setBillingCity(currentCell.getStringCellValue());
                             break;
 
                         case 16:
-                            customer.setShippingAddress2(currentCell.getStringCellValue());
+                            customer.setBillingPostal(currentCell.getStringCellValue());
                             break;
 
                         case 17:
-                            customer.setShippingCountry(currentCell.getStringCellValue());
+                            customer.setShippingName(currentCell.getStringCellValue());
                             break;
 
                         case 18:
-                            customer.setShippingProvince(currentCell.getStringCellValue());
+                            customer.setShippingAddress1(currentCell.getStringCellValue());
                             break;
 
                         case 19:
-                            customer.setShippingCity(currentCell.getStringCellValue());
+                            customer.setShippingAddress2(currentCell.getStringCellValue());
                             break;
 
                         case 20:
-                            customer.setShippingPostal(currentCell.getStringCellValue());
+                            customer.setShippingCountry(currentCell.getStringCellValue());
                             break;
 
                         case 21:
-                            customer.setDeliveryInstructions(currentCell.getStringCellValue());
+                            customer.setShippingProvince(currentCell.getStringCellValue());
                             break;
 
                         case 22:
-//                            int companyID = (int)currentCell.getNumericCellValue();
-//                            customer.setCompanyID(String.valueOf(companyID));
-                            customer.setCompanyID(currentCell.getStringCellValue());
+                            customer.setShippingCity(currentCell.getStringCellValue());
                             break;
 
                         case 23:
+                            customer.setShippingPostal(currentCell.getStringCellValue());
+                            break;
+
+                        case 24:
+                            customer.setDeliveryInstructions(currentCell.getStringCellValue());
+                            break;
+
+                        case 25:
                             int vat = (int)currentCell.getNumericCellValue();
                             customer.setVatNumber_Customer(String.valueOf(vat));
+                            break;
+
+                        case 26:
+                            int additionalNumber_Customer = (int)currentCell.getNumericCellValue();
+                            customer.setAdditionalNumber_Customer(String.valueOf(additionalNumber_Customer));
+                            break;
+
+                        case 27:
+                            int otherSellerid_Customer = (int)currentCell.getNumericCellValue();
+                            customer.setOtherSellerid_Customer(String.valueOf(otherSellerid_Customer));
                             break;
 
                         default:
@@ -168,7 +190,7 @@ public class UploadCustomersHelper {
 
                     cellIdx++;
                 }
-
+                customer.setCompanyID(Constant.COMPANY_ID);
                 productMainList.add(customer);
             }
 
@@ -183,11 +205,37 @@ public class UploadCustomersHelper {
     public void saveAll(MultipartFile file) {
         try {
             List<Customer> customerList = excelToProductList(file.getInputStream());
-            repository.saveAll(customerList);
+//            repository.saveAll(customerList);
+            for (Customer customerEnglish : customerList ) {
+                Customer customerArabic = getCustomerArabicOnline(customerEnglish);
+                customerHelper.save(customerEnglish, customerArabic);
+            }
         } catch (IOException e) {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
     }
 
+    private Customer getCustomerArabicOnline(Customer customerEnglish) {
+        Customer customerArabic = new Customer();
+        customerArabic.setFirstName(Translator.getTranslation(customerEnglish.getFirstName()));
+        customerArabic.setLastName(Translator.getTranslation(customerEnglish.getLastName()));
+        customerArabic.setCustomer(Translator.getTranslation(customerEnglish.getCustomer()));
+        customerArabic.setBillingAddress1(Translator.getTranslation(customerEnglish.getBillingAddress1()));
+        customerArabic.setBillingAddress2(Translator.getTranslation(customerEnglish.getBillingAddress2()));
+        customerArabic.setNotes(Translator.getTranslation(customerEnglish.getNotes()));
+        customerArabic.setBillingCountry(Translator.getTranslation(customerEnglish.getBillingCountry()));
+        customerArabic.setBillingProvince(Translator.getTranslation(customerEnglish.getBillingProvince()));
+        customerArabic.setBillingCity(Translator.getTranslation(customerEnglish.getBillingCity()));
+        customerArabic.setBillingPostal(Translator.getTranslation(customerEnglish.getBillingPostal()));
+        customerArabic.setShippingAddress1(Translator.getTranslation(customerEnglish.getShippingAddress1()));
+        customerArabic.setShippingAddress2(Translator.getTranslation(customerEnglish.getShippingAddress2()));
+        customerArabic.setShippingName(Translator.getTranslation(customerEnglish.getShippingName()));
+        customerArabic.setShippingCountry(Translator.getTranslation(customerEnglish.getShippingCountry()));
+        customerArabic.setShippingProvince(Translator.getTranslation(customerEnglish.getShippingProvince()));
+        customerArabic.setShippingCity(Translator.getTranslation(customerEnglish.getShippingCity()));
+        customerArabic.setShippingPostal(Translator.getTranslation(customerEnglish.getShippingPostal()));
+        customerArabic.setDeliveryInstructions(Translator.getTranslation(customerEnglish.getDeliveryInstructions()));
+        return customerArabic;
+    }
 }
 

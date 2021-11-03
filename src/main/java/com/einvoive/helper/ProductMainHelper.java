@@ -3,15 +3,25 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
+import com.einvoive.util.Translator;
+import com.google.api.client.json.Json;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 @Component
 public class ProductMainHelper {
@@ -20,6 +30,7 @@ public class ProductMainHelper {
     ProductMainRepository repository;
     @Autowired
     TranslationHelper translationHelper;
+
     @Autowired
     MongoOperations mongoOperation;
     Gson gson = new Gson();
@@ -60,6 +71,56 @@ public class ProductMainHelper {
         productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
         return productArabic;
     }
+
+    public ProductMain getProductArabicOnline(ProductMain productEnglish) {
+        ProductMain productArabic = new ProductMain();
+        productArabic.setProductName(Translator.getTranslation(productEnglish.getProductName()));
+        productArabic.setDescription(Translator.getTranslation(productEnglish.getDescription()));
+        return productArabic;
+    }
+
+//    String url = HOST_MALL_ADMIN + "/productAttribute/category/create";
+    //设置头信息
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//    //构造表单参数
+//    MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
+//    params.add("name", name);
+//    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+//    ResponseEntity<CommonResult> responseEntity = restTemplate.postForEntity(url, requestEntity, CommonResult.class);
+//    return responseEntity.getBody();
+
+//    String translate(String english)  {
+//        String arabic = null;
+//        try{
+//            arabic = Translator.translate("en", "ar", english);
+////            System.out.println(translation);
+//        }
+//        catch(Exception ex)
+//        {
+//            arabic = "Error in translation: " + ex.getMessage();
+////            System.out.println("Error in translation:" + ex);
+//        }
+//        return arabic;
+//    }
+
+//    public String getPostResponse(String english){
+//        String url = "http://fad2-101-50-88-15.ngrok.io/Translate/translate-text";
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
+//        params.add("text", english);
+//        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+//        ResponseEntity<Json> responseEntity = null;
+//        try {
+//            responseEntity = restTemplate.postForEntity(url, requestEntity, Json.class);
+//        }
+//        catch (Exception ex) {
+//            System.out.println(ex.getMessage());
+//        }
+//        String arabic = responseEntity.getBody().toString();
+//        return arabic;
+//    }
 
     public String getTopSaledProducts(String companyId){
         List<ProductMain> products = null;
@@ -104,7 +165,9 @@ public class ProductMainHelper {
     }
 
     public String update(ProductMain productEnglish, ProductMain productArabic) {
-        return save(productEnglish, productArabic);
+        repository.save(productEnglish);
+        saveProductArabic(productEnglish, productArabic);
+        return "product updated";
     }
 
 }

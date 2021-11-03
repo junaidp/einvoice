@@ -157,7 +157,7 @@ public class ReportsHelper {
                     .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
-                invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerName())
+                invoiceList = mongoOperation.find(new Query(Criteria.where("customerName").is(invoiceListMain.get(0).getCustomerName())
                         .and("companyID").is(companyID).and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
                 if(topCustomersInvoices != null)
@@ -189,7 +189,7 @@ public class ReportsHelper {
         for(Invoice invoice:invoiceList){
             sum += Integer.parseInt(invoice.getTotalAmountDue());
         }
-        Customer customer = mongoOperation.findOne(new Query(Criteria.where("_id").is(invoiceList.get(0).getCustomerName())), Customer.class);
+        Customer customer = mongoOperation.findOne(new Query(Criteria.where("customer").is(invoiceList.get(0).getCustomerName())), Customer.class);
         topCustomersInvoices.setCustomerName(customer.getCustomer());
         topCustomersInvoices.setInvoiceTotal(String.valueOf(sum));
         return topCustomersInvoices;
@@ -234,7 +234,7 @@ public class ReportsHelper {
                     .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
-                invoiceList = mongoOperation.find(new Query(Criteria.where("customerID").is(invoiceListMain.get(0).getCustomerName())
+                invoiceList = mongoOperation.find(new Query(Criteria.where("customerName").is(invoiceListMain.get(0).getCustomerName())
                         .and("companyID").is(companyID).and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
                         .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);

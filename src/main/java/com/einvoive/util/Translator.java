@@ -27,4 +27,18 @@ public class Translator {
         return response.toString();
     }
 
+   public static String getTranslation(String english)  {
+        String arabic = null;
+        try{
+            arabic = translate("en", "ar", english);
+//            System.out.println(translation);
+        }
+        catch(Exception ex)
+        {
+            arabic = "Error in translation: " + ex.getMessage();
+//            System.out.println("Error in translation:" + ex);
+        }
+        return arabic;
+    }
+
 }

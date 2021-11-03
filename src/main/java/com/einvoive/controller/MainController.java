@@ -2,6 +2,7 @@ package com.einvoive.controller;
 
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,8 +66,8 @@ public class MainController {
     }
 
     @PostMapping("/saveCustomer")
-    public String saveCustomer(@RequestBody Customer customerEnglish, Customer customerArabic) {
-        return customerHelper.save(customerEnglish, customerArabic);
+    public String saveCustomer(@RequestBody List<Customer> customer) {
+        return customerHelper.save(customer.get(0), customer.get(1));
     }
 
     @PostMapping("/saveInvoice")
@@ -223,6 +224,11 @@ public class MainController {
         return userHelper.getAllUsers(companyID);
     }
 
+    @GetMapping("/getAvailableInvoiceNo")
+    public String getAvailableInvoiceNo(@RequestParam String companyID) {
+        String invpiceNo = new Gson().toJson(invoiceHelper.getNextInvoiceNumber(companyID));
+        return invpiceNo;
+    }
 
     @GetMapping("/getTopSaledProducts")
     public String getTopSaledProducts(@RequestParam String companyID) {
@@ -349,5 +355,6 @@ public class MainController {
     public String getTranslation(@RequestParam String english) {
         return translationHelper.getTranslation(english);
     }
+
 
 }

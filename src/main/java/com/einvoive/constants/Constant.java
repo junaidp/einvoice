@@ -2,6 +2,8 @@ package com.einvoive.constants;
 
 public class Constant {
 
+    public static String COMPANY_ID;
+    public static String LOGGED_IN_USER_ID;
     public static String STATUS_APPROVED = "APPROVED";
     public static String STATUS_UNAPPROVED = "UNAPPROVED";
     public static String STATUS_FORAPPROVAL = "FORAPPROVAL";
