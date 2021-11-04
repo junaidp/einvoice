@@ -359,7 +359,8 @@ public class MainController {
 
     @GetMapping("/getTranslationFromApi")
     public String getTranslationFromApi(@RequestParam String english) {
-        return Translator.getTranslation(english);
+        String arabic = new Gson().toJson(Translator.getTranslation(english));
+        return arabic;
     }
 
 }

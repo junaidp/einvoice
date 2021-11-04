@@ -38,7 +38,43 @@ public class Invoice {
     private String companyID;
     private String customerName;
     private String totalExcludingVAT;
+    private String serviceLocation;
+    private String downPayment;
+    private String retention;
+    private String totalNetAmount;
     private List<LineItem> lineItemList;
+
+    public String getServiceLocation() {
+        return serviceLocation;
+    }
+
+    public void setServiceLocation(String serviceLocation) {
+        this.serviceLocation = serviceLocation;
+    }
+
+    public String getDownPayment() {
+        return downPayment;
+    }
+
+    public void setDownPayment(String downPayment) {
+        this.downPayment = downPayment;
+    }
+
+    public String getRetention() {
+        return retention;
+    }
+
+    public void setRetention(String retention) {
+        this.retention = retention;
+    }
+
+    public String getTotalNetAmount() {
+        return totalNetAmount;
+    }
+
+    public void setTotalNetAmount(String totalNetAmount) {
+        this.totalNetAmount = totalNetAmount;
+    }
 
     public String getCurrency() {
         return currency;
