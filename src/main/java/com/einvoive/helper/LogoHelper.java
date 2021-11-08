@@ -1,5 +1,6 @@
 package com.einvoive.helper;
 
+import com.einvoive.constants.Constant;
 import com.einvoive.model.Company;
 import com.einvoive.model.Logo;
 import com.einvoive.repository.CompanyRepository;
@@ -33,9 +34,9 @@ public class LogoHelper {
     @Autowired
     private GridFsOperations operations;
 
-    public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
+    public String uploadLogo(MultipartFile upload) throws IOException {
         DBObject metadata = new BasicDBObject();
-        String logoName =  getCompanyName(companyID)+"_logo";
+        String logoName =  getCompanyName(Constant.COMPANY_ID)+"_logo";
         metadata.put("fileSize", upload.getSize());
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
         return fileID.toString();

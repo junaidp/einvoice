@@ -188,8 +188,8 @@ public class UploadController {
     }
 
     @PostMapping("/uploadLogo")
-    public ResponseEntity<?> uploadLogo(@RequestParam("file")MultipartFile file, String companyID) throws IOException {
-        return new ResponseEntity<>(logoHelper.uploadLogo(file, companyID), HttpStatus.OK);
+    public ResponseEntity<?> uploadLogo(@RequestParam("file")MultipartFile file) throws IOException {
+        return new ResponseEntity<>(logoHelper.uploadLogo(file), HttpStatus.OK);
     }
 
     @GetMapping("/getLogo")
