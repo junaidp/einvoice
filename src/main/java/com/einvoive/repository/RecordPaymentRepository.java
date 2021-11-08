@@ -9,6 +9,6 @@ import java.util.List;
 public interface RecordPaymentRepository extends MongoRepository<RecordPayment, String>
     {
 
-        @Query("{ 'code' : ?0'}")
-        List<RecordPayment> findByName(String code);
+        @Query("{ 'invoiceNo' : ?0'}")
+        List<RecordPayment> findByName(String invoiceNo);
 }

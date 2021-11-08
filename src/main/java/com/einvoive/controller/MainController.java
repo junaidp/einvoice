@@ -63,7 +63,7 @@ public class MainController {
     }
 
     @PostMapping("/saveCompany")
-    public String saveCompany(@RequestBody Company companyEnglish, Company companyArabic) { return companyHelper.saveCompany(companyEnglish, companyArabic);
+    public String saveCompany(@RequestBody Company companyEnglish) { return companyHelper.saveCompany(companyEnglish);
     }
 
     @PostMapping("/saveCustomer")
@@ -133,13 +133,13 @@ public class MainController {
     }
 
     @PostMapping("/updateCompany")
-    public String updateCompany(@RequestBody Company companyEnglish, Company companyArabic) {
-        return companyHelper.updateCompany(companyEnglish, companyArabic);
+    public String updateCompany(@RequestBody List<Company> companyList) {
+        return companyHelper.updateCompany(companyList.get(0), companyList.get(1));
     }
 
     @PostMapping("/updateCustomer")
-    public String updateCustomer(@RequestBody Customer customerEnglish, Customer customerArabic) {
-        return customerHelper.update(customerEnglish, customerArabic);
+    public String updateCustomer(@RequestBody List<Customer> customerList) {
+        return customerHelper.update(customerList.get(0), customerList.get(1));
     }
 
     @PostMapping("/updateInvoice")
@@ -223,6 +223,11 @@ public class MainController {
     @GetMapping("/getAllUsers")
     public String getAllUsers(@RequestParam String companyID) {
         return userHelper.getAllUsers(companyID);
+    }
+
+    @GetMapping("/getRecordPaymeny")
+    public String getRecordPaymeny(@RequestParam String invoiceNo) {
+        return recordPaymentHelper.getRecordPaymenyByInvoiceNo(invoiceNo);
     }
 
     @GetMapping("/getAvailableInvoiceNo")

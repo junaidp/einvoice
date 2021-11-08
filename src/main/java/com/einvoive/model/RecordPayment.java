@@ -13,11 +13,19 @@ public class RecordPayment {
     @Id
     private String id;
     private Date paymentDate;
-    private String amount;
-    private String paymentAccount;
-    private String notes;
+    private String totalAmount;
     private String invoiceNo;
-    private String invoiceTotal;
+    private String paidAmmount;
+    private String payAccount;
+    private String notes;
+
+    public String getPaidAmmount() {
+        return paidAmmount;
+    }
+
+    public void setPaidAmmount(String paidAmmount) {
+        this.paidAmmount = paidAmmount;
+    }
 
     public String getId() {
         return id;
@@ -35,28 +43,12 @@ public class RecordPayment {
         this.paymentDate = paymentDate;
     }
 
-    public String getAmount() {
-        return amount;
+    public String getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public String getPaymentAccount() {
-        return paymentAccount;
-    }
-
-    public void setPaymentAccount(String paymentAccount) {
-        this.paymentAccount = paymentAccount;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public String getInvoiceNo() {
@@ -67,11 +59,19 @@ public class RecordPayment {
         this.invoiceNo = invoiceNo;
     }
 
-    public String getInvoiceTotal() {
-        return invoiceTotal;
+    public String getPayAccount() {
+        return payAccount;
     }
 
-    public void setInvoiceTotal(String invoiceTotal) {
-        this.invoiceTotal = invoiceTotal;
+    public void setPayAccount(String payAccount) {
+        this.payAccount = payAccount;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

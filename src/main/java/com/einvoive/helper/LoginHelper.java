@@ -12,6 +12,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import com.einvoive.constants.Constant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class LoginHelper {
 
@@ -20,6 +23,9 @@ public class LoginHelper {
 
     @Autowired
     CompanyHelper companyHelper;
+
+    @Autowired
+    UserHelper userHelper;
 
     @Autowired
     MongoOperations mongoOperation;
@@ -31,19 +37,35 @@ public class LoginHelper {
 //    private String loggedInUserID;
 
     public String signIn(Login login) {
+        List<Company> companyList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
         System.out.println(login.getEmail() + "," + login.getPassword());
         Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword()))), Company.class);
         if(loginCompany != null){
+            companyList.add(loginCompany);
             Constant.COMPANY_ID = loginCompany.getCompanyID();
             Constant.LOGGED_IN_USER_ID = loginCompany.getId();
-            return gson.toJson(loginCompany);
+            try{
+                companyList.add(companyHelper.getCompanyArabic(loginCompany));
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            return gson.toJson(companyList);
         }
-        else{
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
-//        companyID = savedUser.getCompanyID();
-//        loggedInUserID = savedUser.getId();
-        return gson.toJson(savedUser);
+        if(savedUser != null){
+           userList.add(savedUser);
+           Constant.COMPANY_ID = savedUser.getCompanyID();
+           Constant.LOGGED_IN_USER_ID = savedUser.getId();
+//           try{
+//               userList.add(userHelper.get(loginCompany));
+//              } catch (Exception ex) {
+//                System.out.println(ex.getMessage());
+//              }
+              return gson.toJson(userList);
         }
+        else
+            return gson.toJson("Invalid Credentials");
     }
 
 //    public String getCompanyID() {

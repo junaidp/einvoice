@@ -1,6 +1,5 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Company;
 import com.einvoive.model.Customer;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.repository.CustomerRepository;
@@ -25,7 +24,7 @@ public class CustomerHelper {
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
-    private List<Customer> customers;
+//    private List<Customer> customers;
 
     public String save(Customer customerEnglish, Customer customerArabic) {
         ErrorCustom error = new ErrorCustom();
@@ -122,16 +121,29 @@ public class CustomerHelper {
     }
 
     public String getAllCustomers(String comapnyID){
-        customers = null;
+        List<List<Customer>> listCustomers = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(comapnyID));
             System.out.println("QUERY");
-            customers = mongoOperation.find(query, Customer.class);
+            List<Customer>customers = mongoOperation.find(query, Customer.class);
+            listCustomers = getCustomersInLanguages(customers);
         }catch(Exception ex){
             System.out.println("Error in get Customers:"+ ex);
         }
-        return gson.toJson(customers);
+        return gson.toJson(listCustomers);
+    }
+
+    private List<List<Customer>> getCustomersInLanguages(List<Customer> customers){
+       List<List<Customer>> listCustomers = new ArrayList<>();
+        List<Customer> customersArabic = new ArrayList<>();
+        for(Customer customerEng : customers)
+            customersArabic.add(getCustomerArabic(customerEng));
+        if(customers != null && customersArabic != null){
+            listCustomers.add(customers);
+            listCustomers.add(customersArabic);
+        }
+        return listCustomers;
     }
 
     public String getCustomer(String customerID){
@@ -143,7 +155,7 @@ public class CustomerHelper {
             System.out.println("QUERY");
             customerEnglish = mongoOperation.findOne(query, Customer.class);
             if(customerEnglish != null)
-                getCustomerArabic(customerEnglish);
+                customerArabic = getCustomerArabic(customerEnglish);
         }catch(Exception ex){
             System.out.println("Error in get Customers:"+ ex);
         }

@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.TranslationRepository;
+import com.einvoive.util.Translator;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -50,10 +51,17 @@ public class TranslationHelper {
     }
 
     public String mergeAndSave(String english, String arabic){
-        Translation translationSave = new Translation();
-        translationSave.setEnglish(english);
-        translationSave.setArabic(arabic);
-        return saveTranslation(translationSave);
+        Translation translationSaved = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+       if(translationSaved != null){
+           translationSaved.setArabic(arabic);
+           return updateTranslation(translationSaved);
+       }
+       else {
+           Translation translationSave = new Translation();
+           translationSave.setEnglish(english);
+           translationSave.setArabic(arabic);
+           return saveTranslation(translationSave);
+       }
     }
 
     public String getTranslation(String english) {
@@ -82,7 +90,19 @@ public class TranslationHelper {
     }
 
     public String getTranslationMain(String english) {
-        Translation translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+        Translation translation = new Translation();
+        try {
+            translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+        }catch (Exception exception) {
+            System.out.println("No Translation found for text "+ english +
+                    "having Exception: "+ exception.getMessage());
+        }
+        if(translation == null){
+            System.out.println("No Translation saved: Assigning Translation through API");
+//            translation.setId("123");
+//            translation.setEnglish(english);
+            translation.setArabic(Translator.getTranslation(english));
+        }
         return translation.getArabic();
     }
 

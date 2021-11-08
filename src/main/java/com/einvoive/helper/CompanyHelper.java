@@ -5,6 +5,7 @@ import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Invoice;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.CompanyRepository;
+import com.einvoive.util.Translator;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -29,16 +31,16 @@ public class CompanyHelper {
 
     Gson gson = new Gson();
 
-    public String saveCompany(Company companyEnglish, Company companyArabic){
+    public String saveCompany(Company companyEnglish){
         String msg = validationBeforeSave(companyEnglish);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
-
-                saveCompanyArabic(companyEnglish, companyArabic);
+//                saveCompanyArabic(companyEnglish);
                 companyRepository.save(companyEnglish);
-                return "Company Saved";
+                Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
+                return gson.toJson(companySaved);
             } catch (Exception ex) {
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
@@ -78,7 +80,9 @@ public class CompanyHelper {
         translationHelper.mergeAndSave(companyEnglish.getNotes(), companyArabic.getNotes());
         translationHelper.mergeAndSave(companyEnglish.getCountry(), companyArabic.getCountry());
         translationHelper.mergeAndSave(companyEnglish.getState(), companyArabic.getState());
+        translationHelper.mergeAndSave(companyEnglish.getPostalCode(), companyArabic.getPostalCode());
         translationHelper.mergeAndSave(companyEnglish.getCity(), companyArabic.getCity());
+        //translationHelper.mergeAndSave(companyEnglish.gePostal(),companyArabic.getPostalCode());
     }
 
     private String validationBeforeSave(Company company) {
@@ -114,7 +118,7 @@ public class CompanyHelper {
         return gson.toJson(companyEnglish);
     }
 
-    private Company getCompanyArabic(Company companyEnglish) {
+    public Company getCompanyArabic(Company companyEnglish) {
         Company companyArabic = new Company();
         companyArabic.setFirstName(translationHelper.getTranslationMain(companyEnglish.getFirstName()));
         companyArabic.setLastName(translationHelper.getTranslationMain(companyEnglish.getLastName()));
@@ -125,13 +129,16 @@ public class CompanyHelper {
         companyArabic.setCity(translationHelper.getTranslationMain(companyEnglish.getCity()));
         companyArabic.setAddress1(translationHelper.getTranslationMain(companyEnglish.getAddress1()));
         companyArabic.setAddress2(translationHelper.getTranslationMain(companyEnglish.getAddress2()));
+        companyArabic.setPostalCode(translationHelper.getTranslationMain(companyEnglish.getPostalCode()));
         return companyArabic;
     }
 
-    public String updateCompany(Company companyEnglish, Company userCompanyArabic) {
+    public String updateCompany(Company companyEnglish , Company comapnyArabic) {
         Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
         companyRepository.delete(company);
-        return saveCompany(company, userCompanyArabic);
+        saveCompany(companyEnglish);
+        saveCompanyArabic(companyEnglish, comapnyArabic);
+        return gson.toJson("Company Updated");
     }
 
 //    public String uploadCompanyLogo(String filePath, String companyID){
@@ -145,9 +152,15 @@ public class CompanyHelper {
 //    }
 
     public String getCompany(String companyID) {
+        List<Company> companyList = new ArrayList<>();
         try{
-            Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)),Company.class);
-            return gson.toJson(company);
+            Company companyEnglish = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)),Company.class);
+            Company companyArabic = getCompanyArabic(companyEnglish);
+            if(companyEnglish != null)
+                companyList.add(companyEnglish);
+            if(companyArabic != null)
+                companyList.add(companyArabic);
+            return gson.toJson(companyList);
         }
         catch (Exception ex){
             System.out.println("Error in getting Company:"+ ex);
