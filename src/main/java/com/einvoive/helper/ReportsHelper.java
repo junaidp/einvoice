@@ -5,7 +5,7 @@ import com.einvoive.model.Invoice;
 import com.einvoive.model.LineItem;
 import com.einvoive.model.TopCustomersInvoices;
 import com.einvoive.repository.LineItemRepository;
-import com.einvoive.constants.Constant;
+import com.einvoive.constants.Constants;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -45,7 +45,7 @@ public class ReportsHelper {
             invoiceHelper.getInvoicesByCompany(companyID);
             List<Invoice> invoiceList =  mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
                     .and("invoiceDate").gte(startDateFinal).lte(endDateFinal).
-                    and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
             int count = 0;
             while (lineItemList.size() != 0){
                 for(Invoice invoice : invoiceList){
@@ -73,7 +73,7 @@ public class ReportsHelper {
         try{
             lineItemList = mongoOperation.findAll(LineItem.class);
             List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
             int count = 0;
             while (lineItemList.size() != 0){
                 for(Invoice invoice : invoiceList){
@@ -113,7 +113,7 @@ public class ReportsHelper {
         TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
         try{
             invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
             year = Calendar.getInstance().get(Calendar.YEAR);
             while (invoiceListMain.size() != 0){
                 TopCustomersInvoices topInvoices = computeInvoicesTotal();
@@ -154,11 +154,11 @@ public class ReportsHelper {
         try{
             List<Invoice> invoiceList = null;
             invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
                 invoiceList = mongoOperation.find(new Query(Criteria.where("customerName").is(invoiceListMain.get(0).getCustomerName())
-                        .and("companyID").is(companyID).and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                        .and("companyID").is(companyID).and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
                 if(topCustomersInvoices != null)
                     topCustomersInvoicesList.add(topCustomersInvoices);
@@ -214,7 +214,7 @@ public class ReportsHelper {
         try{
             invoicesList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
                     .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
         } catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
             return gson.toJson(ex.getMessage());
@@ -231,12 +231,12 @@ public class ReportsHelper {
             List<Invoice> invoiceList = null;
             invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
                     .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
             while (invoiceListMain.size() != 0){
                 invoiceList = null;
                 invoiceList = mongoOperation.find(new Query(Criteria.where("customerName").is(invoiceListMain.get(0).getCustomerName())
                         .and("companyID").is(companyID).and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
-                        .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                        .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
                 TopCustomersInvoices topCustomersInvoices = computeInvoiceSum(invoiceList);
                 if(topCustomersInvoices != null)
                     topCustomersInvoicesList.add(topCustomersInvoices);
@@ -287,7 +287,7 @@ public class ReportsHelper {
         try{
             invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
                     .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
-                    .and("status").is(Constant.STATUS_APPROVED)), Invoice.class);
+                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
                 int sum = 0;
                 for(Invoice invoice:invoiceListMain){
                     sum += Integer.parseInt(invoice.getTotalAmountDue());

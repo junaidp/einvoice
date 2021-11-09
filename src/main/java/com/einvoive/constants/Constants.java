@@ -1,6 +1,6 @@
 package com.einvoive.constants;
 
-public class Constant {
+public class Constants {
 
     public static String COMPANY_ID;
     public static String LOGGED_IN_USER_ID;

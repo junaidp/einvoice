@@ -190,6 +190,7 @@ public class InvoiceHelper {
     }
 
     public String update(Invoice invoice) {
+            deleteInvoice(invoice.getId());
             return save(invoice);
     }
 
@@ -233,5 +234,30 @@ public class InvoiceHelper {
             System.out.println("Error in get invoices By ID :"+ ex);
         }
         return gson.toJson(invoicesList);
+    }
+
+    public String setInvoiceStatusByInvoiceID(String invoiceID, String status) {
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        try {
+            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(invoiceID)), Invoice.class);
+            if(invoice != null){
+                invoice.setStatus(status);
+                repository.save(invoice);
+                return "Invoice Status Updated";
+            }
+            else{
+                error.setErrorStatus("Error");
+                error.setError("No Invoice against this ID");
+                jsonError = gson.toJson(error);
+                return jsonError;
+            }
+        }
+        catch (Exception ex){
+            error.setErrorStatus("Error");
+            error.setError(ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 }

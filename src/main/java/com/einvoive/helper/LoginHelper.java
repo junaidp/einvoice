@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import com.einvoive.constants.Constant;
+import com.einvoive.constants.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,8 @@ public class LoginHelper {
         Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword()))), Company.class);
         if(loginCompany != null){
             companyList.add(loginCompany);
-            Constant.COMPANY_ID = loginCompany.getCompanyID();
-            Constant.LOGGED_IN_USER_ID = loginCompany.getId();
+            Constants.COMPANY_ID = loginCompany.getCompanyID();
+            Constants.LOGGED_IN_USER_ID = loginCompany.getId();
             try{
                 companyList.add(companyHelper.getCompanyArabic(loginCompany));
             } catch (Exception ex) {
@@ -55,8 +55,8 @@ public class LoginHelper {
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
         if(savedUser != null){
            userList.add(savedUser);
-           Constant.COMPANY_ID = savedUser.getCompanyID();
-           Constant.LOGGED_IN_USER_ID = savedUser.getId();
+           Constants.COMPANY_ID = savedUser.getCompanyID();
+           Constants.LOGGED_IN_USER_ID = savedUser.getId();
 //           try{
 //               userList.add(userHelper.get(loginCompany));
 //              } catch (Exception ex) {

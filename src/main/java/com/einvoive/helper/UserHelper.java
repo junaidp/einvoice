@@ -125,6 +125,7 @@ public class UserHelper {
     }
 
     public String updateUser(User userEntity) {
+        deleteUser(userEntity.getUserId());
         return saveUser(userEntity);
     }
 }

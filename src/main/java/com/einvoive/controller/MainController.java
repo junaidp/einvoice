@@ -319,6 +319,11 @@ public class MainController {
         return invoiceHelper.setInvoiceStatus(id, status);
     }
 
+    @PostMapping("/setInvoiceStatusByInvoiceID")
+    public String setInvoiceStatusByInvoiceID(@RequestBody Invoice invoice) {
+        return invoiceHelper.setInvoiceStatusByInvoiceID(invoice.getInvoiceNumber(), invoice.getStatus());
+    }
+
     @PostMapping("/signIn")
     public String signIn(@RequestBody Login login){ return loginHelper.signIn(login); }
 

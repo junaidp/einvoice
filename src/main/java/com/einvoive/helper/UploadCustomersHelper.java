@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.einvoive.constants.Constant;
+import com.einvoive.constants.Constants;
 import com.einvoive.model.Customer;
-import com.einvoive.model.ProductMain;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.util.Translator;
 import org.apache.poi.ss.usermodel.Cell;
@@ -190,7 +189,7 @@ public class UploadCustomersHelper {
 
                     cellIdx++;
                 }
-                customer.setCompanyID(Constant.COMPANY_ID);
+                customer.setCompanyID(Constants.COMPANY_ID);
                 productMainList.add(customer);
             }
 
