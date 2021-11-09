@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -24,7 +25,7 @@ public class UserHelper {
 
     Gson gson = new Gson();
 
-    private List<User> users;
+//    private List<User> users;
 
     public String saveUser(User userEntity){
         String msg = validationBeforeSave(userEntity);
@@ -33,6 +34,7 @@ public class UserHelper {
         if(msg == null || msg.isEmpty()) {
 //            userEntity.setUserId(getAvaiablaeId());
             try {
+//                userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
                 userRepository.save(userEntity);
                 return "User Saved";
             }
@@ -87,8 +89,8 @@ public class UserHelper {
         return gson.toJson(userList);
     }
 
-    public String getUser(String userID){
-        users = null;
+    public String getUserByUserID(String userID){
+        List<User> users = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("id").is(userID));
@@ -100,9 +102,9 @@ public class UserHelper {
         return gson.toJson(users);
     }
 
-    public String deleteUser(String userID){
-        getUser(userID);
-        userRepository.deleteAll(users);
+    public String deleteUser(String iD){
+        List<User> userList = mongoOperation.find(new Query(Criteria.where("id").is(iD)), User.class);
+        userRepository.deleteAll(userList);
         return "User deleted";
     }
 
@@ -125,7 +127,9 @@ public class UserHelper {
     }
 
     public String updateUser(User userEntity) {
-        deleteUser(userEntity.getUserId());
+        User userSaved = mongoOperation.findOne(new Query(Criteria.where("id").is(userEntity.getId())), User.class);
+        userEntity.setPassword(userSaved.getPassword());
+        userRepository.delete(userSaved);
         return saveUser(userEntity);
     }
 }

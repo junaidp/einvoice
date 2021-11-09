@@ -22,6 +22,9 @@ public class MainController {
     LoginHelper loginHelper;
 
     @Autowired
+    UpdatePasswordHelper updatePasswordHelper;
+
+    @Autowired
     PaymentCardHelper paymentCardHelper;
 
     @Autowired
@@ -325,7 +328,10 @@ public class MainController {
     }
 
     @PostMapping("/signIn")
-    public String signIn(@RequestBody Login login){ return loginHelper.signIn(login); }
+    public String signIn(@RequestBody Login login) { return loginHelper.signIn(login); }
+
+    @PostMapping("/changePassword")
+    public String testuser(@RequestBody UpdatePassword updatePassword) { return updatePasswordHelper.changePassword(updatePassword); }
 
 //    @PostMapping("/signInUser")
 //    public String signInUser(@RequestBody User user){

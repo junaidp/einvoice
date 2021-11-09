@@ -6,6 +6,7 @@ import com.einvoive.model.Invoice;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.CompanyRepository;
 import com.einvoive.util.Translator;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -37,7 +38,7 @@ public class CompanyHelper {
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
-//                saveCompanyArabic(companyEnglish);
+//                companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
                 companyRepository.save(companyEnglish);
                 Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
                 return gson.toJson(companySaved);

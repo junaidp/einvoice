@@ -133,9 +133,9 @@ public class UploadController {
         }
         if (uploadProductsHelper.hasExcelFormat(file)) {
             try {
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
-                Files.write(path, bytes);
+//                byte[] bytes = file.getBytes();
+//                Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
+//                Files.write(path, bytes);
                 uploadProductsHelper.saveAll(file, Constants.COMPANY_ID, Constants.LOGGED_IN_USER_ID);
                 return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
             } catch (Exception e) {
@@ -165,9 +165,9 @@ public class UploadController {
         }
         if (uploadProductsHelper.hasExcelFormat(file)) {
             try {
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
-                Files.write(path, bytes);
+//                byte[] bytes = file.getBytes();
+//                Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
+//                Files.write(path, bytes);
                 uploadCustomersHelper.saveAll(file);
                 return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
 //                message = "Uploaded the file successfully: " + file.getOriginalFilename();

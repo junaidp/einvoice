@@ -42,6 +42,7 @@ public class Invoice {
     private String downPayment;
     private String retention;
     private String totalNetAmount;
+    private String recordPayment;
     private List<LineItem> lineItemList;
 
     public String getServiceLocation() {
@@ -58,6 +59,14 @@ public class Invoice {
 
     public void setDownPayment(String downPayment) {
         this.downPayment = downPayment;
+    }
+
+    public String getRecordPayment() {
+        return recordPayment;
+    }
+
+    public void setRecordPayment(String recordPayment) {
+        this.recordPayment = recordPayment;
     }
 
     public String getRetention() {

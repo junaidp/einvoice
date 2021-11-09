@@ -15,7 +15,8 @@ public class RecordPaymentHelper {
 
     @Autowired
     RecordPaymentRepository repository;
-
+    @Autowired
+    InvoiceHelper invoiceHelper;
     @Autowired
     MongoOperations mongoOperation;
 
@@ -26,6 +27,7 @@ public class RecordPaymentHelper {
         String jsonError;
             try {
                 repository.save(recordPayment);
+                updateInvoiceRecordPayment(recordPayment);
                 return "RecordPayment saved";
             }catch(Exception ex){
                 error.setErrorStatus("Error");
@@ -34,6 +36,12 @@ public class RecordPaymentHelper {
                 return jsonError;
             }
      }
+
+     private void updateInvoiceRecordPayment(RecordPayment recordPayment){
+        Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(recordPayment.getInvoiceNo())), Invoice.class);
+         invoice.setRecordPayment(String.valueOf(Double.parseDouble(invoice.getRecordPayment()) - Double.parseDouble(recordPayment.getPaidAmmount())));
+        invoiceHelper.update(invoice);
+    }
 
     public String update(RecordPayment recordPayment) {
         RecordPayment recordPayment1 = mongoOperation.findOne(new Query(Criteria.where("id").is(recordPayment.getId())), RecordPayment.class);

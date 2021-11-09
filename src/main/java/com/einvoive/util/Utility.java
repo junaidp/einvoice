@@ -10,7 +10,7 @@ public class Utility {
     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
 
-    public static byte[] getSHA(String text) throws NoSuchAlgorithmException
+    private static byte[] getSHA(String text) throws NoSuchAlgorithmException
     {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         return md.digest(text.getBytes(StandardCharsets.UTF_8));
