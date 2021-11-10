@@ -168,8 +168,8 @@ public class UploadController {
 //                byte[] bytes = file.getBytes();
 //                Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
 //                Files.write(path, bytes);
-                uploadCustomersHelper.saveAll(file);
-                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
+                return uploadCustomersHelper.saveAll(file);
+//                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
 //                message = "Uploaded the file successfully: " + file.getOriginalFilename();
             } catch (Exception e) {
                 error.setErrorStatus("Error");

@@ -10,6 +10,7 @@ import com.einvoive.constants.Constants;
 import com.einvoive.model.Customer;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.util.Translator;
+import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,6 +29,7 @@ public class UploadCustomersHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    static String[] HEADERs = { "Id", "Title", "Description", "Published" };
     static String SHEET = "Sheet1";
+    private Gson gson = new Gson();
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
@@ -201,17 +203,20 @@ public class UploadCustomersHelper {
         }
     }
 
-    public void saveAll(MultipartFile file) {
+    public String saveAll(MultipartFile file) {
+        String response = "Record Uploaded";
         try {
             List<Customer> customerList = excelToProductList(file.getInputStream());
 //            repository.saveAll(customerList);
             for (Customer customerEnglish : customerList ) {
                 Customer customerArabic = getCustomerArabicOnline(customerEnglish);
-                customerHelper.save(customerEnglish, customerArabic);
+                response = customerHelper.save(customerEnglish, customerArabic);
             }
         } catch (IOException e) {
+            response = "fail to store excel data: " + e.getMessage();
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
+        return response;
     }
 
     private Customer getCustomerArabicOnline(Customer customerEnglish) {

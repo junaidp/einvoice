@@ -90,7 +90,7 @@ public class TranslationHelper {
     }
 
     public String getTranslationMain(String english) {
-        Translation translation = new Translation();
+        Translation translation = null;
         try {
             translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
         }catch (Exception exception) {
@@ -98,6 +98,7 @@ public class TranslationHelper {
                     "having Exception: "+ exception.getMessage());
         }
         if(translation == null){
+            translation = new Translation();
             System.out.println("No Translation saved: Assigning Translation through API");
 //            translation.setId("123");
 //            translation.setEnglish(english);
