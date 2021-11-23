@@ -209,8 +209,8 @@ public class MainController {
     }
 
     @PostMapping("/updateInvoice")
-    public String updateInvoice(@RequestBody InvoiceWithFile invoiceWithFile) {
-        return null; // TODO: invoiceHelper.update(invoiceWithFile);
+    public String updateInvoice(@RequestBody Invoice invoice) {
+        return invoiceHelper.update(invoice);
     }
 
     @PostMapping("/updateInvoiceB2C")
