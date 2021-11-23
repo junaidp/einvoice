@@ -1,15 +1,13 @@
 package com.einvoive.controller;
 
 import com.einvoive.constants.Constants;
-import com.einvoive.helper.CompanyHelper;
-import com.einvoive.helper.LogoHelper;
-import com.einvoive.helper.UploadCustomersHelper;
-import com.einvoive.helper.UploadProductsHelper;
+import com.einvoive.helper.*;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Logo;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,13 +40,16 @@ public class UploadController {
     @Autowired
     LogoHelper logoHelper;
 
-    //Save the uploaded file to this folder
+    @Autowired
+    InvoiceHelper invoiceHelper;
+
+     //Save the uploaded file to this folder
     private static String UPLOADED_INVOICE_FOLDER = "D://Envoice//invoice//";
     private static String UPLOADED_FOLDER = "D://Envoice//help//";
     private static String UPLOAD_Product_FOLDER = "D://Envoice//products//";
     private static String UPLOAD_Customer_FOLDER = "D://Envoice//customers//";
     private static String UPLOAD_Logos_FOLDER = "D://Envoice//logos//";
-    private Gson gson;
+    private Gson gson = new Gson();
 
     @GetMapping("/")
     public String index() {
@@ -78,6 +80,18 @@ public class UploadController {
         }
 
         return "redirect:/uploadStatus";
+    }
+
+    @PostMapping("/uploadInvoiceAttachment")
+    public String uploadInvoiceAttachment(@RequestParam("file") MultipartFile file, @RequestParam String invoiceNo){
+        if (file.isEmpty())
+            return gson.toJson("Attached file is empty");
+//        System.out.println(file.getContentType());
+//        if(file.getContentType().substring(file.getContentType().length()-3, file.getContentType().length()).equalsIgnoreCase("pdf"))
+//            return invoiceHelper.uploadFile(file);
+        else
+            return invoiceHelper.uploadFile(file, invoiceNo);
+//        return gson.toJson("Attached file is invalid format");
     }
 
     public String uploadInvoice(@RequestParam("file") MultipartFile file) {
@@ -200,6 +214,21 @@ public class UploadController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + logo.getFilename() + "\"")
                 .body(new ByteArrayResource(logo.getFile()));
     }
+
+    @RequestMapping(value ="/loadInvoiceAttachment", method = RequestMethod.GET, produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<Resource> load(@RequestParam String invoiceNo) throws MalformedURLException {
+        Resource file = invoiceHelper.load(invoiceNo);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+//    @RequestMapping(value = "/loadInvoiceAttachment", method = RequestMethod.GET, produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//    public String load(@RequestParam String invoiceNo) throws IOException {
+//        String path = invoiceHelper.load(invoiceNo).getURL().getPath();
+//        return gson.toJson(path);
+////        return ResponseEntity.ok()
+////                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+//    }
 
     @GetMapping("/uploadStatus")
     public String uploadStatus() {

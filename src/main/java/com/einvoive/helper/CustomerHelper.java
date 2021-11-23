@@ -61,12 +61,16 @@ public class CustomerHelper {
                 .and("companyID").is(customer.getCompanyID())), Customer.class);
         List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())
                 .and("companyID").is(customer.getCompanyID())), Customer.class);
+        List<Customer> customerVatNo = mongoOperation.find(new Query(Criteria.where("vatNumber_Customer").is(customer.getVatNumber_Customer())
+                .and("companyID").is(customer.getCompanyID())), Customer.class);
         if(phoneList.size() > 0)
             msg1 = "--Customer Phone No";
         if(emailList.size() > 0)
             msg2 = "--Customer Email";
         if(phoneMainList.size() > 0)
             msg3 = "--Customer Phone Main No";
+        if(customerVatNo.size() > 0)
+            msg3 = "--Customer VAT No";
         msg = msg1 + msg2 + msg3;
         return msg;
     }

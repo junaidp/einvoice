@@ -69,6 +69,7 @@ public class ProductMainHelper {
         ProductMain productArabic = new ProductMain();
         productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
         productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
+        productArabic.setId(productEnglish.getId());
         return productArabic;
     }
 

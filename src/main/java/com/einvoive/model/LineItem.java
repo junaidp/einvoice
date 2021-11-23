@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
         @Id
         private String id;
+        private String productId;
         private String productName;
         private String price;
         private String quantity;
@@ -116,4 +117,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
         public void setAmountBeforeTax(String amountBeforeTax) {
             this.amountBeforeTax = amountBeforeTax;
         }
+
+        public String getProductId() {
+            return productId;
+        }
+
+        public void setProductId(String productId) {
+            this.productId = productId;
+        }
+
+
     }

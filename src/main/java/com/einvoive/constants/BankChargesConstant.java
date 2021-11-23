@@ -1,10 +1,10 @@
 package com.einvoive.constants;
 
-public class AccountReceivableConstant {
+public class BankChargesConstant {
 
-    private final String code = "22";
+    private final String code = "40";
 
-    private final String name = "Account Receivable";
+    private final String name = "Bank Charges";
 
     public String getCode() {
         return code;

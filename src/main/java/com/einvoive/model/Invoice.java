@@ -2,6 +2,7 @@ package com.einvoive.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ public class Invoice {
     private String originalRefNo;
     private String type;
     private Date supplyDate;
+    private String dateTime;
     private String reasonChangingStandard;
     private String invoiceNumber;
     private String invoiceName;
@@ -43,7 +45,36 @@ public class Invoice {
     private String retention;
     private String totalNetAmount;
     private String recordPayment;
+    private String bankAccount;
     private List<LineItem> lineItemList;
+
+    public Invoice(){
+
+    }
+    //private MultipartFile file;
+//
+//    public MultipartFile getFile() {
+//        return file;
+//    }
+//
+//    public void setFile(MultipartFile file) {
+//        this.file = file;
+//    }
+
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) {
+        this.bankAccount = bankAccount;
+    }
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
 
     public String getServiceLocation() {
         return serviceLocation;

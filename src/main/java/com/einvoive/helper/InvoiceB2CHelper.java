@@ -1,73 +1,49 @@
 package com.einvoive.helper;
 
-import com.einvoive.constants.Constants;
 import com.einvoive.model.*;
+import com.einvoive.repository.InvoiceB2CRepository;
 import com.einvoive.util.Utility;
-import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
-public class InvoiceHelper {
+public class InvoiceB2CHelper {
 
     @Autowired
-    InvoiceRepository repository;
+    InvoiceB2CRepository repository;
 
     @Autowired
-    LineItemHelper lineItemHelper;
+    LineItemB2CHelper lineItemHelper;
 
     @Autowired
     MongoOperations mongoOperation;
 
-    @Autowired
-     InvoiceRepository invoiceRepository;
-
-    @Autowired
-    JournalEntriesHelper journalEntriesHelper;
-
-    @Autowired
-    private GridFsTemplate template;
-
-    private Gson gson = new Gson();
+    Gson gson = new Gson();
 
     private String INVOICE_SEPARATOR = "-";
 
-    private  List<Invoice> invoiceListMain = null;
+    private  List<InvoiceB2C>invoiceListMain = null;
 
-    public String save(Invoice invoice){
+    public String save(InvoiceB2C invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
             setInvoice(invoice);
             repository.save(invoice);
-            for(LineItem lineItem : invoice.getLineItemList()){
+            for(LineItemB2C lineItem : invoice.getLineItemList()){
                 lineItem.setInvoiceId(invoice.getId());
                 lineItemHelper.save(lineItem);
             }
-//            if(!file.isEmpty())
-//                uploadFile(file, invoice.getInvoiceNumber());
             return "Invoice saved";
         }catch(Exception ex){
             error.setErrorStatus("Error");
@@ -77,7 +53,7 @@ public class InvoiceHelper {
         }
     }
 
-    private void setInvoice(Invoice invoice) throws NoSuchAlgorithmException {
+    private void setInvoice(InvoiceB2C invoice) throws NoSuchAlgorithmException {
         invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
 //      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
@@ -91,7 +67,7 @@ public class InvoiceHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceByCompany(companyID);
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-                invoiceNumber = companyID + INVOICE_SEPARATOR + "1";
+            invoiceNumber = companyID + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -104,10 +80,10 @@ public class InvoiceHelper {
             }
             invoiceNumber = companyID + INVOICE_SEPARATOR + invoiceNum;
         }
-         return invoiceNumber;
+        return invoiceNumber;
     }
 
-    private String getPreviousHash(Invoice invoice) {
+    private String getPreviousHash(InvoiceB2C invoice) {
         List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
         String previousHash = "";
         if(invoiceList.size() > 0)
@@ -119,14 +95,14 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByCustomer(String customerName){
-        List<Invoice> invoices = null;
+        List<InvoiceB2C> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("customerName").is(customerName));
-            invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getLineItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                lineItemHelper.getLineItemsB2C(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
@@ -135,14 +111,14 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByInvoiceNo(String invoiceNo){
-        List<Invoice> invoices = null;
+        List<InvoiceB2C> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("invoiceNumber").is(invoiceNo));
-            invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getLineItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                lineItemHelper.getLineItemsB2C(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
@@ -150,31 +126,15 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-    public Invoice getInvoiceByInvoiceNoQR(String invoiceNumber){
-        Invoice invoices = null;
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("invoiceNumber").is(invoiceNumber));
-            invoices = mongoOperation.findOne(query, Invoice.class);
-//            for(Invoice invoice : invoices) {
-//                lineItemHelper.getLineItems(invoice.getId());
-//                invoice.setLineItemList(lineItemHelper.getLineItems());
-//            }
-        }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
-        }
-        return invoices;
-    }
-
     public String getInvoicesByStatus(String status){
-        List<Invoice> invoices = null;
+        List<InvoiceB2C> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("status").is(status));
-            invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getLineItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                lineItemHelper.getLineItemsB2C(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
@@ -183,14 +143,14 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByCompany(String companyID){
-        List<Invoice> invoices = null;
+        List<InvoiceB2C> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getLineItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                lineItemHelper.getLineItemsB2C(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
             System.out.println("Error in get invoices:"+ ex);
@@ -204,7 +164,7 @@ public class InvoiceHelper {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
             query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber")).limit(1);
-           // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, Invoice.class);
             return invoices.get(0).getInvoiceNumber();
         }catch(Exception ex){
@@ -215,7 +175,7 @@ public class InvoiceHelper {
     }
 
     public String deleteInvoice(String invoiceID){
-        List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);
+        List<InvoiceB2C> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), InvoiceB2C.class);
         repository.deleteAll(invoices);
         return "Invoice deleted";
     }
@@ -225,10 +185,9 @@ public class InvoiceHelper {
         return String.valueOf(invoiceList.size()+1);
     }
 
-    public String update(Invoice invoice) {
-            deleteInvoice(invoice.getId());
-           //TODO: return save(invoice, file);
-        return null;
+    public String update(InvoiceB2C invoice) {
+        deleteInvoice(invoice.getId());
+        return save(invoice);
     }
 
     public String getInvoiceStatus(String id) {
@@ -236,42 +195,13 @@ public class InvoiceHelper {
         return invoice.getStatus();
     }
 
-    public Resource load(String invoiceNo) throws MalformedURLException {
-        try {
-            Path file = Paths.get(Constants.INVOICES_PATH+invoiceNo);
-            String[] filePath = file.toFile().list();
-            Resource resource = new UrlResource(file.toUri()+filePath[0]);
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
-    }
-
-    public String uploadFile(MultipartFile file, String invoiceNo)  {
-        try{
-             byte[] bytes = file.getBytes();
-             Path path = Paths.get(Constants.INVOICES_PATH+invoiceNo);
-            if(!path.toFile().exists())
-                Files.createDirectories(path);
-            Files.copy(file.getInputStream(), path.resolve(file.getOriginalFilename()));
-            return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
-          }catch (Exception exception){
-            return gson.toJson(exception.getMessage());
-        }
-    }
-
     public String setInvoiceStatus(String id, String status) {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
+            InvoiceB2C invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), InvoiceB2C.class);
             if(invoice != null){
-                invoice.setStatus(status);
-//                journalEntriesHelper.setToSave(invoice);
+//                invoice.setStatus(status);
                 repository.save(invoice);
                 return "Invoice Status Updated";
             }
@@ -291,11 +221,11 @@ public class InvoiceHelper {
     }
 
     public String getInvoicesByID(String id) {
-        List<Invoice> invoicesList = null;
+        List<InvoiceB2C> invoicesList = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("id").is(id));
-            invoicesList = mongoOperation.find(query, Invoice.class);
+            invoicesList = mongoOperation.find(query, InvoiceB2C.class);
         }catch(Exception ex){
             System.out.println("Error in get invoices By ID :"+ ex);
         }
@@ -306,9 +236,9 @@ public class InvoiceHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(invoiceID)), Invoice.class);
+            InvoiceB2C invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(invoiceID)), InvoiceB2C.class);
             if(invoice != null){
-                invoice.setStatus(status);
+//                invoice.setStatus(status);
                 repository.save(invoice);
                 return "Invoice Status Updated";
             }

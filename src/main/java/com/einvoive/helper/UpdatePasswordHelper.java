@@ -5,6 +5,7 @@ import com.einvoive.model.Company;
 import com.einvoive.model.Login;
 import com.einvoive.model.UpdatePassword;
 import com.einvoive.model.User;
+import com.einvoive.repository.CompanyRepository;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
@@ -26,17 +27,18 @@ public class UpdatePasswordHelper {
     @Autowired
     CompanyHelper companyHelper;
     @Autowired
+    CompanyRepository companyRepository;
+    @Autowired
     UserHelper userHelper;
     @Autowired
     MongoOperations mongoOperation;
     Gson gson = new Gson();
 
     public String changePassword(UpdatePassword updatePassword) {
-        List<User> userList = new ArrayList<>();
         Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(updatePassword.getEmail()).and("password").is(updatePassword.getPassword()))), Company.class);
         if(loginCompany != null){
             loginCompany.setPassword(updatePassword.getNewPassword());
-            companyHelper.saveCompany(loginCompany);
+            companyRepository.save(loginCompany);
             Constants.COMPANY_ID = loginCompany.getCompanyID();
             Constants.LOGGED_IN_USER_ID = loginCompany.getId();
              return gson.toJson("Your Company Password has been updated!");
@@ -44,7 +46,7 @@ public class UpdatePasswordHelper {
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(updatePassword.getEmail()).and("password").is(updatePassword.getPassword())), User.class);
         if(savedUser != null){
             savedUser.setPassword(updatePassword.getNewPassword());
-            userHelper.saveUser(savedUser);
+            userRepository.save(savedUser);
             Constants.COMPANY_ID = savedUser.getCompanyID();
             Constants.LOGGED_IN_USER_ID = savedUser.getId();
             return gson.toJson("User Password has been updated!");

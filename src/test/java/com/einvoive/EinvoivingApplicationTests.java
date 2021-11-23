@@ -2,6 +2,7 @@ package com.einvoive;
 
 import com.einvoive.helper.InvoiceHelper;
 import com.einvoive.model.Invoice;
+import com.einvoive.model.InvoiceWithFile;
 import com.einvoive.util.Translator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ class EinvoivingApplicationTests {
 
     @Test
     void saveInvoice(){
-        Invoice inv = new Invoice();
-        inv.setCompanyID("hyphen");
-        invoiceHelper.save(inv);
+        InvoiceWithFile inv = new InvoiceWithFile();
+        inv.getInvoice().setCompanyID("hyphen");
+       //TODO  invoiceHelper.save(inv);
         System.out.println("");
     }
 

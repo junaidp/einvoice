@@ -1,9 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Customer;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.LineItem;
-import com.einvoive.model.TopCustomersInvoices;
+import com.einvoive.model.*;
 import com.einvoive.repository.LineItemRepository;
 import com.einvoive.constants.Constants;
 import com.google.gson.Gson;
@@ -206,7 +203,23 @@ public class ReportsHelper {
         }
     }
 
-        public String getInvoicesByDuration(String startDate, String endDate, String companyID) throws ParseException {
+    public String getInvoicesB2CByDuration(String startDate, String endDate, String companyID) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateFinal = df.parse(startDate);
+        Date endDateFinal = df.parse(endDate);
+        List<InvoiceB2C> invoicesList;
+        try{
+            invoicesList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
+                    .and("status").is(Constants.STATUS_APPROVED)), InvoiceB2C.class);
+        } catch(Exception ex){
+            System.out.println("Error in get invoicesB2C:"+ ex);
+            return gson.toJson(ex.getMessage());
+        }
+        return gson.toJson(invoicesList);
+    }
+
+     public String getInvoicesByDuration(String startDate, String endDate, String companyID) throws ParseException {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date startDateFinal = df.parse(startDate);
         Date endDateFinal = df.parse(endDate);
