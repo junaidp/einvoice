@@ -45,9 +45,6 @@ public class InvoiceHelper {
      InvoiceRepository invoiceRepository;
 
     @Autowired
-    JournalEntriesHelper journalEntriesHelper;
-
-    @Autowired
     private GridFsTemplate template;
 
     private Gson gson = new Gson();
