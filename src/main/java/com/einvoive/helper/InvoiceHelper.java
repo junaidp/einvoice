@@ -83,7 +83,7 @@ public class InvoiceHelper {
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
         invoice.setPreviousHash(getPreviousHash(invoice));
-//        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
+        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
     }
 
     public String getNextInvoiceNumber(String companyID) {
