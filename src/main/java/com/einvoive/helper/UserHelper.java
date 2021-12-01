@@ -3,7 +3,6 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
-import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -141,9 +140,11 @@ public class UserHelper {
 
     }
 
-    public String getUserToken(String id){
+    public String getUserToken(String id, String token){
        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-       String userToken = user.getLoginToken();
-       return userToken;
+       if(token.equals(user.getLoginToken())){
+           return gson.toJson(user);
+        }
+       else return "Wrong token entered";
     }
 }

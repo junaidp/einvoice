@@ -553,8 +553,8 @@ public class MainController {
 
 
     @GetMapping("/getUserToken")
-    public String getUserToken(String userId){
-        return gson.toJson(userHelper.getUserToken(userId));
+    public String getUserToken(String userId, String token){
+        return gson.toJson(userHelper.getUserToken(userId, token));
     }
 
 //    @GetMapping("/getJournalEntries")
