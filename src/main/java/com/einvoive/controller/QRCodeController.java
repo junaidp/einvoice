@@ -31,8 +31,8 @@ public class QRCodeController {
             throws Exception {
         String[] params = StringUtils.split(codeText, "&");
         String sellerName =  params[0];
-        String vatRegNo =  params[1];
-        String timeStamp =  params[2];
+        String vatRegNo   =  params[1];
+        String timeStamp  =  params[2];
         String invoiceTotal =  params[3];
         String vatTotal =  params[4];
         //return ResponseEntity.status(HttpStatus.OK).body(QRCodeGenerator.getQRCodeImageZatca("test Records","310122393500003", "2022-04-25T15:30:00Z", "1000.00", "150.00" ));
