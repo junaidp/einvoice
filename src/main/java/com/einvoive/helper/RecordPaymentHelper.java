@@ -40,7 +40,7 @@ public class RecordPaymentHelper {
      private void updateInvoiceRecordPayment(RecordPayment recordPayment){
         Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(recordPayment.getInvoiceNo())), Invoice.class);
          invoice.setRecordPayment(String.valueOf(Double.parseDouble(invoice.getRecordPayment()) - Double.parseDouble(recordPayment.getPaidAmmount())));
-        invoiceHelper.update(invoice);
+        invoiceHelper.save(invoice);
     }
 
     public String update(RecordPayment recordPayment) {

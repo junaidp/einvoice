@@ -34,9 +34,9 @@ public class LogoHelper {
     @Autowired
     private GridFsOperations operations;
 
-    public String uploadLogo(MultipartFile upload) throws IOException {
+    public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
         DBObject metadata = new BasicDBObject();
-        String logoName =  getCompanyName(Constants.COMPANY_ID)+"_logo";
+        String logoName =  getCompanyName(companyID)+"_logo";
         metadata.put("fileSize", upload.getSize());
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
         return fileID.toString();

@@ -42,7 +42,7 @@ public class ProductMainHelper {
                 .and("companyID").is(productEnglish.getCompanyID())), ProductMain.class);
         if(productMain != null){
             error.setErrorStatus("Error");
-            error.setError("Product Name Already Exists");
+            error.setError("Product Name: "+ productEnglish.getProductName()+" is already exists");
             jsonError = gson.toJson(error);
             return jsonError;
         }
@@ -134,6 +134,27 @@ public class ProductMainHelper {
             System.out.println("Error in get Products:"+ ex);
         }
         return gson.toJson(products);
+    }
+
+    //Product Name in both languages
+    public String getProductsNames(String companyId){
+        List<ProductMain> productsLanguagesList = new ArrayList<>();
+        List<ProductMain> productsEnglish = null;
+        List<ProductMain> productsArabic = new ArrayList<>();
+        try {
+            Query query = new Query(Criteria.where("companyID").is(companyId));
+            productsEnglish = mongoOperation.find(query, ProductMain.class);
+            for(ProductMain productMainEnglish : productsEnglish)
+                productsArabic.add(getProductArabic(productMainEnglish));
+            for(int i=0; i<productsEnglish.size(); i++){
+                productsLanguagesList.add(productsEnglish.get(i));
+                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
+                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get Products Names:"+ ex);
+        }
+        return gson.toJson(productsLanguagesList);
     }
 
     public String getProducts(String companyId){

@@ -40,7 +40,7 @@ public class UploadCustomersHelper {
         return true;
     }
 
-    public static List<Customer> excelToProductList(InputStream is) {
+    public static List<Customer> excelToProductList(InputStream is, String companyID) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(SHEET);
@@ -191,7 +191,7 @@ public class UploadCustomersHelper {
 
                     cellIdx++;
                 }
-                customer.setCompanyID(Constants.COMPANY_ID);
+                customer.setCompanyID(companyID);
                 productMainList.add(customer);
             }
 
@@ -203,10 +203,10 @@ public class UploadCustomersHelper {
         }
     }
 
-    public String saveAll(MultipartFile file) {
+    public String saveAll(MultipartFile file, String companyID) {
         String response = "Record Uploaded";
         try {
-            List<Customer> customerList = excelToProductList(file.getInputStream());
+            List<Customer> customerList = excelToProductList(file.getInputStream(), companyID);
 //            repository.saveAll(customerList);
             for (Customer customerEnglish : customerList ) {
                 Customer customerArabic = getCustomerArabicOnline(customerEnglish);

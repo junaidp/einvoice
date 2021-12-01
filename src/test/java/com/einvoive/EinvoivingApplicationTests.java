@@ -2,7 +2,9 @@ package com.einvoive;
 
 import com.einvoive.helper.InvoiceHelper;
 import com.einvoive.model.Invoice;
+import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
+import com.einvoive.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +16,17 @@ class EinvoivingApplicationTests {
     @Autowired
     InvoiceHelper invoiceHelper;
 
+    @Autowired
+    EmailSender emailSender;
+
     @Test
     void contextLoads() {
+    }
+
+    @Test
+    void sendEmail(){
+        String randomNumber = Utility.getRandomNumber();
+        emailSender.sendEmail("junaidp@gmail.com", "Login Token", "email body here"+ randomNumber);
     }
 
     @Test

@@ -331,13 +331,25 @@ public class MainController {
     }
 
     @GetMapping("/getAvailableInvoiceNo")
-    public String getAvailableInvoiceNo(@RequestParam String companyID) {
-        return gson.toJson(invoiceHelper.getNextInvoiceNumber(companyID));
+    public String getAvailableInvoiceNo(@RequestParam String id, @RequestParam String userType) {
+        //id could be of company or user
+        if(userType.equals(Constants.TYPE_COMPANY))
+            return gson.toJson(invoiceHelper.getNextInvoiceNoByCompanyID(id));
+        if(userType.equals(Constants.TYPE_INDIVIDUAL))
+            return gson.toJson(invoiceHelper.getNextInvoiceNoIndividual(id));
+        else
+            return gson.toJson(invoiceHelper.getNextInvoiceNoByUserID(id));
     }
 
     @GetMapping("/getAvailableInvoiceB2CNo")
-    public String getAvailableInvoiceB2CNo(@RequestParam String companyID) {
-        return gson.toJson(invoiceB2CHelper.getNextInvoiceNumber(companyID));
+    public String getAvailableInvoiceB2CNo(@RequestParam String id, @RequestParam String userType) {
+        //id could be of company or user
+        if(userType.equals(Constants.TYPE_COMPANY))
+            return gson.toJson(invoiceB2CHelper.getNextInvoiceNoByCompanyID(id));
+        if(userType.equals(Constants.TYPE_INDIVIDUAL))
+            return gson.toJson(invoiceB2CHelper.getNextInvoiceNoIndividual(id));
+        else
+            return gson.toJson(invoiceB2CHelper.getNextInvoiceNoByUserID(id));
     }
 
     @GetMapping("/getTopSaledProducts")
@@ -424,6 +436,13 @@ public class MainController {
     @GetMapping("/getInvoicesByCompany")
     public String getInvoicesByCompany(@RequestParam String companyID) { return invoiceHelper.getInvoicesByCompany(companyID); }
 
+    @GetMapping("/getAllInvoicesByLocation")
+    public String getAllInvoicesByLocation(@RequestParam String companyID, @RequestParam String location) {
+        return invoiceHelper.getAllInvoicesByLocation(companyID, location); }
+
+    @GetMapping("/getAllInvoicesB2CByLocation")
+    public String getAllInvoicesB2CByLocation(@RequestParam String companyID, @RequestParam String location) { return invoiceB2CHelper.getAllInvoicesB2CByLocation(companyID, location); }
+
     @GetMapping("/getInvoicesB2CByCompany")
     public String getInvoicesB2CByCompany(@RequestParam String companyID) { return invoiceB2CHelper.getInvoicesByCompany(companyID); }
 
@@ -467,6 +486,9 @@ public class MainController {
     public String getLineItemsB2C(@RequestParam String invoiceId) {
         return lineItemB2CHelper.getLineItemsB2C(invoiceId);
     }
+
+    @GetMapping("/getProductsNames")
+    public String getProductsNames(@RequestParam String companyId) { return productMainHelper.getProductsNames(companyId); }
 
     @GetMapping("/getProducts")
     public String getProducts(@RequestParam String companyId) {
@@ -530,6 +552,10 @@ public class MainController {
     }
 
 
+    @GetMapping("/getUserToken")
+    public String getUserToken(String userId){
+        return gson.toJson(userHelper.getUserToken(userId));
+    }
 
 //    @GetMapping("/getJournalEntries")
 //    public String getJournalEntries(String invoiceNo){

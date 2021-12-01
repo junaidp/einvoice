@@ -256,4 +256,135 @@ public class InvoiceB2CHelper {
             return jsonError;
         }
     }
+
+
+    //    Company having multiple user w.r.t their locations
+    public String getNextInvoiceNoByUserID(String id) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            inv = StringUtils.split(String.valueOf(inv[1]), INVOICE_SEPARATOR);
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + invoiceNum;
+        }
+        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+    }
+
+    //    When single user Company request
+    public String getNextInvoiceNoIndividual(String id){
+        Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[0]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+        }
+        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+    }
+
+    //for Multiple User under a company But CompanyID is generating
+    public String getNextInvoiceNoByCompanyID(String id) {
+        Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[0]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+        }
+        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+    }
+
+
+    public String getLastInvoiceLocation(String companyID, String location) {
+        List<InvoiceB2C> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                if(invoice.getInvoiceNumber().contains(location))
+                    return invoice.getInvoiceNumber();
+            }
+        }catch(Exception ex){
+            System.out.println("Error in getLastInvoiceLocation:"+ ex);
+            return "";
+        }
+        return "";
+    }
+
+    public String getLastInvoiceNo(String companyID) {
+        List<InvoiceB2C> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            char someChar = '-';
+            for(InvoiceB2C invoice : invoices){
+                int count = 0;
+                for (int i = 0; i < invoice.getInvoiceNumber().length(); i++) {
+                    if (invoice.getInvoiceNumber().charAt(i) == someChar) {
+                        count++;
+                    }
+                }
+                if(count == 2)
+                    return invoice.getInvoiceNumber();
+            }
+        }catch(Exception ex){
+            System.out.println("Error in getLastInvoiceNoB2C:"+ ex);
+            return "";
+        }
+        return "";
+    }
+
+    public String getAllInvoicesB2CByLocation(String companyID, String location){
+        List<InvoiceB2C> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID).and("location").is(location));
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            for(InvoiceB2C invoice : invoices) {
+                lineItemHelper.getLineItemsB2C(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,6 +25,7 @@ public class UploadProductsHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "Id", "Title", "Description", "Published" };
     static String SHEET = "Sheet1";
+    private Gson gson = new Gson();
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
@@ -120,17 +122,20 @@ public class UploadProductsHelper {
         }
     }
 
-    public void saveAll(MultipartFile file, String companyID, String loggedInUserID) {
+    public String saveAll(MultipartFile file, String companyID, String loggedInUserID) {
+        String msg = "Record Uploaded";
         try {
             List<ProductMain> productMainList = excelToProductList(file.getInputStream(), companyID, loggedInUserID);
 //            productMainHelper.repository.saveAll(productMainList);
             for (ProductMain productEnglish : productMainList ) {
                 ProductMain productArabic = productMainHelper.getProductArabicOnline(productEnglish);
-                productMainHelper.save(productEnglish, productArabic);
+                msg = productMainHelper.save(productEnglish, productArabic);
             }
         } catch (IOException e) {
+            msg = e.getMessage();
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
+        return gson.toJson(msg);
     }
 
 }

@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 public class Utility {
 
@@ -86,6 +87,12 @@ public class Utility {
             }
         }
         return tmpBuffer.toString();
+    }
+
+    public static String getRandomNumber(){
+        Random rand = new Random();
+        String random = String.valueOf(rand.nextInt(10000));
+        return random;
     }
 }
 

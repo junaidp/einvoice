@@ -23,6 +23,7 @@ public class Company {
     private String country;
     private String state;
     private String city;
+    private String districtNeighborhood;
     private String postalCode;
     private String userType;
     private String vatNumber_Company;
@@ -43,6 +44,14 @@ public class Company {
 
     public void setAdditionalNumber_Company(String additionalNumber_Company) {
         this.additionalNumber_Company = additionalNumber_Company;
+    }
+
+    public String getDistrictNeighborhood() {
+        return districtNeighborhood;
+    }
+
+    public void setDistrictNeighborhood(String districtNeighborhood) {
+        this.districtNeighborhood = districtNeighborhood;
     }
 
     public String getOtherSellerid_Company() {

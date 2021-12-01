@@ -39,16 +39,12 @@ public class UpdatePasswordHelper {
         if(loginCompany != null){
             loginCompany.setPassword(updatePassword.getNewPassword());
             companyRepository.save(loginCompany);
-            Constants.COMPANY_ID = loginCompany.getCompanyID();
-            Constants.LOGGED_IN_USER_ID = loginCompany.getId();
              return gson.toJson("Your Company Password has been updated!");
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(updatePassword.getEmail()).and("password").is(updatePassword.getPassword())), User.class);
         if(savedUser != null){
             savedUser.setPassword(updatePassword.getNewPassword());
             userRepository.save(savedUser);
-            Constants.COMPANY_ID = savedUser.getCompanyID();
-            Constants.LOGGED_IN_USER_ID = savedUser.getId();
             return gson.toJson("User Password has been updated!");
         }
         else

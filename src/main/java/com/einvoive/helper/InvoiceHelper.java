@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,9 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class InvoiceHelper {
@@ -83,15 +78,39 @@ public class InvoiceHelper {
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
         invoice.setPreviousHash(getPreviousHash(invoice));
-        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
+//        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
     }
 
-    public String getNextInvoiceNumber(String companyID) {
-
-        String lastCompanyInvoiceNumber = getLastInvoiceByCompany(companyID);
+//    Company having multiple user w.r.t their locations
+    public String getNextInvoiceNoByUserID(String id) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-                invoiceNumber = companyID + INVOICE_SEPARATOR + "1";
+            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            inv = StringUtils.split(String.valueOf(inv[1]), INVOICE_SEPARATOR);
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + invoiceNum;
+        }
+        return invoiceNumber;
+    }
+
+//    When single user Company request
+    public String getNextInvoiceNoIndividual(String id){
+        Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -102,7 +121,29 @@ public class InvoiceHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = companyID + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+        }
+        return invoiceNumber;
+    }
+
+    //for Multiple User under a company But CompanyID is generating
+    public String getNextInvoiceNoByCompanyID(String id) {
+        Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
+        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
+        String invoiceNumber = "";
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+        }
+        else{
+            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+            int invoiceNum = 0 ;
+            if(inv!=null && !(inv.length <=0)) {
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
+            }
+            else{
+                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+            }
+            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
         }
          return invoiceNumber;
     }
@@ -182,6 +223,23 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
+    public String getAllInvoicesByLocation(String companyID, String location){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID).and("location").is(location));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
+    //direct api method
     public String getInvoicesByCompany(String companyID){
         List<Invoice> invoices = null;
         try {
@@ -198,20 +256,48 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-    public String getLastInvoiceByCompany(String companyID) {
+    public String getLastInvoiceLocation(String companyID, String location) {
         List<Invoice> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber")).limit(1);
+            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
            // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, Invoice.class);
-            return invoices.get(0).getInvoiceNumber();
+            for(Invoice invoice : invoices) {
+                if(invoice.getInvoiceNumber().contains(location))
+                    return invoice.getInvoiceNumber();
+            }
         }catch(Exception ex){
             System.out.println("Error in getLastInvoiceByCompany:"+ ex);
             return "";
         }
+        return "";
+    }
 
+    public String getLastInvoiceNo(String companyID) {
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            invoices = mongoOperation.find(query, Invoice.class);
+            char someChar = '-';
+            for(Invoice invoice : invoices){
+                int count = 0;
+                for (int i = 0; i < invoice.getInvoiceNumber().length(); i++) {
+                    if (invoice.getInvoiceNumber().charAt(i) == someChar) {
+                        count++;
+                    }
+                }
+                if(count == 1)
+                    return invoice.getInvoiceNumber();
+            }
+        }catch(Exception ex){
+            System.out.println("Error in getLastInvoiceByCompany:"+ ex);
+            return "";
+        }
+        return "";
     }
 
     public String deleteInvoice(String invoiceID){
@@ -226,9 +312,8 @@ public class InvoiceHelper {
     }
 
     public String update(Invoice invoice) {
-            deleteInvoice(invoice.getId());
-           //TODO: return save(invoice, file);
-        return null;
+        deleteInvoice(invoice.getId());
+        return save(invoice);
     }
 
     public String getInvoiceStatus(String id) {
@@ -272,6 +357,8 @@ public class InvoiceHelper {
             if(invoice != null){
                 invoice.setStatus(status);
 //                journalEntriesHelper.setToSave(invoice);
+                if(status.equals(Constants.STATUS_APPROVED))
+                    journalEntriesHelper.requestHanler(invoice);
                 repository.save(invoice);
                 return "Invoice Status Updated";
             }

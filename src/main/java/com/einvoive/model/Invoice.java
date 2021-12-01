@@ -46,11 +46,11 @@ public class Invoice {
     private String totalNetAmount;
     private String recordPayment;
     private String bankAccount;
+    private String referenceField;
+    private String projectCode;
+    private String location;
     private List<LineItem> lineItemList;
 
-    public Invoice(){
-
-    }
     //private MultipartFile file;
 //
 //    public MultipartFile getFile() {
@@ -60,6 +60,30 @@ public class Invoice {
 //    public void setFile(MultipartFile file) {
 //        this.file = file;
 //    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getReferenceField() {
+        return referenceField;
+    }
+
+    public void setReferenceField(String referenceField) {
+        this.referenceField = referenceField;
+    }
+
+    public String getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(String projectCode) {
+        this.projectCode = projectCode;
+    }
 
     public String getBankAccount() {
         return bankAccount;

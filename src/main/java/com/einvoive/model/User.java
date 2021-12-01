@@ -21,6 +21,15 @@ import java.util.List;
         private boolean productSetup;
         private boolean invoiceRaise;
         private boolean paymentReceipt;
+        private String loginToken;
+
+    public String getLoginToken() {
+        return loginToken;
+    }
+
+    public void setLoginToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
 
     public String getPhone() {
         return phone;

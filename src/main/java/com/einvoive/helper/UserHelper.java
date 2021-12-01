@@ -132,4 +132,18 @@ public class UserHelper {
         userRepository.delete(userSaved);
         return saveUser(userEntity);
     }
+
+    //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
+    //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
+    public void updateUserForToken(String id) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        userRepository.save(user);
+
+    }
+
+    public String getUserToken(String id){
+       User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+       String userToken = user.getLoginToken();
+       return userToken;
+    }
 }
