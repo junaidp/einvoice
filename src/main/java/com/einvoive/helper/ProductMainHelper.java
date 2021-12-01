@@ -4,17 +4,14 @@ import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
 import com.einvoive.util.Translator;
-import com.google.api.client.json.Json;
+
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,6 +155,7 @@ public class ProductMainHelper {
     }
 
     public String getProducts(String companyId){
+        System.out.println("Getting products for company:"+ companyId);
         List<List<ProductMain>> productsMain = new ArrayList<>();
         List<ProductMain> productsEnglish = null;
         List<ProductMain> productsArabic = new ArrayList<>();
