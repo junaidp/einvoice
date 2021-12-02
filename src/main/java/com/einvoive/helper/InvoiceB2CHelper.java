@@ -278,7 +278,7 @@ public class InvoiceB2CHelper {
             }
             invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
-        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+        return invoiceNumber+INVOICE_SEPARATOR;
     }
 
     //    When single user Company request
@@ -301,7 +301,7 @@ public class InvoiceB2CHelper {
             }
             invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
-        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+        return invoiceNumber+INVOICE_SEPARATOR;
     }
 
     //for Multiple User under a company But CompanyID is generating
@@ -324,7 +324,7 @@ public class InvoiceB2CHelper {
             }
             invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
-        return invoiceNumber+INVOICE_SEPARATOR+"B2C";
+        return invoiceNumber+INVOICE_SEPARATOR;
     }
 
 

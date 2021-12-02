@@ -106,7 +106,6 @@ public class UploadProductsHelper {
 //                        default:
 //                            break;
                     }
-
                     cellIdx++;
                 }
                 productMain.setUserId(loggedInUserID);
