@@ -67,7 +67,7 @@ public class LoginHelper {
     private void saveTokenAndEmail(User savedUser) {
         String randomNumber = Utility.getRandomNumber();
         savedUser.setLoginToken(randomNumber);
-        userHelper.updateUserForToken(savedUser.getUserId());
+        userHelper.updateUserForToken(savedUser.getUserId(), randomNumber);
         emailSender.sendEmail(savedUser.getEmail(), "Gofatoorah Login Verification", "Login Token :" + randomNumber);
 
     }

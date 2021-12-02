@@ -138,6 +138,20 @@ public class CustomerHelper {
         return gson.toJson(listCustomers);
     }
 
+    //only in English
+    public String getAllCustomersEnglish(String comapnyID){
+        List<Customer>customers = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(comapnyID));
+            System.out.println("QUERY");
+            customers = mongoOperation.find(query, Customer.class);
+        }catch(Exception ex){
+            System.out.println("Error in get Customers English:"+ ex);
+        }
+        return gson.toJson(customers);
+    }
+
     private List<List<Customer>> getCustomersInLanguages(List<Customer> customers){
        List<List<Customer>> listCustomers = new ArrayList<>();
         List<Customer> customersArabic = new ArrayList<>();

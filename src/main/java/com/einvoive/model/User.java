@@ -21,8 +21,16 @@ import java.util.List;
         private boolean productSetup;
         private boolean invoiceRaise;
         private boolean paymentReceipt;
+        private boolean addCustomer;
         private String loginToken;
 
+    public boolean isAddCustomer() {
+        return addCustomer;
+    }
+
+    public void setAddCustomer(boolean addCustomer) {
+        this.addCustomer = addCustomer;
+    }
     public String getLoginToken() {
         return loginToken;
     }

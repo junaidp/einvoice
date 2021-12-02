@@ -372,6 +372,11 @@ public class MainController {
         return customerHelper.getAllCustomers(companyID);
     }
 
+    @GetMapping("/getAllCustomersEnglish")
+    public String getAllCustomersEnglish(@RequestParam String companyID) {
+        return customerHelper.getAllCustomersEnglish(companyID);
+    }
+
     @GetMapping("/getCustomer")
     public String getCustomer(@RequestParam String customerID) {
         return customerHelper.getCustomer
@@ -398,6 +403,11 @@ public class MainController {
         return reportsHelper.getTopCustomerInvoicesByDates(startDate, endDate, companyID);
     }
 
+    @GetMapping("/getInvoicesByDurationLocation")
+    public String getInvoicesByDurationLocation(@RequestParam String startDate, String endDate, String companyID, String location){
+        return invoiceHelper.getInvoicesByDurationLocation(startDate, endDate, companyID, location);
+    }
+
     @GetMapping("/getTopSoldProductsByDate")
     public String getTopSoldProductsByDate(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
         return reportsHelper.getTopSoldProductsByDate(startDate, endDate, companyID);
@@ -415,6 +425,9 @@ public class MainController {
 
     @GetMapping("/getInvoicesByCustomer")
     public String getInvoicesByCustomer(@RequestParam String customerName) { return invoiceHelper.getInvoicesByCustomer(customerName); }
+
+    @GetMapping("/getInvoicesByCustomerLocation")
+    public String getInvoicesByCustomerLocation(@RequestParam String customerName, @RequestParam String location) { return invoiceHelper.getInvoicesByCustomerLocation(customerName, location); }
 
     @GetMapping("/getInvoicesByInvoiceNo")
     public String getInvoicesByInvoiceNo(@RequestParam String invoiceNo) { return invoiceHelper.getInvoicesByInvoiceNo(invoiceNo); }
@@ -434,7 +447,7 @@ public class MainController {
     public String getInvoicesByStatus(@RequestParam String status) { return invoiceHelper.getInvoicesByStatus(status); }
 
     @GetMapping("/getInvoicesByCompany")
-    public String getInvoicesByCompany(@RequestParam String companyID) { return invoiceHelper.getInvoicesByCompany(companyID); }
+    public String getInvoicesByCompany(@RequestParam String companyID) {return invoiceHelper.getInvoicesByCompany(companyID); }
 
     @GetMapping("/getAllInvoicesByLocation")
     public String getAllInvoicesByLocation(@RequestParam String companyID, @RequestParam String location) {
@@ -553,8 +566,8 @@ public class MainController {
 
 
     @GetMapping("/getUserToken")
-    public String getUserToken(String userId, String token){
-        return gson.toJson(userHelper.getUserToken(userId, token));
+    public String getUserToken(@RequestParam String email,@RequestParam String token){
+        return gson.toJson(userHelper.getUserToken(email, token));
     }
 
 //    @GetMapping("/getJournalEntries")

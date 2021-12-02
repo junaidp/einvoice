@@ -1,5 +1,9 @@
 package com.einvoive.util;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -8,7 +12,7 @@ import java.util.Random;
 
 public class Utility {
 
-    private static String hexIP = null;
+     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
 
     private static byte[] getSHA(String text) throws NoSuchAlgorithmException
@@ -94,5 +98,7 @@ public class Utility {
         String random = String.valueOf(rand.nextInt(10000));
         return random;
     }
+
+
 }
 

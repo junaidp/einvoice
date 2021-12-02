@@ -4,7 +4,10 @@ import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
 import com.google.gson.Gson;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,6 +18,12 @@ import java.util.List;
 
 @Component
 public class UserHelper {
+
+    @Autowired
+    MongoClient mongoClient;
+
+    @Value("${spring.data.mongodb.database}")
+    private String db;
 
     @Autowired
     UserRepository userRepository;
@@ -134,17 +143,24 @@ public class UserHelper {
 
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
     //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
-    public void updateUserForToken(String id) {
-        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-        userRepository.save(user);
-
+    public void updateUserForToken(String id, String randomNumber) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(id)), User.class);
+//        userRepository.save(user);
+        user.setLoginToken(randomNumber);
+        updateUser(user);
     }
 
-    public String getUserToken(String id, String token){
-       User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+    public String getUserToken(String email, String token){
+       User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
        if(token.equals(user.getLoginToken())){
            return gson.toJson(user);
         }
-       else return "Wrong token entered";
+       else return gson.toJson("Wrong token entered");
+    }
+
+    public void updateRecord(){
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(db);
+      //  mongoDatabase.getCollection("user").updateOne(user)
+
     }
 }

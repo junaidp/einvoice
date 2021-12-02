@@ -67,7 +67,7 @@ public class InvoiceB2CHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceByCompany(companyID);
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = companyID + INVOICE_SEPARATOR + "1";
+            invoiceNumber = companyID.substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -78,7 +78,7 @@ public class InvoiceB2CHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = companyID + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = companyID.substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber;
     }
@@ -264,7 +264,7 @@ public class InvoiceB2CHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -276,7 +276,7 @@ public class InvoiceB2CHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber+INVOICE_SEPARATOR+"B2C";
     }
@@ -287,7 +287,7 @@ public class InvoiceB2CHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -299,7 +299,7 @@ public class InvoiceB2CHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber+INVOICE_SEPARATOR+"B2C";
     }
@@ -310,7 +310,7 @@ public class InvoiceB2CHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -322,7 +322,7 @@ public class InvoiceB2CHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber+INVOICE_SEPARATOR+"B2C";
     }

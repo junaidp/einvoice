@@ -37,8 +37,7 @@ public class QRCodeController {
         String vatTotal =  params[4];
         //return ResponseEntity.status(HttpStatus.OK).body(QRCodeGenerator.getQRCodeImageZatca("test Records","310122393500003", "2022-04-25T15:30:00Z", "1000.00", "150.00" ));
         return ResponseEntity.status(HttpStatus.OK).body(QRCodeGenerator.getQRCodeImageZatca(sellerName,vatRegNo, timeStamp, invoiceTotal, vatTotal ));
-
-    }
+}
 
     @GetMapping(value = "/genrateQRCode/{invoiceNo}" , produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<byte[]> generateQRCode(@PathVariable("invoiceNo") String invoiceNo) {

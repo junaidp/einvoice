@@ -2,6 +2,7 @@ package com.einvoive.helper;
 
 import com.einvoive.constants.Constants;
 import com.einvoive.model.*;
+import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
@@ -20,6 +21,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -40,6 +44,9 @@ public class InvoiceHelper {
      InvoiceRepository invoiceRepository;
 
     @Autowired
+    JournalEntriesHelper journalEntriesHelper;
+
+    @Autowired
     private GridFsTemplate template;
 
     private Gson gson = new Gson();
@@ -47,6 +54,9 @@ public class InvoiceHelper {
     private String INVOICE_SEPARATOR = "-";
 
     private  List<Invoice> invoiceListMain = null;
+
+    @Autowired
+    EmailSender emailSender;
 
     public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
@@ -84,7 +94,7 @@ public class InvoiceHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -96,7 +106,7 @@ public class InvoiceHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = user.getCompanyID() + INVOICE_SEPARATOR + user.getLocation() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber;
     }
@@ -107,7 +117,7 @@ public class InvoiceHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = company.getCompanyID().substring(0, 2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -118,7 +128,7 @@ public class InvoiceHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber;
     }
@@ -129,7 +139,7 @@ public class InvoiceHelper {
         String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
         String invoiceNumber = "";
         if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + "1";
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + "1";
         }
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
@@ -140,7 +150,7 @@ public class InvoiceHelper {
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
             }
-            invoiceNumber = company.getCompanyID() + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
         }
          return invoiceNumber;
     }
@@ -161,6 +171,23 @@ public class InvoiceHelper {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("customerName").is(customerName));
+            invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+        }catch(Exception ex){
+            System.out.println("Error in get invoices:"+ ex);
+        }
+        return gson.toJson(invoices);
+    }
+
+    //Location based
+    public String getInvoicesByCustomerLocation(String customerName, String location){
+        List<Invoice> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("customerName").is(customerName).and("location").is(location));
             invoices = mongoOperation.find(query, Invoice.class);
             for(Invoice invoice : invoices) {
                 lineItemHelper.getLineItems(invoice.getId());
@@ -354,8 +381,15 @@ public class InvoiceHelper {
             if(invoice != null){
                 invoice.setStatus(status);
 //                journalEntriesHelper.setToSave(invoice);
-                if(status.equals(Constants.STATUS_APPROVED))
+                if(status.equals(Constants.STATUS_APPROVED)) {
+                    User user = mongoOperation.findOne(new Query(Criteria.where("id").is(invoice.getUserId())), User.class);
+                    emailSender.sendEmail(user.getEmail(), "Invoice Approved", "Your Invoice has benn approved. Please have a look on Invoice: "+invoice.getInvoiceNumber());
                     journalEntriesHelper.requestHanler(invoice);
+                }
+                if(status.equals(Constants.STATUS_FORAPPROVAL)){
+                    User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
+                    emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
+                }
                 repository.save(invoice);
                 return "Invoice Status Updated";
             }
@@ -410,4 +444,23 @@ public class InvoiceHelper {
             return jsonError;
         }
     }
+
+    public String getInvoicesByDurationLocation(String startDate, String endDate, String companyID, String location) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDateFinal = null;
+        Date endDateFinal = null;
+        try {
+            startDateFinal = df.parse(startDate);
+            endDateFinal = df.parse(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                .and("invoiceDate").gte(startDateFinal).lte(endDateFinal).and("location").is(location)), Invoice.class);
+        if(invoiceList.isEmpty())
+            return gson.toJson("No Record found");
+        else
+            return gson.toJson(invoiceListMain);
+    }
+
 }
