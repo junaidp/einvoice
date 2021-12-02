@@ -44,11 +44,11 @@ public class UploadController {
     InvoiceHelper invoiceHelper;
 
      //Save the uploaded file to this folder
-    private static String UPLOADED_INVOICE_FOLDER = "D://Envoice//invoice//";
-    private static String UPLOADED_FOLDER = "D://Envoice//help//";
-    private static String UPLOAD_Product_FOLDER = "D://Envoice//products//";
-    private static String UPLOAD_Customer_FOLDER = "D://Envoice//customers//";
-    private static String UPLOAD_Logos_FOLDER = "D://Envoice//logos//";
+    private static String UPLOADED_INVOICE_FOLDER = Constants.PROJECT_PATH+"//invoice//";
+    private static String UPLOADED_FOLDER = Constants.PROJECT_PATH+"//help//";
+    private static String UPLOAD_Product_FOLDER = Constants.PROJECT_PATH+"//products//";
+    private static String UPLOAD_Customer_FOLDER = Constants.PROJECT_PATH+"//customers//";
+    private static String UPLOAD_Logos_FOLDER = Constants.PROJECT_PATH+"//logos//";
     private Gson gson = new Gson();
 
     @GetMapping("/")
