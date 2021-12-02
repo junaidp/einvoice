@@ -45,10 +45,10 @@ public class UploadController {
 
      //Save the uploaded file to this folder
     private static String UPLOADED_INVOICE_FOLDER = Constants.PROJECT_PATH+"//invoice//";
-    private static String UPLOADED_FOLDER = Constants.PROJECT_PATH+"//help//";
-    private static String UPLOAD_Product_FOLDER = Constants.PROJECT_PATH+"//products//";
-    private static String UPLOAD_Customer_FOLDER = Constants.PROJECT_PATH+"//customers//";
-    private static String UPLOAD_Logos_FOLDER = Constants.PROJECT_PATH+"//logos//";
+//    private static String UPLOADED_FOLDER = Constants.PROJECT_PATH+"//help//";
+//    private static String UPLOAD_Product_FOLDER = Constants.PROJECT_PATH+"//products//";
+//    private static String UPLOAD_Customer_FOLDER = Constants.PROJECT_PATH+"//customers//";
+//    private static String UPLOAD_Logos_FOLDER = Constants.PROJECT_PATH+"//logos//";
     private Gson gson = new Gson();
 
     @GetMapping("/")
@@ -137,71 +137,30 @@ public class UploadController {
 
     @PostMapping("/uploadProducts") // //new annotation since 4.3
     public ResponseEntity<String> uploadProducts(@RequestParam("file") MultipartFile file, @RequestParam String companyID, @RequestParam String userID) {
-//        ErrorCustom error = new ErrorCustom();
-//        String jsonError;
-        if (file.isEmpty()) {
-//            error.setErrorStatus("Error");
-//            error.setError("Attach file is empty");
-//            jsonError = gson.toJson(error);
+        if (file.isEmpty())
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attached file is empty");
-        }
-        if (uploadProductsHelper.hasExcelFormat(file)) {
+        if (uploadProductsHelper.hasExcelFormat(file))
             try {
                 return ResponseEntity.status(HttpStatus.OK).body(uploadProductsHelper.saveAll(file, companyID, userID));
-//                byte[] bytes = file.getBytes();
-//                Path path = Paths.get(UPLOAD_Product_FOLDER + file.getOriginalFilename());
-//                Files.write(path, bytes);
-//                return uploadProductsHelper.saveAll(file, companyID, userID);
-//                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
             } catch (Exception e) {
-//                error.setErrorStatus("Error");
-//                error.setError(e.getMessage());
-//                jsonError = gson.toJson(error);
-//                return jsonError;
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
             }
-        }
         else {
-//            error.setErrorStatus("Error");
-//            error.setError("Attach file format is not excell");
-//            jsonError = gson.toJson(error);
-//            return jsonError;
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attach file format is not excell");
         }
     }
 
     @PostMapping("/uploadCustomers") // //new annotation since 4.3
     public ResponseEntity<String> uploadCustomers(@RequestParam("file") MultipartFile file, @RequestParam String companyID) {
-//        ErrorCustom error = new ErrorCustom();
-//        String jsonError;
-        if (file.isEmpty()) {
-//            error.setErrorStatus("Error");
-//            error.setError("Attach file is empty");
-//            jsonError = gson.toJson(error);
-//            return jsonError;
+        if (file.isEmpty())
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attached file is empty");
-        }
-        if (uploadProductsHelper.hasExcelFormat(file)) {
+        if (uploadProductsHelper.hasExcelFormat(file))
             try {
-//                byte[] bytes = file.getBytes();
-//                Path path = Paths.get(UPLOAD_Customer_FOLDER + file.getOriginalFilename());
-//                Files.write(path, bytes);
                 return ResponseEntity.status(HttpStatus.OK).body(uploadCustomersHelper.saveAll(file, companyID));
-//                return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
-//                message = "Uploaded the file successfully: " + file.getOriginalFilename();
             } catch (Exception e) {
-//                error.setErrorStatus("Error");
-//                error.setError(e.getMessage());
-//                jsonError = gson.toJson(error);
-//                return jsonError;
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
             }
-        }
         else {
-//            error.setErrorStatus("Error");
-//            error.setError("Attach file format is not excell");
-//            jsonError = gson.toJson(error);
-//            return jsonError;
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attach file format is not excell");
         }
     }

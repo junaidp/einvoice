@@ -76,7 +76,7 @@ public class UploadProductsHelper {
                             break;
 
                         case 2:
-                            int value = (int)currentCell.getNumericCellValue();
+                            double value = (double) currentCell.getNumericCellValue();
                             productMain.setPrice(String.valueOf(value));
                             break;
 
@@ -103,8 +103,8 @@ public class UploadProductsHelper {
 //                            productMain.setCompanyID(loginHelper.getCompanyID());
 //                            break;
 
-                        default:
-                            break;
+//                        default:
+//                            break;
                     }
 
                     cellIdx++;
@@ -113,9 +113,7 @@ public class UploadProductsHelper {
                 productMain.setCompanyID(companyID);
                 productMainList.add(productMain);
             }
-
             workbook.close();
-
             return productMainList;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
