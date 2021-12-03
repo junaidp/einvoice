@@ -39,7 +39,7 @@ public class UserHelper {
 
 //    private List<User> users;
 
-    public String saveUser(User userEntity){
+    public String saveUser(User userEntity, boolean sendEmail){
         String msg = validationBeforeSave(userEntity);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -48,7 +48,8 @@ public class UserHelper {
             try {
 //                userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
                 userRepository.save(userEntity);
-                emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
+                if(sendEmail)
+                    emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
                 return "User Saved";
             }
             catch (Exception ex){
@@ -143,7 +144,7 @@ public class UserHelper {
         User userSaved = mongoOperation.findOne(new Query(Criteria.where("id").is(userEntity.getId())), User.class);
         userEntity.setPassword(userSaved.getPassword());
         userRepository.delete(userSaved);
-        return saveUser(userEntity);
+        return saveUser(userEntity, false);
     }
 
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method

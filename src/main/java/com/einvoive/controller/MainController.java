@@ -93,7 +93,7 @@ public class MainController {
 
     @PostMapping("/saveUser")
     public String saveUser(@RequestBody User userEntity) {
-        return userHelper.saveUser(userEntity);
+        return userHelper.saveUser(userEntity, true);
     }
     @PostMapping("/saveBank")
     public String saveBank(@RequestBody BankAccount bankAccountSave) {
