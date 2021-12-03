@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
+import com.einvoive.util.EmailSender;
 import com.google.gson.Gson;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -29,6 +30,9 @@ public class UserHelper {
     UserRepository userRepository;
 
     @Autowired
+    EmailSender emailSender;
+
+    @Autowired
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
@@ -44,6 +48,7 @@ public class UserHelper {
             try {
 //                userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
                 userRepository.save(userEntity);
+                emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
                 return "User Saved";
             }
             catch (Exception ex){

@@ -35,6 +35,9 @@ public class LogoHelper {
     private GridFsOperations operations;
 
     public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
+        Logo logo = getLogo(companyID);
+        if(!logo.getFilename().isEmpty())
+            deleteLogo(logo.getFilename());
         DBObject metadata = new BasicDBObject();
         String logoName =  getCompanyName(companyID)+"_logo";
         metadata.put("fileSize", upload.getSize());
@@ -42,6 +45,9 @@ public class LogoHelper {
         return fileID.toString();
     }
 
+    private void deleteLogo(String filename){
+        template.delete(new Query(Criteria.where("fileName").is(filename)));
+    }
 
     public Logo getLogo(String companyID) throws IOException {
         String logoName =  getCompanyName(companyID)+"_logo";

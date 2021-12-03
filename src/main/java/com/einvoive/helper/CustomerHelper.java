@@ -55,24 +55,25 @@ public class CustomerHelper {
         String msg1 = "";
         String msg2 = "";
         String msg3 = "";
-        List<Customer> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(customer.getPhone())
-                .and("companyID").is(customer.getCompanyID())), Customer.class);
-        List<Customer> phoneMainList = mongoOperation.find(new Query(Criteria.where("phoneMain").is(customer.getPhoneMain())
-                .and("companyID").is(customer.getCompanyID())), Customer.class);
-        List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())
-                .and("companyID").is(customer.getCompanyID())), Customer.class);
+        String msg4 = "";
+//        List<Customer> phoneList = mongoOperation.find(new Query(Criteria.where("phone").is(customer.getPhone())
+//                .and("companyID").is(customer.getCompanyID())), Customer.class);
+//        List<Customer> phoneMainList = mongoOperation.find(new Query(Criteria.where("phoneMain").is(customer.getPhoneMain())
+//                .and("companyID").is(customer.getCompanyID())), Customer.class);
+//        List<Customer> emailList = mongoOperation.find(new Query(Criteria.where("email").is(customer.getEmail())
+//                .and("companyID").is(customer.getCompanyID())), Customer.class);
         List<Customer> customerVatNo = mongoOperation.find(new Query(Criteria.where("vatNumber_Customer").is(customer.getVatNumber_Customer())
                 .and("companyID").is(customer.getCompanyID())), Customer.class);
-        if(phoneList.size() > 0)
-            msg1 = "--Customer Phone No";
-        if(emailList.size() > 0)
-            msg2 = "--Customer Email";
-        if(phoneMainList.size() > 0)
-            msg3 = "--Customer Phone Main No";
+//        if(phoneList.size() > 0)
+//            msg1 = "--Customer Phone No";
+//        if(emailList.size() > 0)
+//            msg2 = "--Customer Email";
+//        if(phoneMainList.size() > 0)
+//            msg3 = "--Customer Phone Main No";
         if(customerVatNo.size() > 0)
-            msg3 = "--Customer VAT No";
-        msg = msg1 + msg2 + msg3;
-        return msg;
+            msg4 = "--Customer VAT No";
+//        msg = msg1 + msg2 + msg3 + msg4;
+        return msg4;
     }
 
     public String update(Customer customerEnglish, Customer customerArabic){

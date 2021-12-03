@@ -289,7 +289,7 @@ public class InvoiceHelper {
            // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, Invoice.class);
             for(Invoice invoice : invoices) {
-                if(invoice.getInvoiceNumber().contains(location))
+                if(invoice.getInvoiceNumber().contains(location.substring(0,2)))
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
