@@ -4,6 +4,7 @@ import com.einvoive.constants.Constants;
 import com.einvoive.model.Company;
 import com.einvoive.model.Logo;
 import com.einvoive.repository.CompanyRepository;
+import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -36,17 +37,17 @@ public class LogoHelper {
 
     public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
         Logo logo = getLogo(companyID);
-        if(!logo.getFilename().isEmpty())
+        if(logo.getFilename() != null)
             deleteLogo(logo.getFilename());
         DBObject metadata = new BasicDBObject();
         String logoName =  getCompanyName(companyID)+"_logo";
         metadata.put("fileSize", upload.getSize());
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
-        return fileID.toString();
+        return new Gson().toJson("Logo Uploaded with file ID: "+fileID.toString());
     }
 
     private void deleteLogo(String filename){
-        template.delete(new Query(Criteria.where("fileName").is(filename)));
+        template.delete(new Query(Criteria.where("filename").is(filename)));
     }
 
     public Logo getLogo(String companyID) throws IOException {
