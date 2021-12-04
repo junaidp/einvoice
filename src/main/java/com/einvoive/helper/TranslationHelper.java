@@ -102,9 +102,10 @@ public class TranslationHelper {
         if(translation == null){
             translation = new Translation();
             System.out.println("No Translation saved: Assigning Translation through API");
-//            translation.setId("123");
-//            translation.setEnglish(english);
             translation.setArabic(Translator.getTranslation(english));
+            translation.setEnglish(english);
+            //saveing Translation
+            translationRepository.save(translation);
         }
         return translation.getArabic();
     }

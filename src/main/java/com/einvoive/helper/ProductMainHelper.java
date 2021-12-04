@@ -64,10 +64,10 @@ public class ProductMainHelper {
 
     public ProductMain getProductArabic(ProductMain productEnglish) {
         ProductMain productArabic = new ProductMain();
-        if(productEnglish.getProductName() != null && (!productEnglish.getProductName().isEmpty() && productEnglish.getProductName().length() > 2))
+        if(productEnglish.getProductName() != null && (!productEnglish.getProductName().isEmpty()))
             productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
-//        if(productEnglish.getDescription() != null && (!productEnglish.getDescription().isEmpty()))
-//            productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
+        if(productEnglish.getDescription() != null && (!productEnglish.getDescription().isEmpty()))
+            productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
         productArabic.setId(productEnglish.getId());
         return productArabic;
     }
@@ -165,13 +165,13 @@ public class ProductMainHelper {
             if(!companyId.isEmpty())
              query.addCriteria(Criteria.where("companyID").is(companyId));
             productsEnglish = mongoOperation.find(query, ProductMain.class);
-//            for(ProductMain productMainEnglish : productsEnglish)
-//                productsArabic.add(getProductArabic(productMainEnglish));
-//            if(productsEnglish != null && productsArabic != null){
-//                productsMain.add(productsEnglish);
-//                productsMain.add(productsArabic);
-//            }
-            productsMain.add(productsEnglish); //Only English to test
+            for(ProductMain productMainEnglish : productsEnglish)
+                productsArabic.add(getProductArabic(productMainEnglish));
+            if(productsEnglish != null && productsArabic != null){
+                productsMain.add(productsEnglish);
+                productsMain.add(productsArabic);
+            }
+//            productsMain.add(productsEnglish); //Only English to test
         }catch(Exception ex){
             System.out.println("Error in get Products:"+ ex);
         }
