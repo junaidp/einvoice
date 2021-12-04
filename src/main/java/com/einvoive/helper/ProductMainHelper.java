@@ -64,8 +64,10 @@ public class ProductMainHelper {
 
     public ProductMain getProductArabic(ProductMain productEnglish) {
         ProductMain productArabic = new ProductMain();
-        productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
-        productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
+        if(productEnglish.getProductName() != null && (!productEnglish.getProductName().isEmpty() && productEnglish.getProductName().length() > 2))
+            productArabic.setProductName(translationHelper.getTranslationMain(productEnglish.getProductName()));
+//        if(productEnglish.getDescription() != null && (!productEnglish.getDescription().isEmpty()))
+//            productArabic.setDescription(translationHelper.getTranslationMain(productEnglish.getDescription()));
         productArabic.setId(productEnglish.getId());
         return productArabic;
     }
@@ -141,21 +143,20 @@ public class ProductMainHelper {
         try {
             Query query = new Query(Criteria.where("companyID").is(companyId));
             productsEnglish = mongoOperation.find(query, ProductMain.class);
-            for(ProductMain productMainEnglish : productsEnglish)
-                productsArabic.add(getProductArabic(productMainEnglish));
-            for(int i=0; i<productsEnglish.size(); i++){
-                productsLanguagesList.add(productsEnglish.get(i));
-                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
-                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
-            }
+//            for(ProductMain productMainEnglish : productsEnglish)
+//                productsArabic.add(getProductArabic(productMainEnglish));
+//            for(int i=0; i<productsEnglish.size(); i++){
+//                productsLanguagesList.add(productsEnglish.get(i));
+//                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
+//                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
+//            }
         }catch(Exception ex){
             System.out.println("Error in get Products Names:"+ ex);
         }
-        return gson.toJson(productsLanguagesList);
+        return gson.toJson(productsEnglish);
     }
 
     public String getProducts(String companyId){
-        System.out.println("Getting products for company:"+ companyId);
         List<List<ProductMain>> productsMain = new ArrayList<>();
         List<ProductMain> productsEnglish = null;
         List<ProductMain> productsArabic = new ArrayList<>();
@@ -164,12 +165,13 @@ public class ProductMainHelper {
             if(!companyId.isEmpty())
              query.addCriteria(Criteria.where("companyID").is(companyId));
             productsEnglish = mongoOperation.find(query, ProductMain.class);
-            for(ProductMain productMainEnglish : productsEnglish)
-                productsArabic.add(getProductArabic(productMainEnglish));
-            if(productsEnglish != null && productsArabic != null){
-                productsMain.add(productsEnglish);
-                productsMain.add(productsArabic);
-            }
+//            for(ProductMain productMainEnglish : productsEnglish)
+//                productsArabic.add(getProductArabic(productMainEnglish));
+//            if(productsEnglish != null && productsArabic != null){
+//                productsMain.add(productsEnglish);
+//                productsMain.add(productsArabic);
+//            }
+            productsMain.add(productsEnglish); //Only English to test
         }catch(Exception ex){
             System.out.println("Error in get Products:"+ ex);
         }
