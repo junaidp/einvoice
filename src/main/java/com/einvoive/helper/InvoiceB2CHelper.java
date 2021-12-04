@@ -292,9 +292,9 @@ public class InvoiceB2CHelper {
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
             int invoiceNum = 0 ;
-            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
+//            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
             if(inv!=null && !(inv.length <=0)) {
-                invoiceNum = Integer.parseInt(inv[0]) + 1;
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
             }
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
@@ -315,9 +315,9 @@ public class InvoiceB2CHelper {
         else{
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
             int invoiceNum = 0 ;
-            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
+//            inv = StringUtils.split(inv[1], INVOICE_SEPARATOR);
             if(inv!=null && !(inv.length <=0)) {
-                invoiceNum = Integer.parseInt(inv[0]) + 1;
+                invoiceNum = Integer.parseInt(inv[1]) + 1;
             }
             else{
                 invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
@@ -361,7 +361,7 @@ public class InvoiceB2CHelper {
                         count++;
                     }
                 }
-                if(count == 2)
+                if(count == 1)
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
