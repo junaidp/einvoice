@@ -143,13 +143,13 @@ public class ProductMainHelper {
         try {
             Query query = new Query(Criteria.where("companyID").is(companyId));
             productsEnglish = mongoOperation.find(query, ProductMain.class);
-//            for(ProductMain productMainEnglish : productsEnglish)
-//                productsArabic.add(getProductArabic(productMainEnglish));
-//            for(int i=0; i<productsEnglish.size(); i++){
-//                productsLanguagesList.add(productsEnglish.get(i));
-//                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
-//                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
-//            }
+            for(ProductMain productMainEnglish : productsEnglish)
+                productsArabic.add(getProductArabic(productMainEnglish));
+            for(int i=0; i<productsEnglish.size(); i++){
+                productsLanguagesList.add(productsEnglish.get(i));
+                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
+                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
+            }
         }catch(Exception ex){
             System.out.println("Error in get Products Names:"+ ex);
         }

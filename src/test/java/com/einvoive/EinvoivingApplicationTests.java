@@ -1,6 +1,7 @@
 package com.einvoive;
 
 import com.einvoive.helper.InvoiceHelper;
+import com.einvoive.helper.ProductMainHelper;
 import com.einvoive.model.Invoice;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
@@ -19,8 +20,17 @@ class EinvoivingApplicationTests {
     @Autowired
     EmailSender emailSender;
 
+    @Autowired
+    ProductMainHelper productMainHelper;
+
     @Test
     void contextLoads() {
+    }
+
+    //@Test
+    void getProductsTranslation(){
+        String test = productMainHelper.getProductsNames("DarAlMaysan");
+        System.out.println(test);
     }
 
     @Test
@@ -29,7 +39,7 @@ class EinvoivingApplicationTests {
         emailSender.sendEmail("junaidp@gmail.com", "Login Token", "email body here"+ randomNumber);
     }
 
-    @Test
+   // @Test
     void saveInvoice(){
         Invoice inv = new Invoice();
         inv.setCompanyID("hyphen");
@@ -42,7 +52,9 @@ class EinvoivingApplicationTests {
       @Test
     void translate()  {
         try{
-            String translation = Translator.translate("en", "ar", "Hello");
+           // String translationBk = TranslatorHelper.translate("en", "ar", "Hello");
+            String translation = Translator.translate("Hello");
+
             System.out.println(translation);
           }
         catch(Exception ex)
