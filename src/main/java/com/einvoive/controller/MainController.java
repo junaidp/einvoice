@@ -565,9 +565,9 @@ public class MainController {
     }
 
 
-    @GetMapping("/getUserToken")
-    public String getUserToken(@RequestParam String email,@RequestParam String token){
-        return gson.toJson(userHelper.getUserToken(email, token));
+    @GetMapping("/getLoginToken")
+    public String getLoginToken(@RequestParam String email,@RequestParam String token){
+        return gson.toJson(loginHelper.getLoginToken(email, token));
     }
 
 //    @GetMapping("/getJournalEntries")

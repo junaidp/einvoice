@@ -1,9 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Company;
-import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.Translation;
+import com.einvoive.model.*;
 import com.einvoive.repository.CompanyRepository;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
@@ -104,6 +101,13 @@ public class CompanyHelper {
         return msg;
     }
 
+    //Email Verification token
+//    public void updateUserForToken(String companyID, String randomNumber) {
+//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)), Company.class);
+//        company.setLoginToken(randomNumber);
+//        updateCompanyEnglish(company);
+//    }
+
     public String getAvaiablaeId() {
         Long total = companyRepository.count();
         int count = total.intValue();
@@ -139,6 +143,15 @@ public class CompanyHelper {
         companyRepository.delete(company);
         saveCompany(companyEnglish);
         saveCompanyArabic(companyEnglish, comapnyArabic);
+        return gson.toJson("Company Updated");
+    }
+
+    public String updateCompanyEnglish(Company companyEnglish) {
+//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
+//        company.setLoginToken(companyEnglish.getLoginToken());
+//        companyEnglish = company;
+        companyRepository.delete(companyEnglish);
+        saveCompany(companyEnglish);
         return gson.toJson("Company Updated");
     }
 

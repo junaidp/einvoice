@@ -29,6 +29,15 @@ public class Company {
     private String vatNumber_Company;
     private String additionalNumber_Company;
     private String otherSellerid_Company;
+    private String loginToken;
+
+    public String getLoginToken() {
+        return loginToken;
+    }
+
+    public void setLoginToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
 
     public String getVatNumber_Company() {
         return vatNumber_Company;

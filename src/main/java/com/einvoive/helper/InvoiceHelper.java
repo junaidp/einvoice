@@ -387,6 +387,7 @@ public class InvoiceHelper {
                     journalEntriesHelper.requestHanler(invoice);
                 }
                 if(status.equals(Constants.STATUS_FORAPPROVAL)){
+                    //Todo null check
                     User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
                     emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
                 }

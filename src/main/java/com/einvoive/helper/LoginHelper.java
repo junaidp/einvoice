@@ -44,14 +44,18 @@ public class LoginHelper {
         List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
         System.out.println(login.getEmail() + "," + login.getPassword());
-        Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword()))), Company.class);
+        Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), Company.class);
         if(loginCompany != null){
+            //DIrect Login
+//            companyList.add(loginCompany);
+//            try{
+//                companyList.add(companyHelper.getCompanyArabic(loginCompany));
+//            } catch (Exception ex) {
+//                System.out.println(ex.getMessage());
+//            }
+//            return gson.toJson(companyList);
+            saveCompanyTokenAndEmail(loginCompany);
             companyList.add(loginCompany);
-            try{
-                companyList.add(companyHelper.getCompanyArabic(loginCompany));
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
             return gson.toJson(companyList);
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
@@ -63,13 +67,33 @@ public class LoginHelper {
         else
             return gson.toJson("Invalid Credentials");
     }
-
+//User
     private void saveTokenAndEmail(User savedUser) {
         String randomNumber = Utility.getRandomNumber();
         savedUser.setLoginToken(randomNumber);
         userHelper.updateUserForToken(savedUser.getUserId(), randomNumber);
         emailSender.sendEmail(savedUser.getEmail(), "Gofatoorah Login Verification", "Login Token :" + randomNumber);
 
+    }
+    //Company
+    private void saveCompanyTokenAndEmail(Company company) {
+        String randomNumber = Utility.getRandomNumber();
+        company.setLoginToken(randomNumber);
+//        companyHelper.updateUserForToken(company.getCompanyID(), randomNumber);
+        companyHelper.updateCompanyEnglish(company);
+        emailSender.sendEmail(company.getEmail(), "Gofatoorah Login Verification", "Login Token :" + randomNumber);
+    }
+
+    public String getLoginToken(String email, String token){
+        User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+        if(user != null && token.equals(user.getLoginToken())){
+            return gson.toJson(user);
+        }
+        Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
+        if(company != null && token.equals(company.getLoginToken())){
+            return gson.toJson(company);
+        }
+        else return gson.toJson("Wrong token entered");
     }
 
 }

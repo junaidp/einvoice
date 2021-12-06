@@ -149,20 +149,20 @@ public class UserHelper {
 
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
     //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
-    public void updateUserForToken(String id, String randomNumber) {
-        User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(id)), User.class);
+    public void updateUserForToken(String userid, String randomNumber) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(userid)), User.class);
 //        userRepository.save(user);
         user.setLoginToken(randomNumber);
         updateUser(user);
     }
 
-    public String getUserToken(String email, String token){
-       User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
-       if(token.equals(user.getLoginToken())){
-           return gson.toJson(user);
-        }
-       else return gson.toJson("Wrong token entered");
-    }
+//    public String getUserToken(String email, String token){
+//       User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+//       if(token.equals(user.getLoginToken())){
+//           return gson.toJson(user);
+//        }
+//       else return gson.toJson("Wrong token entered");
+//    }
 
     public void updateRecord(){
         MongoDatabase mongoDatabase = mongoClient.getDatabase(db);
