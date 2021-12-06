@@ -383,13 +383,15 @@ public class InvoiceHelper {
 //                journalEntriesHelper.setToSave(invoice);
                 if(status.equals(Constants.STATUS_APPROVED)) {
                     User user = mongoOperation.findOne(new Query(Criteria.where("id").is(invoice.getUserId())), User.class);
-                    emailSender.sendEmail(user.getEmail(), "Invoice Approved", "Your Invoice has benn approved. Please have a look on Invoice: "+invoice.getInvoiceNumber());
+                    if(user != null)
+                        emailSender.sendEmail(user.getEmail(), "Invoice Approved", "Your Invoice has benn approved. Please have a look on Invoice: "+invoice.getInvoiceNumber());
                     journalEntriesHelper.requestHanler(invoice);
                 }
                 if(status.equals(Constants.STATUS_FORAPPROVAL)){
                     //Todo null check
                     User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
-                    emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
+                    if(user != null)
+                        emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
                 }
                 repository.save(invoice);
                 return "Invoice Status Updated";
