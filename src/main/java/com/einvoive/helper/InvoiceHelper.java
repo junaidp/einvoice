@@ -58,19 +58,31 @@ public class InvoiceHelper {
     @Autowired
     EmailSender emailSender;
 
+    @Autowired
+    CompanyHelper companyHelper;
+
+    @Autowired
+    LogsHelper logsHelper;
+
     public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         try {
-            setInvoice(invoice);
-            repository.save(invoice);
-            for(LineItem lineItem : invoice.getLineItemList()){
-                lineItem.setInvoiceId(invoice.getId());
-                lineItemHelper.save(lineItem);
+            Company company = companyHelper.getCompanyObject(invoice.getCompanyID());
+            if(Integer.parseInt(company.getLimitInvoices()) > getCompanyTotalInvoices(invoice.getCompanyID())) {
+                setInvoice(invoice);
+                repository.save(invoice);
+                for (LineItem lineItem : invoice.getLineItemList()) {
+                    lineItem.setInvoiceId(invoice.getId());
+                    lineItemHelper.save(lineItem);
+                }
+                return "Invoice saved";
+            }else{
+                error.setErrorStatus("Error");
+                error.setError("Sorry Company has a limit of generationg "+company.getLimitInvoices()+" Invoices");
+                jsonError = gson.toJson(error);
+                return jsonError;
             }
-//            if(!file.isEmpty())
-//                uploadFile(file, invoice.getInvoiceNumber());
-            return "Invoice saved";
         }catch(Exception ex){
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
@@ -213,6 +225,13 @@ public class InvoiceHelper {
             System.out.println("Error in get invoices:"+ ex);
         }
         return gson.toJson(invoices);
+    }
+
+    private int getCompanyTotalInvoices(String companyID){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("companyID").is(companyID));
+        List<Invoice>invoices = mongoOperation.find(query, Invoice.class);
+        return invoices.size();
     }
 
     public Invoice getInvoiceByInvoiceNoQR(String invoiceNumber){
@@ -388,12 +407,12 @@ public class InvoiceHelper {
                     journalEntriesHelper.requestHanler(invoice);
                 }
                 if(status.equals(Constants.STATUS_FORAPPROVAL)){
-                    //Todo null check
                     User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
                     if(user != null)
                         emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
                 }
                 repository.save(invoice);
+//                saveLogs(invoice);
                 return "Invoice Status Updated";
             }
             else{
@@ -409,6 +428,13 @@ public class InvoiceHelper {
             jsonError = gson.toJson(error);
             return jsonError;
         }
+    }
+
+    private void saveLogs(Invoice invoice) {
+        Logs logs = new Logs();
+        logs.setDate(Calendar.getInstance().getTime());
+        logs.setName(invoice.getCustomerName());
+        System.out.println(logsHelper.save(logs));
     }
 
     public String getInvoicesByID(String id) {

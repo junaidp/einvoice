@@ -18,7 +18,7 @@ public class EmailSender {
            msg.setSubject(subject);
            msg.setText(emailBody);
            mailSender.send(msg);
-           System.out.println("Email Sent to" + toAddress);
+           System.out.println("Email Sent to: " + toAddress);
          }catch(Exception ex){
            System.out.println("Error " +ex);
        }

@@ -1,6 +1,8 @@
 package com.einvoive.helper;
 
+import com.einvoive.model.Company;
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Invoice;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
@@ -15,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 
 @Component
@@ -35,6 +38,9 @@ public class UserHelper {
     @Autowired
     MongoOperations mongoOperation;
 
+    @Autowired
+    CompanyHelper companyHelper;
+
     Gson gson = new Gson();
 
 //    private List<User> users;
@@ -44,13 +50,19 @@ public class UserHelper {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
         if(msg == null || msg.isEmpty()) {
-//            userEntity.setUserId(getAvaiablaeId());
             try {
-//                userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
-                userRepository.save(userEntity);
-                if(sendEmail)
-                    emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
-                return "User Saved";
+                Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
+                if(Integer.parseInt(company.getLimitInvoices()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
+                     userRepository.save(userEntity);
+                    if(sendEmail)
+                        emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
+                    return "User Saved";
+                }else{
+                    error.setErrorStatus("Error");
+                    error.setError("Sorry Company has a limit of generationg "+company.getLimitUsers()+" Users");
+                    jsonError = gson.toJson(error);
+                    return jsonError;
+                }
             }
             catch (Exception ex){
                 error.setErrorStatus("Error");
@@ -66,6 +78,13 @@ public class UserHelper {
             return jsonError;
         }
 //        return msg+"--Already Exists";
+    }
+
+    private int getCompanyTotalUsers(String companyID){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("companyID").is(companyID));
+        List<User>users = mongoOperation.find(query, User.class);
+        return users.size();
     }
 
     private String validationBeforeSave(User user) {

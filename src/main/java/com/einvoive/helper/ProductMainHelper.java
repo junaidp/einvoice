@@ -122,6 +122,20 @@ public class ProductMainHelper {
 //        return arabic;
 //    }
 
+    //search
+    public String searchProducts(String productName){
+        List<ProductMain> products = null;
+        try {
+            productName = "^"+productName;
+            Query query = new Query();
+            query.addCriteria(Criteria.where("productName").regex(productName));
+            products = mongoOperation.find(query, ProductMain.class);
+        }catch(Exception ex){
+            System.out.println("Error in get Products:"+ ex);
+        }
+        return gson.toJson(products);
+    }
+
     public String getTopSaledProducts(String companyId){
         List<ProductMain> products = null;
         try {

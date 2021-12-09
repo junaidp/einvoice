@@ -352,6 +352,11 @@ public class MainController {
             return gson.toJson(invoiceB2CHelper.getNextInvoiceNoByUserID(id));
     }
 
+    @GetMapping("/searchProducts")
+    public String searchProducts(@RequestParam String productName) {
+        return productMainHelper.searchProducts(productName);
+    }
+
     @GetMapping("/getTopSaledProducts")
     public String getTopSaledProducts(@RequestParam String companyID) {
         return productMainHelper.getTopSaledProducts(companyID);

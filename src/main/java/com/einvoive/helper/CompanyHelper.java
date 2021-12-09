@@ -155,6 +155,11 @@ public class CompanyHelper {
         return gson.toJson("Company Updated");
     }
 
+    public Company getCompanyObject(String companyID){
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)),Company.class);
+        return company;
+    }
+
 //    public String uploadCompanyLogo(String filePath, String companyID){
 //        String msg = "Unsuccessfull";
 //        List<Company> companyList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Company.class);

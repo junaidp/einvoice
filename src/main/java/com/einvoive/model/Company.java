@@ -30,6 +30,24 @@ public class Company {
     private String additionalNumber_Company;
     private String otherSellerid_Company;
     private String loginToken;
+    private String limitUsers;
+    private String limitInvoices;
+
+    public String getLimitUsers() {
+        return limitUsers;
+    }
+
+    public void setLimitUsers(String limitUsers) {
+        this.limitUsers = limitUsers;
+    }
+
+    public String getLimitInvoices() {
+        return limitInvoices;
+    }
+
+    public void setLimitInvoices(String limitInvoices) {
+        this.limitInvoices = limitInvoices;
+    }
 
     public String getLoginToken() {
         return loginToken;
