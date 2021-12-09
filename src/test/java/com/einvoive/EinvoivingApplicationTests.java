@@ -1,8 +1,11 @@
 package com.einvoive;
 
 import com.einvoive.helper.InvoiceHelper;
+import com.einvoive.helper.LoginHelper;
 import com.einvoive.helper.ProductMainHelper;
+import com.einvoive.helper.UserHelper;
 import com.einvoive.model.Invoice;
+import com.einvoive.model.Login;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
@@ -23,8 +26,27 @@ class EinvoivingApplicationTests {
     @Autowired
     ProductMainHelper productMainHelper;
 
+    @Autowired
+    LoginHelper loginHelper;
+
+    @Autowired
+    UserHelper userHelper;
+
     @Test
     void contextLoads() {
+    }
+
+    //@Test
+    void updateUserForToken(){
+        userHelper.updateUserForToken("Zohaib1","1234");
+
+    }
+
+   // @Test
+       void login(){
+        Login login = new Login();
+        login.setEmail("testcase@email.com");
+        loginHelper.signIn(login);
     }
 
     //@Test

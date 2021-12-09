@@ -9,11 +9,14 @@ import com.einvoive.util.EmailSender;
 import com.google.gson.Gson;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,6 +45,8 @@ public class UserHelper {
     CompanyHelper companyHelper;
 
     Gson gson = new Gson();
+
+    private Logger logger = LoggerFactory.getLogger(UserHelper.class);
 
 //    private List<User> users;
 
@@ -169,10 +174,15 @@ public class UserHelper {
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
     //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
     public void updateUserForToken(String userid, String randomNumber) {
-        User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(userid)), User.class);
-//        userRepository.save(user);
-        user.setLoginToken(randomNumber);
-        updateUser(user);
+   //     User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(userid)), User.class);
+   //        userRepository.save(user);
+        //user.setLoginToken(randomNumber);
+        // updateUser(user);
+
+        Update update = new Update();
+        update.set("loginToken", randomNumber);
+        mongoOperation.updateFirst(new Query(Criteria.where("userId").is(userid)), update, User.class);
+        logger.info("Token:" + randomNumber +"saved for user :" + userid);
     }
 
 //    public String getUserToken(String email, String token){

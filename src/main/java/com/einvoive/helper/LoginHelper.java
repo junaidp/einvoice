@@ -7,6 +7,8 @@ import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -35,6 +37,8 @@ public class LoginHelper {
     EmailSender emailSender;
 
     Gson gson = new Gson();
+    private Logger logger = LoggerFactory.getLogger(LoginHelper.class);
+
 
 //    private String companyID;
 //
@@ -43,7 +47,7 @@ public class LoginHelper {
     public String signIn(Login login){
         List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
-        System.out.println(login.getEmail() + "," + login.getPassword());
+        logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), Company.class);
         if(loginCompany != null){
             //DIrect Login
