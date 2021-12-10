@@ -57,7 +57,7 @@ public class UserHelper {
         if(msg == null || msg.isEmpty()) {
             try {
                 Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
-                if(Integer.parseInt(company.getLimitInvoices()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
+                if(Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
                      userRepository.save(userEntity);
                     if(sendEmail)
                         emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
@@ -173,16 +173,16 @@ public class UserHelper {
 
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
     //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
-    public void updateUserForToken(String userid, String randomNumber) {
+    public void updateUserForToken(User savedUser) {
    //     User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(userid)), User.class);
    //        userRepository.save(user);
         //user.setLoginToken(randomNumber);
         // updateUser(user);
 
         Update update = new Update();
-        update.set("loginToken", randomNumber);
-        mongoOperation.updateFirst(new Query(Criteria.where("userId").is(userid)), update, User.class);
-        logger.info("Token:" + randomNumber +"saved for user :" + userid);
+        update.set("loginToken", savedUser.getLoginToken());
+        mongoOperation.updateFirst(new Query(Criteria.where("userId").is(savedUser.getUserId())), update, User.class);
+        logger.info("Token: " + savedUser.getLoginToken() +" saved for user : " + savedUser.getUserId());
     }
 
 //    public String getUserToken(String email, String token){

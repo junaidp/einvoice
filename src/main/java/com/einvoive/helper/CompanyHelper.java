@@ -5,11 +5,14 @@ import com.einvoive.repository.CompanyRepository;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,6 +31,8 @@ public class CompanyHelper {
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
+
+    private Logger logger = LoggerFactory.getLogger(CompanyHelper.class);
 
     public String saveCompany(Company companyEnglish){
         String msg = validationBeforeSave(companyEnglish);
@@ -146,13 +151,11 @@ public class CompanyHelper {
         return gson.toJson("Company Updated");
     }
 
-    public String updateCompanyEnglish(Company companyEnglish) {
-//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
-//        company.setLoginToken(companyEnglish.getLoginToken());
-//        companyEnglish = company;
-        companyRepository.delete(companyEnglish);
-        saveCompany(companyEnglish);
-        return gson.toJson("Company Updated");
+    public void updateCompanyForToken(Company companyEnglish) {
+        Update update = new Update();
+        update.set("loginToken", companyEnglish.getLoginToken());
+        mongoOperation.updateFirst(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), update, Company.class);
+        logger.info("Token: " + companyEnglish.getLoginToken() +" saved for Comapny: "+ companyEnglish.getCompanyName());
     }
 
     public Company getCompanyObject(String companyID){

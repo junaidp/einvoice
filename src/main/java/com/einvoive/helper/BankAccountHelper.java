@@ -69,7 +69,7 @@ public class BankAccountHelper {
         return gson.toJson(account);
     }
 
-        public String deleteBankAccounts(String iD){
+    public String deleteBankAccounts(String iD){
         BankAccount bankAccount = mongoOperation.findOne(new Query(Criteria.where("id").is(iD)), BankAccount.class);
         bankAccountRepository.delete(bankAccount);
         return "Account deleted";

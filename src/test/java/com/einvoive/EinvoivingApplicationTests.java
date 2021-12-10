@@ -6,6 +6,7 @@ import com.einvoive.helper.ProductMainHelper;
 import com.einvoive.helper.UserHelper;
 import com.einvoive.model.Invoice;
 import com.einvoive.model.Login;
+import com.einvoive.model.User;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
@@ -38,8 +39,10 @@ class EinvoivingApplicationTests {
 
     //@Test
     void updateUserForToken(){
-        userHelper.updateUserForToken("Zohaib1","1234");
-
+        User userTest = new User();
+        userTest.setUserId("Zohaib1");
+        userTest.setLoginToken("1234");
+        userHelper.updateUserForToken(userTest);
     }
 
    // @Test
@@ -49,13 +52,13 @@ class EinvoivingApplicationTests {
         loginHelper.signIn(login);
     }
 
-    //@Test
+    @Test
     void getProductsTranslation(){
         String test = productMainHelper.getProductsNames("DarAlMaysan");
         System.out.println(test);
     }
 
-    @Test
+//    @Test
     void sendEmail(){
         String randomNumber = Utility.getRandomNumber();
         emailSender.sendEmail("junaidp@gmail.com", "Login Token", "email body here"+ randomNumber);
@@ -71,7 +74,7 @@ class EinvoivingApplicationTests {
 
 
     //USE THIS
-      @Test
+//      @Test
     void translate()  {
         try{
            // String translationBk = TranslatorHelper.translate("en", "ar", "Hello");

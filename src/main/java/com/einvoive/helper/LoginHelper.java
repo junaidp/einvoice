@@ -75,7 +75,7 @@ public class LoginHelper {
     private void saveTokenAndEmail(User savedUser) {
         String randomNumber = Utility.getRandomNumber();
         savedUser.setLoginToken(randomNumber);
-        userHelper.updateUserForToken(savedUser.getUserId(), randomNumber);
+        userHelper.updateUserForToken(savedUser);
         emailSender.sendEmail(savedUser.getEmail(), "Gofatoorah Login Verification", "Login Token :" + randomNumber);
 
     }
@@ -83,8 +83,7 @@ public class LoginHelper {
     private void saveCompanyTokenAndEmail(Company company) {
         String randomNumber = Utility.getRandomNumber();
         company.setLoginToken(randomNumber);
-//        companyHelper.updateUserForToken(company.getCompanyID(), randomNumber);
-        companyHelper.updateCompanyEnglish(company);
+        companyHelper.updateCompanyForToken(company);
         emailSender.sendEmail(company.getEmail(), "Gofatoorah Login Verification", "Login Token :" + randomNumber);
     }
 
