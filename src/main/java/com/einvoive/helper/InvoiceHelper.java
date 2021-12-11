@@ -304,9 +304,9 @@ public class InvoiceHelper {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
-           // invoiceRepository.findAll(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));     //Sorting is done through collection as its not working
             invoices = mongoOperation.find(query, Invoice.class);
+            Collections.reverse(invoices);
             for(Invoice invoice : invoices) {
                 if(invoice.getInvoiceNumber().contains(location.substring(0,2)))
                     return invoice.getInvoiceNumber();
@@ -323,8 +323,9 @@ public class InvoiceHelper {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, Invoice.class);
+            Collections.reverse(invoices);
             char someChar = '-';
             for(Invoice invoice : invoices){
                 int count = 0;
