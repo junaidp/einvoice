@@ -333,8 +333,9 @@ public class InvoiceB2CHelper {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, InvoiceB2C.class);
+            Collections.reverse(invoices);
             for(InvoiceB2C invoice : invoices) {
                 if(invoice.getInvoiceNumber().contains(location.substring(0,2)))
                     return invoice.getInvoiceNumber();
@@ -351,8 +352,9 @@ public class InvoiceB2CHelper {
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
             invoices = mongoOperation.find(query, InvoiceB2C.class);
+            Collections.reverse(invoices);
             char someChar = '-';
             for(InvoiceB2C invoice : invoices){
                 int count = 0;
