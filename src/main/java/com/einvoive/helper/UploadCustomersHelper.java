@@ -118,29 +118,29 @@ public class UploadCustomersHelper {
                             customer.setBillingAddress1(currentCell.getStringCellValue());
                             break;
 
-                        case 12:
-                            customer.setBillingAddress2(currentCell.getStringCellValue());
-                            break;
+//                        case 12:
+//                            customer.setBillingAddress2(currentCell.getStringCellValue());
+//                            break;
+//
+//                        case 13:
+//                            customer.setBillingCountry(currentCell.getStringCellValue());
+//                            break;
+//
+//                        case 14:
+//                            customer.setBillingProvince(currentCell.getStringCellValue());
+//                            break;
 
-                        case 13:
-                            customer.setBillingCountry(currentCell.getStringCellValue());
-                            break;
+//                        case 15:
+//                            customer.setBillingCity(currentCell.getStringCellValue());
+//                            break;
+//
+//                        case 16:
+//                            customer.setBillingPostal(currentCell.getStringCellValue());
+//                            break;
 
-                        case 14:
-                            customer.setBillingProvince(currentCell.getStringCellValue());
-                            break;
-
-                        case 15:
-                            customer.setBillingCity(currentCell.getStringCellValue());
-                            break;
-
-                        case 16:
-                            customer.setBillingPostal(currentCell.getStringCellValue());
-                            break;
-
-                        case 17:
-                            customer.setShippingName(currentCell.getStringCellValue());
-                            break;
+//                        case 17:
+//                            customer.setShippingName(currentCell.getStringCellValue());
+//                            break;
 
                         case 18:
                             customer.setShippingAddress1(currentCell.getStringCellValue());
@@ -225,15 +225,15 @@ public class UploadCustomersHelper {
         customerArabic.setLastName(Translator.getTranslation(customerEnglish.getLastName()));
         customerArabic.setCustomer(Translator.getTranslation(customerEnglish.getCustomer()));
         customerArabic.setBillingAddress1(Translator.getTranslation(customerEnglish.getBillingAddress1()));
-        customerArabic.setBillingAddress2(Translator.getTranslation(customerEnglish.getBillingAddress2()));
+//        customerArabic.setBillingAddress2(Translator.getTranslation(customerEnglish.getBillingAddress2()));
         customerArabic.setNotes(Translator.getTranslation(customerEnglish.getNotes()));
-        customerArabic.setBillingCountry(Translator.getTranslation(customerEnglish.getBillingCountry()));
-        customerArabic.setBillingProvince(Translator.getTranslation(customerEnglish.getBillingProvince()));
-        customerArabic.setBillingCity(Translator.getTranslation(customerEnglish.getBillingCity()));
-        customerArabic.setBillingPostal(Translator.getTranslation(customerEnglish.getBillingPostal()));
+//        customerArabic.setBillingCountry(Translator.getTranslation(customerEnglish.getBillingCountry()));
+//        customerArabic.setBillingProvince(Translator.getTranslation(customerEnglish.getBillingProvince()));
+//        customerArabic.setBillingCity(Translator.getTranslation(customerEnglish.getBillingCity()));
+//        customerArabic.setBillingPostal(Translator.getTranslation(customerEnglish.getBillingPostal()));
         customerArabic.setShippingAddress1(Translator.getTranslation(customerEnglish.getShippingAddress1()));
         customerArabic.setShippingAddress2(Translator.getTranslation(customerEnglish.getShippingAddress2()));
-        customerArabic.setShippingName(Translator.getTranslation(customerEnglish.getShippingName()));
+//        customerArabic.setShippingName(Translator.getTranslation(customerEnglish.getShippingName()));
         customerArabic.setShippingCountry(Translator.getTranslation(customerEnglish.getShippingCountry()));
         customerArabic.setShippingProvince(Translator.getTranslation(customerEnglish.getShippingProvince()));
         customerArabic.setShippingCity(Translator.getTranslation(customerEnglish.getShippingCity()));

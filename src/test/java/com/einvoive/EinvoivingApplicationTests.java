@@ -1,9 +1,6 @@
 package com.einvoive;
 
-import com.einvoive.helper.InvoiceHelper;
-import com.einvoive.helper.LoginHelper;
-import com.einvoive.helper.ProductMainHelper;
-import com.einvoive.helper.UserHelper;
+import com.einvoive.helper.*;
 import com.einvoive.model.Invoice;
 import com.einvoive.model.Login;
 import com.einvoive.model.User;
@@ -33,6 +30,9 @@ class EinvoivingApplicationTests {
     @Autowired
     UserHelper userHelper;
 
+    @Autowired
+    CustomerHelper customerHelper;
+
     @Test
     void contextLoads() {
     }
@@ -55,6 +55,12 @@ class EinvoivingApplicationTests {
     @Test
     void getProductsTranslation(){
         String test = productMainHelper.getProductsNames("DarAlMaysan");
+        System.out.println(test);
+    }
+
+    @Test
+    void getAllCustomers(){
+        String test = customerHelper.getAllCustomers("FugroSuhaimiLtd.");
         System.out.println(test);
     }
 

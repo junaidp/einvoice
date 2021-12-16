@@ -20,12 +20,12 @@ public class Customer {
     private String notes;
     private String currency;
     private String billingAddress1;
-    private String billingAddress2;
-    private String billingCountry;
-    private String billingProvince;
-    private String billingCity;
-    private String billingPostal;
-    private String shippingName;
+//    private String billingAddress2;
+//    private String billingCountry;
+//    private String billingProvince;
+//    private String billingCity;
+//    private String billingPostal;
+//    private String shippingName;
     private String shippingAddress1;
     private String shippingAddress2;
     private String shippingCountry;
@@ -72,14 +72,6 @@ public class Customer {
 
     public void setRelatedParty(String relatedParty) {
         this.relatedParty = relatedParty;
-    }
-
-    public String getShippingName() {
-        return shippingName;
-    }
-
-    public void setShippingName(String shippingName) {
-        this.shippingName = shippingName;
     }
 
     public String getPhoneMain() {
@@ -170,52 +162,12 @@ public class Customer {
         this.currency = currency;
     }
 
-    public String getBillingCountry() {
-        return billingCountry;
-    }
-
-    public void setBillingCountry(String billingCountry) {
-        this.billingCountry = billingCountry;
-    }
-
-    public String getBillingProvince() {
-        return billingProvince;
-    }
-
-    public void setBillingProvince(String billingProvince) {
-        this.billingProvince = billingProvince;
-    }
-
-    public String getBillingCity() {
-        return billingCity;
-    }
-
-    public void setBillingCity(String billingCity) {
-        this.billingCity = billingCity;
-    }
-
-    public String getBillingPostal() {
-        return billingPostal;
-    }
-
-    public void setBillingPostal(String billingPostal) {
-        this.billingPostal = billingPostal;
-    }
-
     public String getBillingAddress1() {
         return billingAddress1;
     }
 
     public void setBillingAddress1(String billingAddress1) {
         this.billingAddress1 = billingAddress1;
-    }
-
-    public String getBillingAddress2() {
-        return billingAddress2;
-    }
-
-    public void setBillingAddress2(String billingAddress2) {
-        this.billingAddress2 = billingAddress2;
     }
 
     public String getShippingAddress1() {

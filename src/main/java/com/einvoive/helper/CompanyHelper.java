@@ -145,6 +145,8 @@ public class CompanyHelper {
 
     public String updateCompany(Company companyEnglish , Company comapnyArabic) {
         Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
+        companyEnglish.setLimitUsers(company.getLimitUsers());
+        companyEnglish.setLimitInvoices(company.getLimitInvoices());
         companyRepository.delete(company);
         saveCompany(companyEnglish);
         saveCompanyArabic(companyEnglish, comapnyArabic);
@@ -156,6 +158,14 @@ public class CompanyHelper {
         update.set("loginToken", companyEnglish.getLoginToken());
         mongoOperation.updateFirst(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), update, Company.class);
         logger.info("Token: " + companyEnglish.getLoginToken() +" saved for Comapny: "+ companyEnglish.getCompanyName());
+    }
+
+    public String resetCompanyPassword(Login login) {
+        Update update = new Update();
+        update.set("password", login.getPassword());
+        mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, Company.class);
+        logger.info(" Password updated for Company : " + login.getEmail());
+        return gson.toJson("Password updated successfully : " + login.getEmail());
     }
 
     public Company getCompanyObject(String companyID){

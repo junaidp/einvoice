@@ -6,6 +6,8 @@ import com.einvoive.model.ProductMain;
 import com.einvoive.repository.AccountsRepository;
 import com.einvoive.repository.ProductMainRepository;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,6 +29,8 @@ public class AccountsHelper {
     MongoOperations mongoOperation;
 
     Gson gson = new Gson();
+
+    private Logger logger = LoggerFactory.getLogger(AccountsHelper.class);
 
     public String save(Accounts accounts){
         ErrorCustom error = new ErrorCustom();

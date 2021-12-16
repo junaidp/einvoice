@@ -6,11 +6,8 @@ import com.einvoive.model.*;
 import com.einvoive.util.Translator;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -482,8 +479,17 @@ public class MainController {
     @PostMapping("/signIn")
     public String signIn(@RequestBody Login login) { return loginHelper.signIn(login); }
 
+    @PostMapping("/forgetPassword")
+    public String forgetPassword(@RequestBody Login login) { return loginHelper.forgetPassword(login); }
+
+    @PostMapping("/validateUpdatePassword")
+    public String validateUpdatePassword(@RequestBody Login login) { return loginHelper.validateUpdatePassword(login); }
+
+    @PostMapping("/resetPassword")
+    public String resetPassword(@RequestBody Login login) { return loginHelper.resetPassword(login); }
+
     @PostMapping("/changePassword")
-    public String testuser(@RequestBody UpdatePassword updatePassword) { return updatePasswordHelper.changePassword(updatePassword); }
+    public String changePassword(@RequestBody UpdatePassword updatePassword) { return updatePasswordHelper.changePassword(updatePassword); }
 
 //    @PostMapping("/signInUser")
 //    public String signInUser(@RequestBody User user){

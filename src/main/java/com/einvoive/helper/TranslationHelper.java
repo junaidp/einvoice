@@ -89,10 +89,15 @@ public class TranslationHelper {
         }
     }
 
+    public String checkAndGetTranslation(String english){
+        if(!(english == null) && !english.isEmpty())
+             return getTranslationMain(english);
+        else
+            return "";
+    }
+
     public String getTranslationMain(String english) {
         Translation translation = null;
-//        System.out.println("Last Translation is: "+english);
-        //will be added later ToDo
         try {
             translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
         }catch (Exception exception) {

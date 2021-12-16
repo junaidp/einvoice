@@ -4,6 +4,8 @@ import com.einvoive.model.*;
 import com.einvoive.repository.AccountsRepository;
 import com.einvoive.repository.BankAccountRepository;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,9 +22,7 @@ public class BankAccountHelper {
     private Gson gson = new Gson();
     @Autowired
     MongoOperations mongoOperation;
-
-
-
+    private Logger logger = LoggerFactory.getLogger(BankAccountHelper.class);
 
     public String saveBank(BankAccount bankAccountSave){
         ErrorCustom error = new ErrorCustom();

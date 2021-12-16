@@ -1,9 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Company;
-import com.einvoive.model.ErrorCustom;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.User;
+import com.einvoive.model.*;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
 import com.google.gson.Gson;
@@ -57,14 +54,15 @@ public class UserHelper {
         if(msg == null || msg.isEmpty()) {
             try {
                 Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
-                if(Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
+                if(company.getLimitUsers() == null || Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
                      userRepository.save(userEntity);
+
                     if(sendEmail)
                         emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
                     return "User Saved";
                 }else{
                     error.setErrorStatus("Error");
-                    error.setError("Sorry Company has a limit of generationg "+company.getLimitUsers()+" Users");
+                    error.setError("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
                     jsonError = gson.toJson(error);
                     return jsonError;
                 }
@@ -183,6 +181,14 @@ public class UserHelper {
         update.set("loginToken", savedUser.getLoginToken());
         mongoOperation.updateFirst(new Query(Criteria.where("userId").is(savedUser.getUserId())), update, User.class);
         logger.info("Token: " + savedUser.getLoginToken() +" saved for user : " + savedUser.getUserId());
+    }
+
+    public String resetUserPassword(Login login) {
+        Update update = new Update();
+        update.set("password", login.getPassword());
+        mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, User.class);
+        logger.info(" Password updated for user : " + login.getEmail());
+        return gson.toJson("Password updated Successfully : " + login.getEmail());
     }
 
 //    public String getUserToken(String email, String token){

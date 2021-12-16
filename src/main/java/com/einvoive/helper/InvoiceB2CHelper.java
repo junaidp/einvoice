@@ -1,11 +1,11 @@
 package com.einvoive.helper;
 
+import com.einvoive.constants.Locations;
 import com.einvoive.model.*;
 import com.einvoive.repository.InvoiceB2CRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -257,26 +257,46 @@ public class InvoiceB2CHelper {
         }
     }
 
-
     //    Company having multiple user w.r.t their locations
     public String getNextInvoiceNoByUserID(String id) {
         User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-        String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
-        String invoiceNumber = "";
-        if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + "1";
+        Optional<Locations> locationEnum = Locations.getLocationsByValue(user.getLocation());
+        //check for Fugro Company
+        if(locationEnum.isPresent() && user.getCompanyID().equals("FugroSuhaimiLtd."))
+            return getNextInvoiceNoFugro(user, locationEnum.get().getCode());
+        else {
+            String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
+            String invoiceNumber = "";
+            if (lastCompanyInvoiceNumber.isEmpty()) {
+                invoiceNumber = user.getCompanyID().substring(0, 2) + INVOICE_SEPARATOR + user.getLocation().substring(0, 2) + INVOICE_SEPARATOR + "1";
+            } else {
+                String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+                int invoiceNum = 0;
+                inv = StringUtils.split(String.valueOf(inv[1]), INVOICE_SEPARATOR);
+                if (inv != null && !(inv.length <= 0)) {
+                    invoiceNum = Integer.parseInt(inv[1]) + 1;
+                } else {
+                    invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+                }
+                invoiceNumber = user.getCompanyID().substring(0, 2) + INVOICE_SEPARATOR + user.getLocation().substring(0, 2) + INVOICE_SEPARATOR + invoiceNum;
+            }
+            return invoiceNumber;
         }
-        else{
+    }
+
+    //get Fugro InvoiceNo
+    private String getNextInvoiceNoFugro(User user, String locationCode) {
+        String invoiceNumber = null;
+        String lastCompanyInvoiceNumber = getLastInvoiceFugroLcation(user.getCompanyID(), locationCode);
+        if (lastCompanyInvoiceNumber.isEmpty()) {
+            invoiceNumber = locationCode + INVOICE_SEPARATOR + "1";
+        } else {
             String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
-            int invoiceNum = 0 ;
-            inv = StringUtils.split(String.valueOf(inv[1]), INVOICE_SEPARATOR);
-            if(inv!=null && !(inv.length <=0)) {
+            int invoiceNum = 0;
+            if (inv != null && !(inv.length <= 0)) {
                 invoiceNum = Integer.parseInt(inv[1]) + 1;
             }
-            else{
-                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
-            }
-            invoiceNumber = user.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + user.getLocation().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
+            invoiceNumber = locationCode + INVOICE_SEPARATOR + invoiceNum;
         }
         return invoiceNumber;
     }
@@ -343,6 +363,27 @@ public class InvoiceB2CHelper {
         }catch(Exception ex){
             System.out.println("Error in getLastInvoiceLocation:"+ ex);
             return "";
+        }
+        return "";
+    }
+
+    // location based invoiceNo
+    public String getLastInvoiceFugroLcation(String companyID, String location) {
+        List<InvoiceB2C> invoices = null;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            Collections.reverse(invoices);
+            for(InvoiceB2C invoice : invoices) {
+                String[] inv = StringUtils.split(invoice.getInvoiceNumber(), INVOICE_SEPARATOR);
+                if(inv[0].equals(location))
+                    return invoice.getInvoiceNumber();
+            }
+        }catch(Exception ex){
+            System.out.println("Error in getLastInvoiceLocationFygro:"+ ex.getMessage());
+            return "Error in getLastInvoiceLocationFugro:"+ ex.getMessage();
         }
         return "";
     }
