@@ -1,9 +1,6 @@
 package com.einvoive.helper;
 
-import com.einvoive.model.Invoice;
-import com.einvoive.model.LineItem;
-import com.einvoive.model.ProductMain;
-import com.einvoive.model.TopCustomersInvoices;
+import com.einvoive.model.*;
 import com.einvoive.repository.LineItemRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +24,18 @@ public class LineItemHelper {
 
     Gson gson = new Gson();
 
+    @Autowired
+    LogsHelper logsHelper;
+
+    @Autowired
+    UserHelper userHelper;
+
     private List<LineItem> lineItems;
 
     public String save(LineItem lineItem) {
         try {
             repository.save(lineItem);
+//            logsHelper.save(new Logs("Item added against invoice ID "+userHelper.getUserName(lineItem.getInvoiceId()), "Item added against invoice ID "+userHelper.getUserName(lineItem.getInvoiceId())+ ", Name  "+ lineItem.getProductName()+", Price "+lineItem.getPrice()+", Discount "+lineItem.getDiscount()+", Sub Total "+ lineItem.getItemSubTotal()+", Quantity "+lineItem.getQuantity()+", Tax "+lineItem.getTaxableAmount()));
             return "product saved";
         } catch (Exception ex) {
             return "product Not saved" + ex;

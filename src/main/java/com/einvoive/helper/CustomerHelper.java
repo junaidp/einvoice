@@ -2,7 +2,9 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Customer;
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Logs;
 import com.einvoive.repository.CustomerRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,10 @@ public class CustomerHelper {
     TranslationHelper translationHelper;
     @Autowired
     MongoOperations mongoOperation;
-
+    @Autowired
+    LogsHelper logsHelper;
+    @Autowired
+    CompanyHelper companyHelper;
     Gson gson = new Gson();
     private Logger logger = LoggerFactory.getLogger(Customer.class);
 
@@ -36,6 +41,7 @@ public class CustomerHelper {
             try {
                 saveCustomerArabic(customerEnglish, customerArabic);
                 repository.save(customerEnglish);
+                logsHelper.save(new Logs("Customer added for "+ Utility.getCompanyName(customerEnglish.getCompanyID(), mongoOperation), " A new Customer "+customerEnglish.getCustomer()+" has been added for company "+Utility.getCompanyName(customerEnglish.getCompanyID(), mongoOperation)));
                 return "Customer Saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");

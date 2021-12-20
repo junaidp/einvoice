@@ -1,10 +1,7 @@
 package com.einvoive.helper;
 
 import com.einvoive.constants.Constants;
-import com.einvoive.model.Company;
-import com.einvoive.model.Login;
-import com.einvoive.model.UpdatePassword;
-import com.einvoive.model.User;
+import com.einvoive.model.*;
 import com.einvoive.repository.CompanyRepository;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.Utility;
@@ -33,18 +30,22 @@ public class UpdatePasswordHelper {
     @Autowired
     MongoOperations mongoOperation;
     Gson gson = new Gson();
+    @Autowired
+    private LogsHelper logsHelper;
 
     public String changePassword(UpdatePassword updatePassword) {
         Company loginCompany = mongoOperation.findOne(new Query((Criteria.where("email").is(updatePassword.getEmail()).and("password").is(updatePassword.getPassword()))), Company.class);
         if(loginCompany != null){
             loginCompany.setPassword(updatePassword.getNewPassword());
             companyRepository.save(loginCompany);
-             return gson.toJson("Your Company Password has been updated!");
+            logsHelper.save(new Logs("Change Password request for Company "+loginCompany.getCompanyName()," and Email "+loginCompany.getEmail()));
+            return gson.toJson("Your Company Password has been updated!");
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(updatePassword.getEmail()).and("password").is(updatePassword.getPassword())), User.class);
         if(savedUser != null){
             savedUser.setPassword(updatePassword.getNewPassword());
             userRepository.save(savedUser);
+            logsHelper.save(new Logs("Change Password request for User "+savedUser.getName()," and Email "+loginCompany.getEmail()));
             return gson.toJson("User Password has been updated!");
         }
         else

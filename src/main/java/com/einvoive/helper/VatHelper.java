@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.*;
 import com.einvoive.repository.CustomerRepository;
 import com.einvoive.repository.VatRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -18,8 +19,11 @@ public class VatHelper {
     VatRepository repository;
 
     @Autowired
+    LogsHelper logsHelper;
+    @Autowired
     MongoOperations mongoOperation;
-
+    @Autowired
+    CompanyHelper companyHelper;
     Gson gson = new Gson();
 
     public String save(Vat vat){
@@ -30,6 +34,7 @@ public class VatHelper {
         if(vAT == null){
             try {
                 repository.save(vat);
+                logsHelper.save(new Logs("VAT added for "+ Utility.getCompanyName(vat.getCompanyID(), mongoOperation),"VAT Rates "+vat.getVatRates()));
                 return "VAT saved";
             }catch (Exception ex) {
                 error.setErrorStatus("Error");

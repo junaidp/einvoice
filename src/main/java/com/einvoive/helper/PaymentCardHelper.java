@@ -2,8 +2,10 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Company;
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Logs;
 import com.einvoive.model.PaymentCard;
 import com.einvoive.repository.PaymentCardRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -22,6 +24,12 @@ public class PaymentCardHelper {
     @Autowired
     MongoOperations mongoOperation;
 
+    @Autowired
+    private LogsHelper logsHelper;
+
+    @Autowired
+    UserHelper userHelper;
+
     Gson gson = new Gson();
 
     public String savePaymentCard(PaymentCard paymentCard){
@@ -31,6 +39,7 @@ public class PaymentCardHelper {
         if(msg == null || msg.isEmpty()) {
             try {
                 paymentCardRepository.save(paymentCard);
+                logsHelper.save(new Logs("Adding Payment card for "+ Utility.getUserName(paymentCard.getUserId(), mongoOperation),  "Payment card No "+ paymentCard.getCardNo()+", Full Name "+paymentCard.getFullName()+", Cvv Code "+paymentCard.getCvvCode()+", Expiry "+paymentCard.getExpwiryDate()));
                 return "Payment Card Saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");

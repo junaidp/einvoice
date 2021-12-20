@@ -2,9 +2,11 @@ package com.einvoive.helper;
 
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Location;
+import com.einvoive.model.Logs;
 import com.einvoive.model.Vat;
 import com.einvoive.repository.LocationRepository;
 import com.einvoive.repository.VatRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -20,7 +22,10 @@ public class LocationHelper {
     LocationRepository repository;
     @Autowired
     MongoOperations mongoOperation;
-
+    @Autowired
+    CompanyHelper companyHelper;
+    @Autowired
+    LogsHelper logsHelper;
     Gson gson = new Gson();
 
     public String save(Location location) {
@@ -31,6 +36,7 @@ public class LocationHelper {
             if (loc == null) {
                 try {
                     repository.save(location);
+                    logsHelper.save(new Logs("Saving Location Under "+ Utility.getCompanyName(location.getCompanyID(), mongoOperation), "Location "+location.getLocationName()+" has been saved under "+Utility.getCompanyName(location.getCompanyID(), mongoOperation)));
                     return "Location saved";
                 } catch (Exception ex) {
                     error.setErrorStatus("Error");

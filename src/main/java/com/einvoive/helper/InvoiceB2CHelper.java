@@ -30,6 +30,12 @@ public class InvoiceB2CHelper {
 
     Gson gson = new Gson();
 
+    @Autowired
+    private LogsHelper logsHelper;
+
+    @Autowired
+    UserHelper userHelper;
+
     private String INVOICE_SEPARATOR = "-";
 
     private  List<InvoiceB2C>invoiceListMain = null;
@@ -40,11 +46,16 @@ public class InvoiceB2CHelper {
         try {
             setInvoice(invoice);
             repository.save(invoice);
+            String items = "";
             for(LineItemB2C lineItem : invoice.getLineItemList()){
+                items = items + ", " + lineItem.getProductName();
                 lineItem.setInvoiceId(invoice.getId());
+                lineItemHelper.deleteLineItem(invoice.getId());
                 lineItemHelper.save(lineItem);
+                logsHelper.save(new Logs("Item added against Invoice Name "+invoice.getInvoiceName(), "Item added by "+Utility.getUserName(invoice.getUserId(), mongoOperation)+ ", Item Name  "+ lineItem.getProductName()+", Price "+lineItem.getPrice()+", Discount "+lineItem.getDiscount()+", Sub Total "+ lineItem.getItemSubTotal()+", Quantity "+lineItem.getQuantity()+", Tax "+lineItem.getTaxableAmount()));
             }
-            return "Invoice saved";
+            logsHelper.save(new Logs("InvoiceB2C "+invoice.getInvoiceName()+" added by User "+Utility.getUserName(invoice.getUserId(), mongoOperation), Utility.getUserName(invoice.getUserId(), mongoOperation)+ " has added a new Invoice "+ invoice.getInvoiceName()+", Invoice No: "+invoice.getInvoiceNumber()+", Bill to: "+invoice.getBillToEnglish()+", Total amount due "+ invoice.getTotalAmountDue()+", saved items "+items));
+            return "Invoice B2C saved";
         }catch(Exception ex){
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());

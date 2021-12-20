@@ -2,9 +2,11 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Accounts;
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Logs;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.AccountsRepository;
 import com.einvoive.repository.ProductMainRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,10 @@ public class AccountsHelper {
     Gson gson = new Gson();
 
     private Logger logger = LoggerFactory.getLogger(AccountsHelper.class);
+    @Autowired
+    private LogsHelper logsHelper;
+    @Autowired
+    CompanyHelper companyHelper;
 
     public String save(Accounts accounts){
         ErrorCustom error = new ErrorCustom();
@@ -42,6 +48,7 @@ public class AccountsHelper {
         if(accounts1 == null && accounts2 == null){
             try {
                 accountsRepository.save(accounts);
+                logsHelper.save(new Logs("Account added for "+ Utility.getCompanyName(accounts.getCompanyID(), mongoOperation), Utility.getCompanyName(accounts.getCompanyID(), mongoOperation)+ " has added a new Account "+ accounts.getName()+", code "+accounts.getCode()+", account type "+accounts.getAccountType()));
                 return "BankAccount saved";
             }catch(Exception ex){
                 error.setErrorStatus("Error");

@@ -1,8 +1,14 @@
 package com.einvoive.util;
 
+import com.einvoive.model.Company;
+import com.einvoive.model.User;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -10,9 +16,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+
 public class Utility {
 
-     private static String hexIP = null;
+    private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
 
     private static byte[] getSHA(String text) throws NoSuchAlgorithmException
@@ -99,6 +106,25 @@ public class Utility {
         return random;
     }
 
+    public static String getUserName(String id, MongoOperations mongoOperation){
+        // use findById for this case
+        User user = mongoOperation.findById(id, User.class);
+        //User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        if(user == null)
+            user = mongoOperation.findOne(new Query(Criteria.where("userId").is(id)), User.class);
+        if(user != null)
+            return user.getName();
+        else
+            return "No user found";
+    }
+
+    public static String getCompanyName(String companyID, MongoOperations mongoOperation) {
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)), Company.class);
+        if(company != null)
+            return company.getCompanyName();
+        else
+            return "No company found";
+    }
 
 }
 

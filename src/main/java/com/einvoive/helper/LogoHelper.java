@@ -3,7 +3,9 @@ package com.einvoive.helper;
 import com.einvoive.constants.Constants;
 import com.einvoive.model.Company;
 import com.einvoive.model.Logo;
+import com.einvoive.model.Logs;
 import com.einvoive.repository.CompanyRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -35,6 +37,12 @@ public class LogoHelper {
     @Autowired
     private GridFsOperations operations;
 
+    @Autowired
+    LogsHelper logsHelper;
+
+    @Autowired
+    CompanyHelper companyHelper;
+
     public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
         Logo logo = getLogo(companyID);
         if(logo.getFilename() != null)
@@ -43,6 +51,7 @@ public class LogoHelper {
         String logoName =  getCompanyName(companyID)+"_logo";
         metadata.put("fileSize", upload.getSize());
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
+        logsHelper.save(new Logs("Logo uploaded for "+ Utility.getCompanyName(companyID, mongoOperation),"A new Logo uploaded for "+Utility.getCompanyName(companyID, mongoOperation)));
         return new Gson().toJson("Logo Uploaded with file ID: "+fileID.toString());
     }
 

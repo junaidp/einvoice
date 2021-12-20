@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.*;
 import com.einvoive.repository.AccountsRepository;
 import com.einvoive.repository.BankAccountRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,10 @@ public class BankAccountHelper {
     private Gson gson = new Gson();
     @Autowired
     MongoOperations mongoOperation;
+    @Autowired
+    private LogsHelper logsHelper;
+    @Autowired
+    CompanyHelper companyHelper;
     private Logger logger = LoggerFactory.getLogger(BankAccountHelper.class);
 
     public String saveBank(BankAccount bankAccountSave){
@@ -31,6 +36,7 @@ public class BankAccountHelper {
         if(bankAccount == null ){
             try {
                 bankAccountRepository.save(bankAccountSave);
+                logsHelper.save(new Logs("Bank Account added for "+ Utility.getCompanyName(bankAccountSave.getCompanyID(), mongoOperation), Utility.getCompanyName(bankAccountSave.getCompanyID(), mongoOperation)+ " has added a new Bank Account "+ bankAccountSave.getBankName()+", IBAN "+bankAccountSave.getIbanNumber()+", address "+bankAccountSave.getAddress()));
                 return "Bank Account saved";
             }catch(Exception ex){
                 error.setErrorStatus("Error");

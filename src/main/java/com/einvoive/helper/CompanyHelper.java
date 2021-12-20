@@ -30,6 +30,9 @@ public class CompanyHelper {
     @Autowired
     MongoOperations mongoOperation;
 
+    @Autowired
+    LogsHelper logsHelper;
+
     Gson gson = new Gson();
 
     private Logger logger = LoggerFactory.getLogger(CompanyHelper.class);
@@ -40,9 +43,9 @@ public class CompanyHelper {
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
-//                companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
                 companyRepository.save(companyEnglish);
                 Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
+                logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
                 return gson.toJson(companySaved);
             } catch (Exception ex) {
                 error.setErrorStatus("Error");
@@ -119,14 +122,14 @@ public class CompanyHelper {
         return count+1+"";
     }
 
-    public String singIn(Company company) {
-        System.out.println(company.getCompanyID() + "," + company.getPassword());
-        Query query = new Query();
-        query.addCriteria(Criteria.where("email").is(company.getEmail()).and("password").is(company.getPassword()));
-        Company companyEnglish = mongoOperation.findOne(query, Company.class);
-        Company companyArabic = getCompanyArabic(companyEnglish);
-        return gson.toJson(companyEnglish);
-    }
+//    public String singIn(Company company) {
+//        System.out.println(company.getCompanyID() + "," + company.getPassword());
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("email").is(company.getEmail()).and("password").is(company.getPassword()));
+//        Company companyEnglish = mongoOperation.findOne(query, Company.class);
+//        Company companyArabic = getCompanyArabic(companyEnglish);
+//        return gson.toJson(companyEnglish);
+//    }
 
     public Company getCompanyArabic(Company companyEnglish) {
         Company companyArabic = new Company();

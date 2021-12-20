@@ -64,6 +64,9 @@ public class InvoiceHelper {
     @Autowired
     LogsHelper logsHelper;
 
+    @Autowired
+    UserHelper userHelper;
+
     public String save(Invoice invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -72,14 +75,19 @@ public class InvoiceHelper {
             if(company.getLimitInvoices() == null || Integer.parseInt(company.getLimitInvoices()) > getCompanyTotalInvoices(invoice.getCompanyID())) {
                 setInvoice(invoice);
                 repository.save(invoice);
+                String items = "";
                 for (LineItem lineItem : invoice.getLineItemList()) {
+                    items = items + ", " + lineItem.getProductName();
                     lineItem.setInvoiceId(invoice.getId());
+                    lineItemHelper.deleteLineItem(invoice.getId());
                     lineItemHelper.save(lineItem);
+                    logsHelper.save(new Logs(invoice.getInvoiceName()+" Item added against Invoice Name", "Item added by "+Utility.getUserName(invoice.getUserId(), mongoOperation)+ ", Item Name  "+ lineItem.getProductName()+", Price "+lineItem.getPrice()+", Discount "+lineItem.getDiscount()+", Sub Total "+ lineItem.getItemSubTotal()+", Quantity "+lineItem.getQuantity()+", Tax "+lineItem.getTaxableAmount()));
                 }
+                logsHelper.save(new Logs("InvoiceBEB "+invoice.getInvoiceName()+" added by User "+Utility.getUserName(invoice.getUserId(), mongoOperation), Utility.getUserName(invoice.getUserId(), mongoOperation)+ " has added a new Invoice "+ invoice.getInvoiceName()+", Invoice No: "+invoice.getInvoiceNumber()+", Bill to: "+invoice.getBillTo()+", Total amount due "+ invoice.getTotalAmountDue()+", saved items "+items));
                 return "Invoice saved";
             }else{
                 error.setErrorStatus("Error");
-                error.setError("Sorry Company has a limit of generationg "+company.getLimitInvoices()+" Invoices");
+                error.setError("Sorry Company has a limit of generating "+company.getLimitInvoices()+" Invoices");
                 jsonError = gson.toJson(error);
                 return jsonError;
             }
@@ -146,14 +154,13 @@ public class InvoiceHelper {
 
     // location based invoiceNo
     public String getNextInvoiceNoLocationCode(String companyID, String location) {
-        List<InvoiceB2C> invoices = null;
+        List<Invoice> invoices = null;
         try {
             Query query = new Query();
             query.addCriteria(Criteria.where("companyID").is(companyID));
-//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
-            invoices = mongoOperation.find(query, InvoiceB2C.class);
+            invoices = mongoOperation.find(query, Invoice.class);
             Collections.reverse(invoices);
-            for(InvoiceB2C invoice : invoices) {
+            for(Invoice invoice : invoices) {
                 String[] inv = StringUtils.split(invoice.getInvoiceNumber(), INVOICE_SEPARATOR);
                 if(inv[0].equals(location))
                     return invoice.getInvoiceNumber();
@@ -454,6 +461,7 @@ public class InvoiceHelper {
                     if(user != null)
                         emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
                 }
+                logsHelper.save(new Logs("Changing Invoice Status for "+invoice.getInvoiceName(), "User "+Utility.getUserName(invoice.getUserId(), mongoOperation)+" has changed invoice "+invoice.getInvoiceName()+" status to "+status));
                 repository.save(invoice);
 //                saveLogs(invoice);
                 return "Invoice Status Updated";

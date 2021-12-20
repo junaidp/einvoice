@@ -1,10 +1,12 @@
 package com.einvoive.helper;
 
 import com.einvoive.model.ErrorCustom;
+import com.einvoive.model.Logs;
 import com.einvoive.model.ProductMain;
 import com.einvoive.repository.ProductMainRepository;
 import com.einvoive.util.Translator;
 
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -27,9 +29,14 @@ public class ProductMainHelper {
     ProductMainRepository repository;
     @Autowired
     TranslationHelper translationHelper;
-
+    @Autowired
+    LogsHelper logsHelper;
     @Autowired
     MongoOperations mongoOperation;
+    @Autowired
+    CompanyHelper companyHelper;
+    @Autowired
+    UserHelper userHelper;
     Gson gson = new Gson();
 
     public String save(ProductMain productEnglish, ProductMain productArabic){
@@ -46,7 +53,9 @@ public class ProductMainHelper {
         else {
             try {
                 repository.save(productEnglish);
-                saveProductArabic(productEnglish, productArabic);
+                logsHelper.save(new Logs(productEnglish.getProductName()+" product saved", "Added product for company "+Utility.getCompanyName(productEnglish.getCompanyID(), mongoOperation)+" User "+ Utility.getUserName(productEnglish.getUserId(), mongoOperation)+" Price "+productEnglish.getPrice()+" Assigned charts of account "+productEnglish.getAssignedChartofAccounts()+" Description "+productEnglish.getDescription()+" code "+productEnglish.getCode()));
+                if(!(productArabic == null))
+                    saveProductArabic(productEnglish, productArabic);
                 return "product saved";
             } catch (Exception ex) {
                 error.setErrorStatus("Error");

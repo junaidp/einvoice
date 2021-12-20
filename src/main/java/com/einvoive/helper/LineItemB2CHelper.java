@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.*;
 import com.einvoive.repository.LineItemB2CRepository;
 import com.einvoive.repository.LineItemRepository;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -23,6 +24,12 @@ public class LineItemB2CHelper {
     @Autowired
     MongoOperations mongoOperation;
 
+    @Autowired
+    LogsHelper logsHelper;
+
+    @Autowired
+    UserHelper userHelper;
+
     Gson gson = new Gson();
 
     private List<LineItemB2C> lineItems;
@@ -30,6 +37,7 @@ public class LineItemB2CHelper {
     public String save(LineItemB2C lineItem) {
         try {
             repository.save(lineItem);
+//            logsHelper.save(new Logs("Item added against invoice ID "+ Utility.getUserName(lineItem.getInvoiceId()), "Item added against invoice ID "+userHelper.getUserName(lineItem.getInvoiceId())+ ", Name  "+ lineItem.getProductName()+", Price "+lineItem.getPrice()+", Discount "+lineItem.getDiscount()+", Sub Total "+ lineItem.getItemSubTotal()+", Quantity "+lineItem.getQuantity()+", Tax "+lineItem.getTaxableAmount()));
             return "product saved";
         } catch (Exception ex) {
             return "product Not saved" + ex;

@@ -32,6 +32,7 @@ public class InvoiceB2C {
     private String billToArabicName;
     private String otherBuyerid;
     private String totalExcludingVAT;
+    private String originalRefNo;
     private List<LineItemB2C> lineItemList;
 
     public String getId() {
@@ -46,7 +47,13 @@ public class InvoiceB2C {
     public String getDateTime() {
         return dateTime;
     }
+    public String getOriginalRefNo() {
+        return originalRefNo;
+    }
 
+    public void setOriginalRefNo(String originalRefNo) {
+        this.originalRefNo = originalRefNo;
+    }
     public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }

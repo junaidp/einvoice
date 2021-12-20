@@ -19,7 +19,10 @@ public class RecordPaymentHelper {
     InvoiceHelper invoiceHelper;
     @Autowired
     MongoOperations mongoOperation;
-
+    @Autowired
+    private LogsHelper logsHelper;
+    @Autowired
+    UserHelper userHelper;
     Gson gson = new Gson();
 
     public String save(RecordPayment recordPayment){
@@ -28,6 +31,7 @@ public class RecordPaymentHelper {
             try {
                 repository.save(recordPayment);
                 updateInvoiceRecordPayment(recordPayment);
+                logsHelper.save(new Logs("Adding Payment Record for InvoiceNo"+recordPayment.getInvoiceNo(),  " Total amount "+ recordPayment.getTotalAmount()+" Paid amount "+ recordPayment.getPaidAmmount()+" Paid Account "+ recordPayment.getPayAccount()+ " Paid date "+ recordPayment.getPaymentDate()+ " Paid nots "+ recordPayment.getNotes()));
                 return "RecordPayment saved";
             }catch(Exception ex){
                 error.setErrorStatus("Error");

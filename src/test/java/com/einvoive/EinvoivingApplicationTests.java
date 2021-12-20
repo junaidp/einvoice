@@ -1,9 +1,7 @@
 package com.einvoive;
 
 import com.einvoive.helper.*;
-import com.einvoive.model.Invoice;
-import com.einvoive.model.Login;
-import com.einvoive.model.User;
+import com.einvoive.model.*;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
@@ -26,6 +24,9 @@ class EinvoivingApplicationTests {
 
     @Autowired
     LoginHelper loginHelper;
+
+    @Autowired
+    LogsHelper logsHelper;
 
     @Autowired
     UserHelper userHelper;
@@ -59,12 +60,33 @@ class EinvoivingApplicationTests {
     }
 
     @Test
+    void saveLogs(){
+        logsHelper.save(new Logs("Test Case", "Testing its working"));
+    }
+
+    @Test
+    void saveProduct(){
+        ProductMain productMainEnglish = new ProductMain();
+        productMainEnglish.setProductName("Test12");
+        productMainEnglish.setDescription("Testing through backend");
+        productMainEnglish.setUserId("123");
+        productMainEnglish.setCompanyID("hype");
+        productMainEnglish.setCode("1122");
+        productMainEnglish.setPrice("1000");
+        productMainEnglish.setAssignedChartofAccounts("Pie chart");
+        ProductMain productMainArabic = new ProductMain();
+        productMainArabic.setProductName(Translator.translate(productMainEnglish.getProductName()));
+        productMainArabic.setDescription(Translator.translate(productMainEnglish.getDescription()));
+        productMainHelper.save(productMainEnglish, productMainArabic);
+    }
+
+    @Test
     void getAllCustomers(){
         String test = customerHelper.getAllCustomers("FugroSuhaimiLtd.");
         System.out.println(test);
     }
 
-//    @Test
+    @Test
     void sendEmail(){
         String randomNumber = Utility.getRandomNumber();
         emailSender.sendEmail("junaidp@gmail.com", "Login Token", "email body here"+ randomNumber);
@@ -80,7 +102,7 @@ class EinvoivingApplicationTests {
 
 
     //USE THIS
-//      @Test
+      @Test
     void translate()  {
         try{
            // String translationBk = TranslatorHelper.translate("en", "ar", "Hello");

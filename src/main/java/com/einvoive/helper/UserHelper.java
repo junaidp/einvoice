@@ -41,6 +41,9 @@ public class UserHelper {
     @Autowired
     CompanyHelper companyHelper;
 
+    @Autowired
+    LogsHelper logsHelper;
+
     Gson gson = new Gson();
 
     private Logger logger = LoggerFactory.getLogger(UserHelper.class);
@@ -56,7 +59,7 @@ public class UserHelper {
                 Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
                 if(company.getLimitUsers() == null || Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
                      userRepository.save(userEntity);
-
+                    logsHelper.save(new Logs("New user added for "+company.getCompanyName(), company.getCompanyName()+ " has added a new user "+ userEntity.getName()));
                     if(sendEmail)
                         emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
                     return "User Saved";
@@ -111,7 +114,6 @@ public class UserHelper {
         return msg;
     }
 
-
     public String getAllUsers(String companyID){
         List<User> userList = null;
         try {
@@ -150,17 +152,17 @@ public class UserHelper {
         return count+1+"";
     }
 
-    public String signInUser(User user) {
-        System.out.println(user.getEmail() + "," + user.getPassword());
-        Query query = new Query();
-        query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));
-        User savedUser = mongoOperation.findOne(query, User.class);
-//        rollsHelper.getRolls(savedUser.getUserId());
-//        for(Rolls roll:rollsHelper.getRollsArrayList()){
-//         savedUser.getListRoles().add(roll.getRollName());
-//        }
-        return gson.toJson(savedUser);
-    }
+//    public String signInUser(User user) {
+//        System.out.println(user.getEmail() + "," + user.getPassword());
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));
+//        User savedUser = mongoOperation.findOne(query, User.class);
+////        rollsHelper.getRolls(savedUser.getUserId());
+////        for(Rolls roll:rollsHelper.getRollsArrayList()){
+////         savedUser.getListRoles().add(roll.getRollName());
+////        }
+//        return gson.toJson(savedUser);
+//    }
 
     public String updateUser(User userEntity) {
         User userSaved = mongoOperation.findOne(new Query(Criteria.where("id").is(userEntity.getId())), User.class);
@@ -172,11 +174,6 @@ public class UserHelper {
     //TODO better to use one updateUser Method , but not sure why we are deleting in the above method
     //TODO CONFIRM If we nee to send here id , OR UserID  (dont know why we have 2)
     public void updateUserForToken(User savedUser) {
-   //     User user = mongoOperation.findOne(new Query(Criteria.where("userId").is(userid)), User.class);
-   //        userRepository.save(user);
-        //user.setLoginToken(randomNumber);
-        // updateUser(user);
-
         Update update = new Update();
         update.set("loginToken", savedUser.getLoginToken());
         mongoOperation.updateFirst(new Query(Criteria.where("userId").is(savedUser.getUserId())), update, User.class);
@@ -191,17 +188,9 @@ public class UserHelper {
         return gson.toJson("Password updated Successfully : " + login.getEmail());
     }
 
-//    public String getUserToken(String email, String token){
-//       User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
-//       if(token.equals(user.getLoginToken())){
-//           return gson.toJson(user);
-//        }
-//       else return gson.toJson("Wrong token entered");
-//    }
-
     public void updateRecord(){
         MongoDatabase mongoDatabase = mongoClient.getDatabase(db);
       //  mongoDatabase.getCollection("user").updateOne(user)
-
     }
+
 }

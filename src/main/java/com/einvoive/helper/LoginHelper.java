@@ -2,6 +2,7 @@ package com.einvoive.helper;
 
 import com.einvoive.model.Company;
 import com.einvoive.model.Login;
+import com.einvoive.model.Logs;
 import com.einvoive.model.User;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
@@ -38,6 +39,9 @@ public class LoginHelper {
 
     Gson gson = new Gson();
 
+    @Autowired
+    LogsHelper logsHelper;
+
     private boolean validated = false;
 
     private Logger logger = LoggerFactory.getLogger(LoginHelper.class);
@@ -63,12 +67,14 @@ public class LoginHelper {
 //            return gson.toJson(companyList);
             saveCompanyTokenAndEmail(loginCompany);
             companyList.add(loginCompany);
+            logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
             return gson.toJson(companyList);
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
         if (savedUser != null) {
             saveTokenAndEmail(savedUser);
             userList.add(savedUser);
+            logsHelper.save(new Logs("SingIn request for "+savedUser.getName()," A taken has been sent to "+savedUser.getEmail()));
             return gson.toJson(userList);
         } else
             return gson.toJson("Invalid Credentials");
@@ -94,10 +100,12 @@ public class LoginHelper {
     public String getLoginToken(String email, String token) {
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
         if (user != null && token.equals(user.getLoginToken())) {
+            logsHelper.save(new Logs("SingIn token validation for "+user.getName(),"Token Authenticated against "+user.getEmail()));
             return gson.toJson(user);
         }
         Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
         if (company != null && token.equals(company.getLoginToken())) {
+            logsHelper.save(new Logs("SingIn token validation for "+company.getCompanyName(),"Token Authenticated against "+company.getEmail()));
             return gson.toJson(company);
         } else return gson.toJson("Wrong token entered");
     }
@@ -107,6 +115,7 @@ public class LoginHelper {
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail())), Company.class);
         if (loginCompany != null) {
             saveCompanyTokenAndEmail(loginCompany);
+
             return gson.toJson("A code has been sent to your email.");
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail())), User.class);
@@ -122,11 +131,13 @@ public class LoginHelper {
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("loginToken").is(login.getPassword())), Company.class);
         if (loginCompany != null) {
             validated = true;
+            logsHelper.save(new Logs("Forget Password request validated for "+loginCompany.getCompanyName()," against "+loginCompany.getEmail()));
             return gson.toJson("Validation Successfull");
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("loginToken").is(login.getPassword())), User.class);
         if (savedUser != null) {
             validated = true;
+            logsHelper.save(new Logs("Forget Password request validated for "+savedUser.getName()," against "+savedUser.getEmail()));
             return gson.toJson("Validation Successfull");
         } else
             return gson.toJson("Invalid Token");
@@ -136,10 +147,12 @@ public class LoginHelper {
     public String resetPassword(Login login) {
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail())), Company.class);
         if (loginCompany != null && validated) {
+            logsHelper.save(new Logs("Forget Password request for "+loginCompany.getCompanyName()," and token has been sent to "+loginCompany.getEmail()));
             return companyHelper.resetCompanyPassword(login);
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail())), User.class);
         if (savedUser != null && validated) {
+            logsHelper.save(new Logs("Forget Password request for "+Utility.getUserName(savedUser.getUserId(), mongoOperation)," nd token has been sent to "+savedUser.getEmail()));
             return userHelper.resetUserPassword(login);
         } else
             return gson.toJson("Invalid Credentials");

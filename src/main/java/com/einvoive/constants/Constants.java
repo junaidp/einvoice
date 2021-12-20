@@ -28,4 +28,7 @@ public class Constants {
     public static String CREDIT_NOTE_APPROVAL = " CREDIT NOTE APPROVAL";
     public static String CREDIT_NOTE_RECEIPT = " CREDIT NOTE RECEIPT";
 
+    //Categories
+    public static String LOG_SAVE_INVOICE = "Saving Invoice";
+
 }
