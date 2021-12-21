@@ -108,8 +108,8 @@ public class Utility {
 
     public static String getUserName(String id, MongoOperations mongoOperation){
         // use findById for this case
-//        User user = mongoOperation.findById(id, User.class);
-        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        User user = mongoOperation.findById(id, User.class);
+        //User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
         if(user == null)
             user = mongoOperation.findOne(new Query(Criteria.where("userId").is(id)), User.class);
         if(user != null)
