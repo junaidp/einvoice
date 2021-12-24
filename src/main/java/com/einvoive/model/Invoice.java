@@ -22,6 +22,8 @@ public class Invoice {
     private String dateTime;
     private String reasonChangingStandard;
     private String invoiceNumber;
+    private String creditNote;
+    private String debitNote;
     private String invoiceName;
     private String invoiceDescription;
     private String posoNumber;
@@ -60,6 +62,23 @@ public class Invoice {
 //    public void setFile(MultipartFile file) {
 //        this.file = file;
 //    }
+
+
+    public String getCreditNote() {
+        return creditNote;
+    }
+
+    public void setCreditNote(String creditNote) {
+        this.creditNote = creditNote;
+    }
+
+    public String getDebitNote() {
+        return debitNote;
+    }
+
+    public void setDebitNote(String debitNote) {
+        this.debitNote = debitNote;
+    }
 
     public String getLocation() {
         return location;

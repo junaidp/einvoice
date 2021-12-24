@@ -47,9 +47,9 @@ public enum Locations {
         this.code = code;
     }
 
-    public static Optional<Locations> getLocationsByValue(String value) {
+    public static Optional<Locations> getLocationsByCode(String name) {
         return Arrays.stream(Locations.values())
-                .filter(locations -> locations.name.equals(value))
+                .filter(locations -> locations.name.equals(name))
                 .findFirst();
     }
 

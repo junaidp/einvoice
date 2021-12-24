@@ -338,6 +338,14 @@ public class MainController {
             return gson.toJson(invoiceHelper.getNextInvoiceNoByUserID(id));
     }
 
+    @GetMapping("/getNextCreditDebitNo")
+    public String getNextCreditDebitNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
+        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
+            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
+        else
+            return gson.toJson(invoiceHelper.getNextCreditDebitNo(id, type));
+    }
+
     @GetMapping("/getAvailableInvoiceB2CNo")
     public String getAvailableInvoiceB2CNo(@RequestParam String id, @RequestParam String userType) {
         //id could be of company or user

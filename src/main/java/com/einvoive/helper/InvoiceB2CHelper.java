@@ -271,7 +271,7 @@ public class InvoiceB2CHelper {
     //    Company having multiple user w.r.t their locations
     public String getNextInvoiceNoByUserID(String id) {
         User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-        Optional<Locations> locationEnum = Locations.getLocationsByValue(user.getLocation());
+        Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
         //check for Fugro Company
         if(locationEnum.isPresent() && user.getCompanyID().equals("FugroSuhaimiLtd."))
             return getNextInvoiceNoFugro(user, locationEnum.get().getCode());

@@ -52,7 +52,7 @@ public class LoginHelper {
 //    private String loggedInUserID;
 
     public String signIn(Login login) {
-        List<Company> companyList = new ArrayList<>();
+       List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
         logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), Company.class);

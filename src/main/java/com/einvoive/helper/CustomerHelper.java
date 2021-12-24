@@ -86,6 +86,7 @@ public class CustomerHelper {
 
     public String update(Customer customerEnglish, Customer customerArabic){
         deleteCustomers(customerEnglish.getId());
+        saveCustomerArabic(customerEnglish, customerArabic);
         return save(customerEnglish, customerArabic);
     }
 
@@ -208,10 +209,10 @@ public class CustomerHelper {
 
     }
 
-    public String deleteCustomers(String customerID){
-        Customer customer = mongoOperation.findOne(new Query(Criteria.where("id").is(customerID)), Customer.class);
-        assert customer != null;
-        repository.delete(customer);
+    public String deleteCustomers(String id){
+        Customer customer = mongoOperation.findById(id, Customer.class);
+        if(customer != null)
+            repository.delete(customer);
         return "Customer deleted";
     }
 

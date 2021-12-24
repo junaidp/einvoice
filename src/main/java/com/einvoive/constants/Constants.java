@@ -7,7 +7,8 @@ public class Constants {
     //User Types
     public static final String TYPE_COMPANY= "company";
     public static final String TYPE_INDIVIDUAL = "individual";
-
+    public static final String CREDIT_NOTE = "CN";
+    public static final String DEBIT_NOTE = "DN";
     public static final String VAT_PAYABLE = "VAT Payable";
     public static String PROJECT_PATH = Paths.get("").toAbsolutePath().normalize().toString();
     public static String INVOICES_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\Invoices\\";

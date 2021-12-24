@@ -7,6 +7,8 @@ import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -54,6 +56,8 @@ public class InvoiceHelper {
     private String INVOICE_SEPARATOR = "-";
 
     private  List<Invoice> invoiceListMain = null;
+
+    private Logger logger = LoggerFactory.getLogger(InvoiceHelper.class);
 
     @Autowired
     EmailSender emailSender;
@@ -111,7 +115,7 @@ public class InvoiceHelper {
 //    Company having multiple user w.r.t their locations
     public String getNextInvoiceNoByUserID(String id) {
         User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-        Optional<Locations> locationEnum = Locations.getLocationsByValue(user.getLocation());
+        Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
         //check for Fugro Company
         if(locationEnum.isPresent())
             return getNextInvoiceNoWithLocationCode(user, locationEnum.get().getCode());
@@ -133,6 +137,31 @@ public class InvoiceHelper {
             }
             return invoiceNumber;
         }
+    }
+
+    //getting next credit or debit no
+    public String getCompanyNextCreditDebitNo(String id, String type) {
+        Company company = mongoOperation.findById(id, Company.class);
+         if(type.equals(Constants.CREDIT_NOTE))
+            return getNextCreditNo(company);
+        else if(type.equals(Constants.DEBIT_NOTE))
+            return getNextDebitNo(company);
+        else
+             return gson.toJson("Sorry next "+type+" not found");
+    }
+
+//getting next credit or debit no, fugro(loc code) based n User
+    public String getNextCreditDebitNo(String id, String type) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
+        //check for Fugro Company
+        if(locationEnum.isPresent() && type.equals(Constants.CREDIT_NOTE))
+            return getNextCreditNoWithCode(user.getCompanyID(), locationEnum.get().getCode());
+        else if(locationEnum.isPresent() && type.equals(Constants.DEBIT_NOTE))
+            return getNextDebitNoWithCode(user.getCompanyID(), locationEnum.get().getCode());
+        //fugro end
+        else
+            return gson.toJson("Sorry next "+type+" not found");
     }
 
     //get Fugro InvoiceNo
@@ -170,6 +199,120 @@ public class InvoiceHelper {
             return "Error in getLastInvoiceLocationFugro:"+ ex.getMessage();
         }
         return "";
+    }
+    // Company based creditNo
+    private String getNextCreditNo(Company company) {
+        List<Invoice> invoices = null;
+        String format = company.getCompanyName().substring(0,2).toUpperCase(Locale.ROOT)+INVOICE_SEPARATOR+Constants.CREDIT_NOTE+INVOICE_SEPARATOR;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(company.getCompanyID()));
+            query.addCriteria(Criteria.where("creditNote").regex(format));
+            invoices = mongoOperation.find(query, Invoice.class);
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = getAttachedNo(invoice.getCreditNote(), format);
+                    if (max < num)
+                        max = num;
+                }
+                max++;
+                return format + max;
+            }
+            else
+                return format+"1";
+        }catch(Exception ex){
+            logger.info("Error in getNextCreditNo:"+ ex.getMessage());
+            return "Error in getNextCreditNo:"+ ex.getMessage();
+        }
+    }
+
+    //next DenitNo
+    private String getNextDebitNo(Company company) {
+        List<Invoice> invoices = null;
+        String format = company.getCompanyName().substring(0,2).toUpperCase()+INVOICE_SEPARATOR+Constants.DEBIT_NOTE+INVOICE_SEPARATOR;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(company.getCompanyID()));
+            query.addCriteria(Criteria.where("debitNote").regex(format));
+            invoices = mongoOperation.find(query, Invoice.class);
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = getAttachedNo(invoice.getDebitNote(), format);
+                    if (max < num)
+                        max = num;
+                }
+                max++;
+                return format + max;
+            }
+            else
+                return format+"1";
+        }catch(Exception ex){
+            logger.info("Error in getNextDebitNo:"+ ex.getMessage());
+            return "Error in getNextDebitNo:"+ ex.getMessage();
+        }
+    }
+
+    // location based creditNo Fugro
+    private String getNextCreditNoWithCode(String companyID, String location) {
+        List<Invoice> invoices = null;
+        String format = location+INVOICE_SEPARATOR+Constants.CREDIT_NOTE+INVOICE_SEPARATOR;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.addCriteria(Criteria.where("creditNote").regex(format));
+            invoices = mongoOperation.find(query, Invoice.class);
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = getAttachedNo(invoice.getCreditNote(), format);
+                    if (max < num)
+                        max = num;
+                }
+                max++;
+                return format + max;
+            }
+            else
+                return format+"1";
+        }catch(Exception ex){
+            logger.info("Error in getNextCreditNo:"+ ex.getMessage());
+            return "Error in getNextCreditNo:"+ ex.getMessage();
+        }
+    }
+
+    private int getAttachedNo(String invoiceNo, String format) {
+        int num = 1;
+        String[] inv = StringUtils.split(invoiceNo, format);
+        num = Integer.parseInt(inv[inv.length - 1]);
+        return num;
+    }
+
+    //next DebitNo Fugro
+    private String getNextDebitNoWithCode(String companyID, String location) {
+        List<Invoice> invoices = null;
+        String format = location+INVOICE_SEPARATOR+Constants.DEBIT_NOTE+INVOICE_SEPARATOR;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            query.addCriteria(Criteria.where("debitNote").regex(format));
+            invoices = mongoOperation.find(query, Invoice.class);
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = getAttachedNo(invoice.getDebitNote(), format);
+                    if (max < num)
+                        max = num;
+                }
+                max++;
+                return format + max;
+            }
+            else
+                return format+"1";
+        }catch(Exception ex){
+            logger.info("Error in getNextDebitNo:"+ ex.getMessage());
+            return "Error in getNextDebitNo:"+ ex.getMessage();
+        }
     }
 
     //    When single user Company request
