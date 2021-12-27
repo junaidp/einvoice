@@ -7,6 +7,7 @@ import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -537,8 +539,9 @@ public class InvoiceHelper {
     }
 
     public String deleteInvoice(String invoiceID){
-        List<Invoice> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), Invoice.class);
-        repository.deleteAll(invoices);
+        Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
+        repository.delete(invoice);
+        deleteInvoiceAttachment(invoice.getInvoiceNumber());
         return "Invoice deleted";
     }
 
@@ -569,6 +572,21 @@ public class InvoiceHelper {
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    public String deleteInvoiceAttachment(String invoiceNo){
+        try {
+            File dir = new File(Constants.INVOICES_PATH+invoiceNo);
+            File[] listFiles = dir.listFiles();
+            for(File file : listFiles){
+                logger.info("Deleting "+file.getName());
+                file.delete();
+            }
+            logger.info("Deleting Directory. Success = "+dir.delete());
+            return "Deleting file on path " + invoiceNo;
+        }catch (Exception exception){
+            return gson.toJson(exception.getMessage());
         }
     }
 
