@@ -29,7 +29,7 @@ public enum Locations {
     D_CALIBRATION_RYD("D CALIBRATION RYD", "085"),
     F_CONSTRUCTION_SUPPO("F CONSTRUCTION SUPPO", "024"),
     F_FUGRO_GROUP("F FUGRO GROUP", "021"),
-    J_SURVEY_SERVCS_95("J SURVEY SERVCS # 95", "095"),
+    J_SURVEY_SERVCS("J SURVEY SERVCS", "095"),
     G_ADMINISTRATION("G ADMINISTRATION", "099");
 
 //    private static final Map<String, Locations> BY_CODE = new HashMap<>();
