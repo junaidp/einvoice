@@ -57,26 +57,31 @@ public class LoginHelper {
         logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
         Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), Company.class);
         if (loginCompany != null) {
-            //DIrect Login
-//            companyList.add(loginCompany);
-//            try{
-//                companyList.add(companyHelper.getCompanyArabic(loginCompany));
-//            } catch (Exception ex) {
-//                System.out.println(ex.getMessage());
-//            }
-//            return gson.toJson(companyList);
-            saveCompanyTokenAndEmail(loginCompany);
-            companyList.add(loginCompany);
-            logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
-            return gson.toJson(companyList);
+            try{
+                saveCompanyTokenAndEmail(loginCompany);
+                companyList.add(loginCompany);
+                logger.info("SingIn request for " + loginCompany.getCompanyName());
+                logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
+                return gson.toJson(companyList);
+            } catch (Exception ex) {
+                logger.info(ex.getMessage());
+                return ex.getMessage();
+            }
         }
         User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
         if (savedUser != null) {
-            saveTokenAndEmail(savedUser);
-            userList.add(savedUser);
-            logsHelper.save(new Logs("SingIn request for "+savedUser.getName()," A taken has been sent to "+savedUser.getEmail()));
-            return gson.toJson(userList);
-        } else
+            try {
+//                userList.add(userHelper.getCompanyArabic(loginCompany));
+                saveTokenAndEmail(savedUser);
+                userList.add(savedUser);
+                logger.info("SingIn request for " +savedUser.getName());
+                logsHelper.save(new Logs("SingIn request for " + loginCompany.getCompanyName(), "A taken has been sent to " + loginCompany.getEmail()));
+                return gson.toJson(companyList);
+            } catch (Exception ex) {
+                logger.info(ex.getMessage());
+                return ex.getMessage();
+            }
+        }else
             return gson.toJson("Invalid Credentials");
     }
 
@@ -98,16 +103,22 @@ public class LoginHelper {
     }
 
     public String getLoginToken(String email, String token) {
+        List<Company> companyList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
         if (user != null && token.equals(user.getLoginToken())) {
+            userList.add(user);
+            //ToDO arabic
             logsHelper.save(new Logs("SingIn token validation for "+user.getName(),"Token Authenticated against "+user.getEmail()));
-            return gson.toJson(user);
+            return gson.toJson(userList);
         }
         Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
         if (company != null && token.equals(company.getLoginToken())) {
+            companyList.add(company);
+            companyList.add(companyHelper.getCompanyArabic(company));
             logsHelper.save(new Logs("SingIn token validation for "+company.getCompanyName(),"Token Authenticated against "+company.getEmail()));
-            return gson.toJson(company);
-        } else return gson.toJson("Wrong token entered");
+            return gson.toJson(companyList);
+        } else return gson.toJson("Wrong email/token entered");
     }
 
     //forget password

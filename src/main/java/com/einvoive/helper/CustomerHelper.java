@@ -86,7 +86,7 @@ public class CustomerHelper {
 
     public String update(Customer customerEnglish, Customer customerArabic){
         deleteCustomers(customerEnglish.getId());
-        saveCustomerArabic(customerEnglish, customerArabic);
+//        saveCustomerArabic(customerEnglish, customerArabic);
         return save(customerEnglish, customerArabic);
     }
 
@@ -95,15 +95,9 @@ public class CustomerHelper {
         translationHelper.mergeAndSave(customerEnglish.getLastName(), customerArabic.getLastName());
         translationHelper.mergeAndSave(customerEnglish.getCustomer(), customerArabic.getCustomer());
         translationHelper.mergeAndSave(customerEnglish.getBillingAddress1(), customerArabic.getBillingAddress1());
-//        translationHelper.mergeAndSave(customerEnglish.getBillingAddress2(), customerArabic.getBillingAddress2());
         translationHelper.mergeAndSave(customerEnglish.getNotes(), customerArabic.getNotes());
-//        translationHelper.mergeAndSave(customerEnglish.getBillingCountry(), customerArabic.getBillingCountry());
-//        translationHelper.mergeAndSave(customerEnglish.getBillingProvince(), customerArabic.getBillingProvince());
-//        translationHelper.mergeAndSave(customerEnglish.getBillingCity(), customerArabic.getBillingCity());
-//        translationHelper.mergeAndSave(customerEnglish.getBillingPostal(), customerArabic.getBillingPostal());
         translationHelper.mergeAndSave(customerEnglish.getShippingAddress1(), customerArabic.getShippingAddress1());
         translationHelper.mergeAndSave(customerEnglish.getShippingAddress2(), customerArabic.getShippingAddress2());
-//        translationHelper.mergeAndSave(customerEnglish.getShippingName(), customerArabic.getShippingName());
         translationHelper.mergeAndSave(customerEnglish.getShippingCountry(), customerArabic.getShippingCountry());
         translationHelper.mergeAndSave(customerEnglish.getShippingProvince(), customerArabic.getShippingProvince());
         translationHelper.mergeAndSave(customerEnglish.getShippingCity(), customerArabic.getShippingCity());
@@ -118,7 +112,7 @@ public class CustomerHelper {
         customerArabic.setCustomer(translationHelper.checkAndGetTranslation(customerEnglish.getCustomer()));
         customerArabic.setBillingAddress1(translationHelper.checkAndGetTranslation(customerEnglish.getBillingAddress1()));
         customerArabic.setNotes(translationHelper.checkAndGetTranslation(customerEnglish.getNotes()));
-        customerArabic.setNotes(translationHelper.checkAndGetTranslation(customerEnglish.getShippingAddress1()));
+        customerArabic.setShippingAddress1(translationHelper.checkAndGetTranslation(customerEnglish.getShippingAddress1()));
         customerArabic.setShippingAddress2(translationHelper.checkAndGetTranslation(customerEnglish.getShippingAddress2()));
         customerArabic.setShippingCountry(translationHelper.checkAndGetTranslation(customerEnglish.getShippingCountry()));
         customerArabic.setShippingProvince(translationHelper.checkAndGetTranslation(customerEnglish.getShippingProvince()));

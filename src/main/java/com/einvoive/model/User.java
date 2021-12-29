@@ -31,6 +31,7 @@ import java.util.List;
     public void setAddCustomer(boolean addCustomer) {
         this.addCustomer = addCustomer;
     }
+
     public String getLoginToken() {
         return loginToken;
     }
