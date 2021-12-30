@@ -59,6 +59,12 @@ public class MainController {
     InvoiceHelper invoiceHelper;
 
     @Autowired
+    CreditInvoiceHelper creditInvoiceHelper;
+
+    @Autowired
+    DebitInvoiceHelper debitInvoiceHelper;
+
+    @Autowired
     InvoiceB2CHelper invoiceB2CHelper;
 
     @Autowired
@@ -338,12 +344,20 @@ public class MainController {
             return gson.toJson(invoiceHelper.getNextInvoiceNoByUserID(id));
     }
 
-    @GetMapping("/getNextCreditDebitNo")
-    public String getNextCreditDebitNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
-        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
-            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
-        else
-            return gson.toJson(invoiceHelper.getNextCreditDebitNo(id, type));
+    @GetMapping("/getNextCreditNo")
+    public String getNextCreditNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
+//        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
+//            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
+//        else
+            return gson.toJson(creditInvoiceHelper.getNextCreditNo(id, type));
+    }
+
+    @GetMapping("/getNextDebitNo")
+    public String getNextDebitNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
+//        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
+//            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
+//        else
+            return gson.toJson(debitInvoiceHelper.getNextDebitNo(id, type));
     }
 
     @GetMapping("/getAvailableInvoiceB2CNo")
@@ -586,7 +600,7 @@ public class MainController {
 
     @GetMapping("/getLoginToken")
     public String getLoginToken(@RequestParam String email,@RequestParam String token){
-        return gson.toJson(loginHelper.getLoginToken(email, token));
+        return loginHelper.getLoginToken(email, token);
     }
 
 //    @GetMapping("/getJournalEntries")

@@ -157,10 +157,10 @@ public class UserHelper {
 //        Query query = new Query();
 //        query.addCriteria(Criteria.where("email").is(user.getEmail()).and("password").is(user.getPassword()));
 //        User savedUser = mongoOperation.findOne(query, User.class);
-////        rollsHelper.getRolls(savedUser.getUserId());
-////        for(Rolls roll:rollsHelper.getRollsArrayList()){
-////         savedUser.getListRoles().add(roll.getRollName());
-////        }
+//        rollsHelper.getRolls(savedUser.getUserId());
+//        for(Rolls roll:rollsHelper.getRollsArrayList()){
+//         savedUser.getListRoles().add(roll.getRollName());
+//        }
 //        return gson.toJson(savedUser);
 //    }
 
