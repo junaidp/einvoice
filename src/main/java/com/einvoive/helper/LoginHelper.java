@@ -46,12 +46,6 @@ public class LoginHelper {
 
     private Logger logger = LoggerFactory.getLogger(LoginHelper.class);
 
-
-//    private String companyID;
-//
-//    private String loggedInUserID;
-
-
     public String signIn(Login login) {
         List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
@@ -60,6 +54,7 @@ public class LoginHelper {
         if (loginCompany != null) {
             saveCompanyTokenAndEmail(loginCompany);
             companyList.add(loginCompany);
+            companyList.add(companyHelper.getCompanyArabic(loginCompany));
             logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
             return gson.toJson(companyList);
         }

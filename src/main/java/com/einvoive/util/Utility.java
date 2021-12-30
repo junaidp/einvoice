@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -124,6 +125,13 @@ public class Utility {
             return company.getCompanyName();
         else
             return "No company found";
+    }
+
+    public static int getAttachedNo(String invoiceNo, String format) {
+        int num = 1;
+        String[] inv = StringUtils.split(invoiceNo, format);
+        num = Integer.parseInt(inv[inv.length - 1]);
+        return num;
     }
 
 }

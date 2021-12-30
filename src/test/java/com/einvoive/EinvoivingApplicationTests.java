@@ -2,12 +2,19 @@ package com.einvoive;
 
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
+import com.einvoive.repository.CompanyRepository;
+import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.List;
 //import com.google.cloud.translate.*;
 
 @SpringBootTest
@@ -24,6 +31,15 @@ class EinvoivingApplicationTests {
 
     @Autowired
     LoginHelper loginHelper;
+
+    @Autowired
+    MongoOperations mongoOperation;
+
+    @Autowired
+    CompanyRepository companyRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     LogsHelper logsHelper;
@@ -78,6 +94,21 @@ class EinvoivingApplicationTests {
         productMainArabic.setProductName(Translator.translate(productMainEnglish.getProductName()));
         productMainArabic.setDescription(Translator.translate(productMainEnglish.getDescription()));
         productMainHelper.save(productMainEnglish, productMainArabic);
+    }
+
+    @Test
+    void getInvoicesByUser(){
+        System.out.println("Invoices: "+invoiceHelper.getInvoicesByUser("61ab4c8d95d6ba231072305e"));
+    }
+
+    @Test
+    void getNextInvoiceNumbersForUsersUnderComapny(){
+//        Company company = companyRepository.findUserBycompanyID("FugroSuhaimiLtd.");
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is("FugroSuhaimiLtd.")), Company.class);
+        System.out.println(company.getCompanyName());
+        List<User> userList = mongoOperation.find(new Query(Criteria.where("companyID").is(company.getCompanyID())), User.class);
+        for(User user:userList)
+            System.out.println("Next Invoice No for User: "+user.getName()+" is: "+invoiceHelper.getNextInvoiceNoByUserID(user.getId()));
     }
 
     @Test

@@ -170,6 +170,11 @@ public class UploadController {
         return new ResponseEntity<>(logoHelper.uploadLogo(file, companyID), HttpStatus.OK);
     }
 
+    @PostMapping("/updateInvoiceAttachment")
+    public ResponseEntity<?> updateInvoiceAttachment(@RequestParam("file")MultipartFile file, @RequestParam String companyID) throws IOException {
+        return new ResponseEntity<>(invoiceHelper.updateInvoiceAttachment(file, companyID), HttpStatus.OK);
+    }
+
     @GetMapping("/getLogo")
     public ResponseEntity<ByteArrayResource> getLogo(@RequestParam String companyID) throws IOException {
         Logo logo = logoHelper.getLogo(companyID);
@@ -180,10 +185,15 @@ public class UploadController {
     }
 
     @RequestMapping(value ="/loadInvoiceAttachment", method = RequestMethod.GET, produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> load(@RequestParam String invoiceNo) throws MalformedURLException {
-        Resource file = invoiceHelper.load(invoiceNo);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    public ResponseEntity<?> load(@RequestParam String invoiceNo) throws MalformedURLException {
+        Path path = Paths.get(Constants.INVOICES_PATH+invoiceNo);
+        if (Files.exists(Paths.get(String.valueOf(path)))) {
+            Resource file = invoiceHelper.load(path);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+        }
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found");
     }
 
 //    @RequestMapping(value = "/loadInvoiceAttachment", method = RequestMethod.GET, produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
