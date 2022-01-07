@@ -44,4 +44,32 @@ public class JournalEntries {
     public void setDebit(String debit) {
         this.debit = debit;
     }
+
+    public String getEntryState() {
+        return entryState;
+    }
+
+    public Date getEntryDate() {
+        return entryDate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public String getChartOfAccount() {
+        return chartOfAccount;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
+    public String getDebit() {
+        return debit;
+    }
 }

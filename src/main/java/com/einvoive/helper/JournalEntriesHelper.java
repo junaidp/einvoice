@@ -139,7 +139,7 @@ public class JournalEntriesHelper {
 
     private JournalEntries setToSave(Invoice invoice, JournalEntries journalEntries){
         journalEntries.setEntryState(Constants.TAX_INVOICE);
-        journalEntries.setEntryDate(invoice.getInvoiceDate());
+//        journalEntries.setEntryDate(invoice.getInvoiceDate());
         journalEntries.setCustomerName(invoice.getCustomerName());
         journalEntries.setInvoiceNo(invoice.getInvoiceNumber());
         return journalEntries;

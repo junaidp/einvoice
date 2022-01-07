@@ -171,8 +171,14 @@ public class UploadController {
     }
 
     @PostMapping("/updateInvoiceAttachment")
-    public ResponseEntity<?> updateInvoiceAttachment(@RequestParam("file")MultipartFile file, @RequestParam String companyID) throws IOException {
-        return new ResponseEntity<>(invoiceHelper.updateInvoiceAttachment(file, companyID), HttpStatus.OK);
+    public ResponseEntity<?> updateInvoiceAttachment(@RequestParam("file")MultipartFile file, @RequestParam String invoiceNo) throws IOException {
+        return new ResponseEntity<>(invoiceHelper.updateInvoiceAttachment(file, invoiceNo), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteInvoiceAttachment")
+    public String deleteInvoiceAttachment(@RequestParam String invoiceNo){
+        String msg = invoiceHelper.deleteInvoiceAttachment(invoiceNo);
+        return msg;
     }
 
     @GetMapping("/getLogo")
@@ -192,8 +198,16 @@ public class UploadController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
         }
-        else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File not found");
+        else {
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.IMAGE_PNG);
+//            ErrorCustom errorCustom = new ErrorCustom();
+//            errorCustom.setError("File not attached");
+//            errorCustom.setErrorStatus(HttpStatus.NOT_FOUND.toString());
+//            return new ResponseEntity<>(errorCustom, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error Message");
+//            return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_FOUND);
+        }
     }
 
 //    @RequestMapping(value = "/loadInvoiceAttachment", method = RequestMethod.GET, produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

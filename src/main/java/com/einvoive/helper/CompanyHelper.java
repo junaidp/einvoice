@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class CompanyHelper {
         String jsonError;
         if(msg == null || msg.isEmpty()) {
             try {
+                if(companyEnglish.getPassword().length() != 64)
+                    companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
                 companyRepository.save(companyEnglish);
                 Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
                 logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
@@ -74,7 +77,6 @@ public class CompanyHelper {
             System.out.println("Error in getLastCompanyId:"+ ex);
             return "";
         }
-
     }
 
     private void saveCompanyArabic(Company companyEnglish, Company companyArabic){
@@ -88,6 +90,7 @@ public class CompanyHelper {
         translationHelper.mergeAndSave(companyEnglish.getState(), companyArabic.getState());
         translationHelper.mergeAndSave(companyEnglish.getPostalCode(), companyArabic.getPostalCode());
         translationHelper.mergeAndSave(companyEnglish.getCity(), companyArabic.getCity());
+        translationHelper.mergeAndSave(companyEnglish.getDistrictNeighborhood(), companyArabic.getDistrictNeighborhood());
         //translationHelper.mergeAndSave(companyEnglish.gePostal(),companyArabic.getPostalCode());
     }
 
@@ -143,6 +146,7 @@ public class CompanyHelper {
         companyArabic.setAddress1(translationHelper.getTranslationMain(companyEnglish.getAddress1()));
         companyArabic.setAddress2(translationHelper.getTranslationMain(companyEnglish.getAddress2()));
         companyArabic.setPostalCode(translationHelper.getTranslationMain(companyEnglish.getPostalCode()));
+        companyArabic.setDistrictNeighborhood(translationHelper.getTranslationMain(companyEnglish.getDistrictNeighborhood()));
         return companyArabic;
     }
 
@@ -165,7 +169,11 @@ public class CompanyHelper {
 
     public String resetCompanyPassword(Login login) {
         Update update = new Update();
-        update.set("password", login.getPassword());
+        try {
+            update.set("password", Utility.encrypt(login.getPassword()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, Company.class);
         logger.info(" Password updated for Company : " + login.getEmail());
         return gson.toJson("Password updated successfully : " + login.getEmail());

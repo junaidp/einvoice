@@ -2,8 +2,10 @@ package com.einvoive.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.List;
 
@@ -18,18 +20,18 @@ public class Invoice {
     private String paymentType;
     private String originalRefNo;
     private String type;
-    private Date supplyDate;
+    private String supplyDate;
     private String dateTime;
     private String reasonChangingStandard;
     private String invoiceNumber;
-    private String creditNote;
-    private String debitNote;
+//    private String creditNote;
+//    private String debitNote;
     private String invoiceName;
     private String invoiceDescription;
     private String posoNumber;
     private String billTo;
-    private Date invoiceDate;
-    private Date paymentDue;
+    private String invoiceDate;
+    private String paymentDue;
     private String total;
     private String discount;
     private String totalTaxableAmount;
@@ -64,21 +66,21 @@ public class Invoice {
 //    }
 
 
-    public String getCreditNote() {
-        return creditNote;
-    }
-
-    public void setCreditNote(String creditNote) {
-        this.creditNote = creditNote;
-    }
-
-    public String getDebitNote() {
-        return debitNote;
-    }
-
-    public void setDebitNote(String debitNote) {
-        this.debitNote = debitNote;
-    }
+//    public String getCreditNote() {
+//        return creditNote;
+//    }
+//
+//    public void setCreditNote(String creditNote) {
+//        this.creditNote = creditNote;
+//    }
+//
+//    public String getDebitNote() {
+//        return debitNote;
+//    }
+//
+//    public void setDebitNote(String debitNote) {
+//        this.debitNote = debitNote;
+//    }
 
     public String getLocation() {
         return location;
@@ -328,20 +330,22 @@ public class Invoice {
         this.posoNumber = posoNumber;
     }
 
-    public Date getInvoiceDate() {
+    public String getInvoiceDate() {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(Date invoiceDate) {
+    public void setInvoiceDate(String invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
 
-    public Date getPaymentDue() {
+    public String getPaymentDue() {
         return paymentDue;
     }
 
-    public void setPaymentDue(Date paymentDue) {
+    public void setPaymentDue(String paymentDue) {
+
         this.paymentDue = paymentDue;
+
     }
 
     public String getOriginalRefNo() {
@@ -360,11 +364,20 @@ public class Invoice {
         this.type = type;
     }
 
-    public Date getSupplyDate() {
+    public String getSupplyDate() {
+
         return supplyDate;
+//        TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(date);
+//        Instant i = Instant.from(ta);
+//        this.supplyDate = Date.from(i);
+//        return supplyDate;
     }
 
-    public void setSupplyDate(Date supplyDate) {
+    public void setSupplyDate(String supplyDate) {
+//        TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(supplyDate);
+//        Instant i = Instant.from(ta);
+//        this.supplyDate = Date.from(i);
+        //return supplyDate;
         this.supplyDate = supplyDate;
     }
 
@@ -391,4 +404,6 @@ public class Invoice {
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;
     }
+
+
 }

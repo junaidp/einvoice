@@ -7,7 +7,6 @@ import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
 import com.google.gson.Gson;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +109,7 @@ public class InvoiceHelper {
 //      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
+        invoice.setSupplyDate(invoice.getSupplyDate().toString());
         invoice.setPreviousHash(getPreviousHash(invoice));
 //        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
     }
@@ -467,21 +467,21 @@ public class InvoiceHelper {
         return gson.toJson(invoices);
     }
 
-    public String getAllInvoicesByLocation(String companyID, String location){
-        List<Invoice> invoices = null;
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("companyID").is(companyID).and("location").is(location));
-            invoices = mongoOperation.find(query, Invoice.class);
-            for(Invoice invoice : invoices) {
-                lineItemHelper.getLineItems(invoice.getId());
-                invoice.setLineItemList(lineItemHelper.getLineItems());
-            }
-        }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
-        }
-        return gson.toJson(invoices);
-    }
+//    public String getAllInvoicesByLocation(String companyID, String location){
+//        List<Invoice> invoices = null;
+//        try {
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("companyID").is(companyID).and("location").is(location));
+//            invoices = mongoOperation.find(query, Invoice.class);
+//            for(Invoice invoice : invoices) {
+//                lineItemHelper.getLineItems(invoice.getId());
+//                invoice.setLineItemList(lineItemHelper.getLineItems());
+//            }
+//        }catch(Exception ex){
+//            System.out.println("Error in get invoices:"+ ex);
+//        }
+//        return gson.toJson(invoices);
+//    }
 
     //get Invoices by User ID, test case use
     public String getInvoicesByUser(String userId){
@@ -502,6 +502,18 @@ public class InvoiceHelper {
             numList.add(invoice.getInvoiceNumber());
         return gson.toJson(numList);
     }
+
+    public void addAllInvoices(String companyID, List<Invoice> list){
+            Query query = new Query();
+            query.addCriteria(Criteria.where("companyID").is(companyID));
+            List<Invoice> invoices = mongoOperation.find(query, Invoice.class);
+            for(Invoice invoice : invoices) {
+                lineItemHelper.getLineItems(invoice.getId());
+                invoice.setLineItemList(lineItemHelper.getLineItems());
+            }
+            list.addAll(invoices);
+    }
+
     //direct api method
     public String getInvoicesByCompany(String companyID){
         List<Invoice> invoices = null;
@@ -567,7 +579,7 @@ public class InvoiceHelper {
     public String deleteInvoice(String invoiceID){
         Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
         repository.delete(invoice);
-        deleteInvoiceAttachment(invoice.getInvoiceNumber());
+//        deleteInvoiceAttachment(invoice.getInvoiceNumber());
         return "Invoice deleted";
     }
 
@@ -621,8 +633,8 @@ public class InvoiceHelper {
                 logger.info("Deleting "+file.getName());
                 file.delete();
             }
-            logger.info("Deleting Directory. Success = "+dir.delete());
-            return "Deleting file on path " + invoiceNo;
+            logger.info("Deleting Directory Success = "+dir.delete());
+            return gson.toJson("Deleting file on path "+invoiceNo);
         }catch (Exception exception){
             return gson.toJson(exception.getMessage());
         }
@@ -641,43 +653,61 @@ public class InvoiceHelper {
         }
     }
 
-    public String setInvoiceStatus(String id, String status) {
-        ErrorCustom error = new ErrorCustom();
-        String jsonError;
+//    public String setInvoiceStatus(String id, String status) {
+//        ErrorCustom error = new ErrorCustom();
+//        String jsonError;
+//        try {
+//            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
+//            if(invoice != null){
+//                invoice.setStatus(status);
+////                journalEntriesHelper.setToSave(invoice);
+//                if(status.equals(Constants.STATUS_APPROVED)) {
+//                    User user = mongoOperation.findOne(new Query(Criteria.where("id").is(invoice.getUserId())), User.class);
+//                    if(user != null)
+//                        emailSender.sendEmail(user.getEmail(), "Invoice Approved", "Your Invoice has benn approved. Please have a look on Invoice: "+invoice.getInvoiceNumber());
+//                    journalEntriesHelper.requestHanler(invoice);
+//                }
+//                if(status.equals(Constants.STATUS_FORAPPROVAL)){
+//                    User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
+//                    if(user != null)
+//                        emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
+//                }
+//                logsHelper.save(new Logs("Changing Invoice Status for "+invoice.getInvoiceName(), "User "+Utility.getUserName(invoice.getUserId(), mongoOperation)+" has changed invoice "+invoice.getInvoiceName()+" status to "+status));
+//                repository.save(invoice);
+////                saveLogs(invoice);
+//                return "Invoice Status Updated";
+//            }
+//            else{
+//                error.setErrorStatus("Error");
+//                error.setError("No Invoice against this ID");
+//                jsonError = gson.toJson(error);
+//                return jsonError;
+//            }
+//        }
+//        catch (Exception ex){
+//            error.setErrorStatus("Error");
+//            error.setError(ex.getMessage());
+//            jsonError = gson.toJson(error);
+//            return jsonError;
+//        }
+//    }
+
+    //get All Credit Debit Invoices by ID
+
+    public String getAllTypesInvoiceByID(String id) {
+        Object invoice = null;
         try {
-            Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Invoice.class);
-            if(invoice != null){
-                invoice.setStatus(status);
-//                journalEntriesHelper.setToSave(invoice);
-                if(status.equals(Constants.STATUS_APPROVED)) {
-                    User user = mongoOperation.findOne(new Query(Criteria.where("id").is(invoice.getUserId())), User.class);
-                    if(user != null)
-                        emailSender.sendEmail(user.getEmail(), "Invoice Approved", "Your Invoice has benn approved. Please have a look on Invoice: "+invoice.getInvoiceNumber());
-                    journalEntriesHelper.requestHanler(invoice);
-                }
-                if(status.equals(Constants.STATUS_FORAPPROVAL)){
-                    User user = mongoOperation.findOne(new Query(Criteria.where("location").is(invoice.getLocation())), User.class);
-                    if(user != null)
-                        emailSender.sendEmail(user.getEmail(), "Invoice Approval", "Please Approve this Invoice: "+invoice.getInvoiceNumber());
-                }
-                logsHelper.save(new Logs("Changing Invoice Status for "+invoice.getInvoiceName(), "User "+Utility.getUserName(invoice.getUserId(), mongoOperation)+" has changed invoice "+invoice.getInvoiceName()+" status to "+status));
-                repository.save(invoice);
-//                saveLogs(invoice);
-                return "Invoice Status Updated";
-            }
-            else{
-                error.setErrorStatus("Error");
-                error.setError("No Invoice against this ID");
-                jsonError = gson.toJson(error);
-                return jsonError;
-            }
+            invoice = mongoOperation.findById(id, Invoice.class);
+            if(invoice == null)
+                invoice = mongoOperation.findById(id, CreditInvoice.class);
+            if(invoice == null)
+                invoice = mongoOperation.findById(id, DebitInvoice.class);
+            else
+                gson.toJson("No Invoice found");
+        }catch(Exception ex){
+            System.out.println("Error in get invoices By ID :"+ ex);
         }
-        catch (Exception ex){
-            error.setErrorStatus("Error");
-            error.setError(ex.getMessage());
-            jsonError = gson.toJson(error);
-            return jsonError;
-        }
+        return gson.toJson(invoice);
     }
 
     public String getInvoicesByID(String id) {

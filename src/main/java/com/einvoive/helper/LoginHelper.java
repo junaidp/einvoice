@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +47,11 @@ public class LoginHelper {
 
     private Logger logger = LoggerFactory.getLogger(LoginHelper.class);
 
-    public String signIn(Login login) {
+    public String signIn(Login login) throws NoSuchAlgorithmException {
         List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
         logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
-        Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), Company.class);
+        Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), Company.class);
         if (loginCompany != null) {
             saveCompanyTokenAndEmail(loginCompany);
             companyList.add(loginCompany);
@@ -58,7 +59,7 @@ public class LoginHelper {
             logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
             return gson.toJson(companyList);
         }
-        User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(login.getPassword())), User.class);
+        User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), User.class);
         if (savedUser != null) {
             saveTokenAndEmail(savedUser);
             userList.add(savedUser);

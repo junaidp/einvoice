@@ -8,7 +8,9 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("control")
@@ -77,6 +79,9 @@ public class MainController {
     SettingsHelper settingsHelper;
 
     @Autowired
+    AllInvoicesHelper allInvoicesHelper;
+
+    @Autowired
     BankAccountHelper bankAccountHelper;
 
 //    @Autowired
@@ -118,6 +123,16 @@ public class MainController {
 //        Invoice invoice = gson.fromJson(invoiceJson, Invoice.class);
 //        return invoiceHelper.save(invoice, file);
 //    }
+
+    @PostMapping(value = "/saveCreditInvoice")
+    public String saveCreditInvoice(@RequestBody CreditInvoice invoice)  {
+        return creditInvoiceHelper.save(invoice);
+    }
+
+    @PostMapping(value = "/saveDebitInvoice")
+    public String saveDebitInvoice(@RequestBody DebitInvoice invoice)  {
+        return debitInvoiceHelper.save(invoice);
+    }
 
     @PostMapping(value = "/saveInvoice")
     public String saveInvoice(@RequestBody Invoice invoice)  {
@@ -211,6 +226,16 @@ public class MainController {
         return customerHelper.update(customerList.get(0), customerList.get(1));
     }
 
+    @PostMapping("/updateCreditInvoice")
+    public String updateCreditInvoice(@RequestBody CreditInvoice creditInvoice) {
+        return creditInvoiceHelper.updateCreditInvoice(creditInvoice);
+    }
+
+    @PostMapping("/updateDebitInvoice")
+    public String updateDebitInvoice(@RequestBody DebitInvoice debitInvoice) {
+        return debitInvoiceHelper.updateDebitInvoice(debitInvoice);
+    }
+
     @PostMapping("/updateInvoice")
     public String updateInvoice(@RequestBody Invoice invoice) {
         return invoiceHelper.update(invoice);
@@ -261,6 +286,17 @@ public class MainController {
     public String deleteCustomers(@RequestParam String customerID) {
         return customerHelper.deleteCustomers(customerID);
     }
+
+    @GetMapping("/deleteCreditInvoices")
+    public String deleteCreditInvoices(@RequestParam String id) {
+        return creditInvoiceHelper.deleteCreditInvoice(id);
+    }
+
+    @GetMapping("/deleteDebitInvoices")
+    public String deleteDebitInvoices(@RequestParam String id) {
+        return debitInvoiceHelper.deleteDebitInvoice(id);
+    }
+
 
     @GetMapping("/deleteInvoices")
     public String deleteInvoices(@RequestParam String inoviceID) {
@@ -345,19 +381,19 @@ public class MainController {
     }
 
     @GetMapping("/getNextCreditNo")
-    public String getNextCreditNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
-//        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
-//            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
-//        else
-            return gson.toJson(creditInvoiceHelper.getNextCreditNo(id, type));
+    public String getNextCreditNo(@RequestParam String id, @RequestParam String userType) {
+        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
+            return creditInvoiceHelper.getCreditInvoiceNoByCompanyID(id);
+        else
+            return creditInvoiceHelper.getUserNextCreditNo(id);
     }
 
     @GetMapping("/getNextDebitNo")
-    public String getNextDebitNo(@RequestParam String id, @RequestParam String type, @RequestParam String userType) {
-//        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
-//            return gson.toJson(invoiceHelper.getCompanyNextCreditDebitNo(id, type));
-//        else
-            return gson.toJson(debitInvoiceHelper.getNextDebitNo(id, type));
+    public String getNextDebitNo(@RequestParam String id, @RequestParam String userType) {
+        if(userType.equals(Constants.TYPE_COMPANY) || userType.equals(Constants.TYPE_INDIVIDUAL))
+            return gson.toJson(debitInvoiceHelper.getDebitInvoiceNoByCompanyID(id));
+        else
+            return gson.toJson(debitInvoiceHelper.getNextDebitNo(id));
     }
 
     @GetMapping("/getAvailableInvoiceB2CNo")
@@ -402,9 +438,28 @@ public class MainController {
     }
 
     @GetMapping("/getCustomer")
-    public String getCustomer(@RequestParam String customerID) {
-        return customerHelper.getCustomer
-                (customerID);}
+    public String getCustomer(@RequestParam String customerID) { return customerHelper.getCustomer (customerID);}
+
+    @GetMapping("/getAllTypesInvoiceByCustomer")
+    public String getAllTypesInvoiceByCustomer(@RequestParam String customerName, @RequestParam String location, @RequestParam String companyID) { return allInvoicesHelper.getAllTypesInvoiceByCustomer(customerName,location,companyID); }
+
+    @GetMapping("/getAllTypesInvoiceByCustomerforCompany")
+    public String getAllTypesInvoiceByCustomerforCompany(@RequestParam String customerName, @RequestParam String companyID) { return allInvoicesHelper.getAllTypesInvoiceByCustomerforCompany(customerName,companyID); }
+
+    @GetMapping("/getAllTypesInvoiceByInvoiceNumber")
+    public String getAllTypesInvoiceByInvoiceNumber(@RequestParam String invoiceNumber, @RequestParam String location, @RequestParam String companyID) { return allInvoicesHelper.getAllTypesInvoiceByInvoiceNumber(invoiceNumber, location, companyID); }
+
+    @GetMapping("/getAllTypesInvoiceByInvoiceNumberforCompany")
+    public String getAllTypesInvoiceByInvoiceNumberforCompany(@RequestParam String invoiceNumber, @RequestParam String companyID) { return allInvoicesHelper.getAllTypesInvoiceByInvoiceNumberforCompany(invoiceNumber, companyID); }
+
+    @GetMapping("/getAllTypesInvoiceByDurationforCompany")
+    public String getAllTypesInvoiceByDurationforCompany(@RequestParam String startDate, String endDate, String companyID) { return allInvoicesHelper.getAllTypesInvoiceByDurationforCompany(startDate, endDate, companyID); }
+
+    @GetMapping("/getAllTypesInvoiceByDuration")
+    public String getAllTypesInvoiceByDuration(@RequestParam String startDate, String endDate, String companyID, String location) { return allInvoicesHelper.getAllTypesInvoiceByDuration(startDate, endDate, companyID, location); }
+
+    @GetMapping("/getAllTypesInvoiceByID")
+    public String getAllTypesInvoiceByID(@RequestParam String id) { return allInvoicesHelper.getAllTypesInvoiceByID(id); }
 
     @GetMapping("/getInvoicesByID")
     public String getInvoicesByID(@RequestParam String id) { return invoiceHelper.getInvoicesByID(id); }
@@ -442,10 +497,11 @@ public class MainController {
         return reportsHelper.getTotalSalesByDate(startDate, endDate, companyID);
     }
 
-    @GetMapping("/getInvoicesByYear")
-    public String getInvoicesByYear(@RequestParam String companyID) {
-        return reportsHelper.getInvoicesByYear(companyID);
-    }
+//    ToDo
+//    @GetMapping("/getInvoicesByYear")
+//    public String getInvoicesByYear(@RequestParam String companyID) {
+//        return reportsHelper.getInvoicesByYear(companyID);
+//    }
 
     @GetMapping("/getInvoicesByCustomer")
     public String getInvoicesByCustomer(@RequestParam String customerName) { return invoiceHelper.getInvoicesByCustomer(customerName); }
@@ -470,12 +526,27 @@ public class MainController {
     @GetMapping("/getInvoicesByStatus")
     public String getInvoicesByStatus(@RequestParam String status) { return invoiceHelper.getInvoicesByStatus(status); }
 
+    @GetMapping("/getAllCreditDebitInvoices")
+    public String getAllCreditDebitInvoices(@RequestParam String companyID){
+        List<?> list = new ArrayList();
+        invoiceHelper.addAllInvoices(companyID, (List<Invoice>) list);
+        creditInvoiceHelper.addAllInvoices(companyID, (List<CreditInvoice>) list);
+        debitInvoiceHelper.addAllInvoices(companyID, (List<DebitInvoice>) list);
+        return gson.toJson(list);
+    }
+
+    @GetMapping("/getCreditInvoicesByCompany")
+    public String getCreditInvoicesByCompany(@RequestParam String companyID) {return creditInvoiceHelper.getAllCreditInvoicesByCompanyID(companyID); }
+
+    @GetMapping("/getDebitInvoicesByCompany")
+    public String getDebitInvoicesByCompany(@RequestParam String companyID) {return debitInvoiceHelper.getAllDebitInvoicesByCompanyID(companyID); }
+
     @GetMapping("/getInvoicesByCompany")
     public String getInvoicesByCompany(@RequestParam String companyID) {return invoiceHelper.getInvoicesByCompany(companyID); }
 
     @GetMapping("/getAllInvoicesByLocation")
     public String getAllInvoicesByLocation(@RequestParam String companyID, @RequestParam String location) {
-        return invoiceHelper.getAllInvoicesByLocation(companyID, location); }
+        return allInvoicesHelper.getAllInvoicesByLocation(companyID, location); }
 
     @GetMapping("/getAllInvoicesB2CByLocation")
     public String getAllInvoicesB2CByLocation(@RequestParam String companyID, @RequestParam String location) { return invoiceB2CHelper.getAllInvoicesB2CByLocation(companyID, location); }
@@ -488,9 +559,15 @@ public class MainController {
         return invoiceHelper.getInvoiceStatus(id);
     }
 
+    //for all is added below
+//    @PostMapping("/setInvoiceStatus")
+//    public String setInvoiceStatus(@RequestParam String id, String status) {
+//        return invoiceHelper.setInvoiceStatus(id, status);
+//    }
+
     @PostMapping("/setInvoiceStatus")
     public String setInvoiceStatus(@RequestParam String id, String status) {
-        return invoiceHelper.setInvoiceStatus(id, status);
+        return allInvoicesHelper.setInvoiceStatus(id, status);
     }
 
     @PostMapping("/setInvoiceStatusByInvoiceID")
@@ -499,7 +576,7 @@ public class MainController {
     }
 
     @PostMapping("/signIn")
-    public String signIn(@RequestBody Login login) { return loginHelper.signIn(login); }
+    public String signIn(@RequestBody Login login) throws NoSuchAlgorithmException { return loginHelper.signIn(login); }
 
     @PostMapping("/forgetPassword")
     public String forgetPassword(@RequestBody Login login) { return loginHelper.forgetPassword(login); }

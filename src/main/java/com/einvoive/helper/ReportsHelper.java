@@ -105,44 +105,46 @@ public class ReportsHelper {
                                     //Product Sales end
     //yearWIse Sales
 
-    public String getInvoicesByYear(String companyID){
-        List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
-        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
-        try{
-            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
-                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
-            year = Calendar.getInstance().get(Calendar.YEAR);
-            while (invoiceListMain.size() != 0){
-                TopCustomersInvoices topInvoices = computeInvoicesTotal();
-                if(topInvoices != null)
-                    topCustomersInvoicesList.add(topInvoices);
-            }
-        }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
-        }
-        return gson.toJson(topCustomersInvoicesList);
-    }
+//    ToDo
+//    public String getInvoicesByYear(String companyID){
+//        List<TopCustomersInvoices> topCustomersInvoicesList = new ArrayList<TopCustomersInvoices> ();
+//        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
+//        try{
+//            invoiceListMain = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+//                    .and("status").is(Constants.STATUS_APPROVED)), Invoice.class);
+//            year = Calendar.getInstance().get(Calendar.YEAR);
+//            while (invoiceListMain.size() != 0){
+//                TopCustomersInvoices topInvoices = computeInvoicesTotal();
+//                if(topInvoices != null)
+//                    topCustomersInvoicesList.add(topInvoices);
+//            }
+//        }catch(Exception ex){
+//            System.out.println("Error in get invoices:"+ ex);
+//        }
+//        return gson.toJson(topCustomersInvoicesList);
+//    }
 
-    private TopCustomersInvoices computeInvoicesTotal() {
-        Collections.reverse(invoiceListMain);
-        year = getYear(invoiceListMain.get(0).getInvoiceDate());
-        int sum = 0,count = 0;
-        while (count < invoiceListMain.size()){
-            int invoiceYear = getYear(invoiceListMain.get(count).getInvoiceDate());
-            if(year == invoiceYear) {
-                sum += Integer.parseInt(invoiceListMain.get(count).getTotalAmountDue());
-                invoiceListMain.remove(invoiceListMain.get(count));
-                count = 0;
-            }
-            else
-                count++;
-        }
-        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
-        String yearDur = year + " - " + ++year;
-        topCustomersInvoices.setCustomerName(yearDur);
-        topCustomersInvoices.setInvoiceTotal(String.valueOf(sum));
-        return topCustomersInvoices;
-    }
+    //ToDo
+//    private TopCustomersInvoices computeInvoicesTotal() {
+//        Collections.reverse(invoiceListMain);
+//        year = getYear(invoiceListMain.get(0).getInvoiceDate());
+//        int sum = 0,count = 0;
+//        while (count < invoiceListMain.size()){
+//            int invoiceYear = getYear(invoiceListMain.get(count).getInvoiceDate());
+//            if(year == invoiceYear) {
+//                sum += Integer.parseInt(invoiceListMain.get(count).getTotalAmountDue());
+//                invoiceListMain.remove(invoiceListMain.get(count));
+//                count = 0;
+//            }
+//            else
+//                count++;
+//        }
+//        TopCustomersInvoices topCustomersInvoices = new TopCustomersInvoices();
+//        String yearDur = year + " - " + ++year;
+//        topCustomersInvoices.setCustomerName(yearDur);
+//        topCustomersInvoices.setInvoiceTotal(String.valueOf(sum));
+//        return topCustomersInvoices;
+//    }
 
             //GetTopCustomerInvoices
 

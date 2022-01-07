@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.*;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -16,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
@@ -58,6 +60,8 @@ public class UserHelper {
             try {
                 Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
                 if(company.getLimitUsers() == null || Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
+                    if(userEntity.getPassword().length() != 64)
+                        userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
                      userRepository.save(userEntity);
                     logsHelper.save(new Logs("New user added for "+company.getCompanyName(), company.getCompanyName()+ " has added a new user "+ userEntity.getName()));
                     if(sendEmail)
@@ -182,7 +186,11 @@ public class UserHelper {
 
     public String resetUserPassword(Login login) {
         Update update = new Update();
-        update.set("password", login.getPassword());
+        try {
+            update.set("password", Utility.encrypt(login.getPassword()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, User.class);
         logger.info(" Password updated for user : " + login.getEmail());
         return gson.toJson("Password updated Successfully : " + login.getEmail());
