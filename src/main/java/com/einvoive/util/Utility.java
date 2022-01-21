@@ -1,5 +1,6 @@
 package com.einvoive.util;
 
+import com.einvoive.helper.VatHelper;
 import com.einvoive.model.Company;
 import com.einvoive.model.User;
 import com.mongodb.client.MongoClient;
@@ -7,6 +8,8 @@ import com.mongodb.client.MongoDatabase;
 import com.posadskiy.currencyconverter.CurrencyConverter;
 import com.posadskiy.currencyconverter.config.ConfigBuilder;
 import com.posadskiy.currencyconverter.enums.Currency;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,6 +30,7 @@ public class Utility {
 
     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
+    private Logger logger = LoggerFactory.getLogger(Utility.class);
 
     private static byte[] getSHA(String text) throws NoSuchAlgorithmException
     {
@@ -140,17 +144,22 @@ public class Utility {
     }
 
 
-    public Double getCurrencyRateSAR(){
-        final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
+    public String getCurrencyRateSAR(){
+        try {
+            final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
 
-        CurrencyConverter converter = new CurrencyConverter(
-                new ConfigBuilder()
-                        .currencyConverterApiApiKey(CURRENCY_CONVERTER_API_API_KEY)
-                         .build()
-        );
+            CurrencyConverter converter = new CurrencyConverter(
+                    new ConfigBuilder()
+                            .currencyConverterApiApiKey(CURRENCY_CONVERTER_API_API_KEY)
+                            .build()
+            );
 
-        Double usdToEuroRate = converter.rateFromUsd(Currency.SAR);
-        return usdToEuroRate;
+            Double usdToEuroRate = converter.rateFromUsd(Currency.SAR);
+            return usdToEuroRate.toString();
+        }catch(Exception ex){
+            logger.warn("Error in getting currency rate:" + ex);
+            return "";
+        }
     };
 
 }

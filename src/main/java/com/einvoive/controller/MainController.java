@@ -709,7 +709,7 @@ public class MainController {
     @GetMapping(value = "/getCurrencyRateSAR")
     public String getCurrencyRateSAR(){
         Utility util = new Utility();
-        return util.getCurrencyRateSAR().toString();
+        return util.getCurrencyRateSAR();
     }
 
 
