@@ -3,6 +3,8 @@ package com.einvoive.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document
 public class Company {
 
@@ -32,6 +34,15 @@ public class Company {
     private String loginToken;
     private String limitUsers;
     private String limitInvoices;
+    private Date creationDate;
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
 
     public String getLimitUsers() {
         return limitUsers;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -46,6 +47,7 @@ public class CompanyHelper {
             try {
                 if(companyEnglish.getPassword().length() != 64)
                     companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
+                companyEnglish.setCreationDate(new Date());
                 companyRepository.save(companyEnglish);
                 Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
                 logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
