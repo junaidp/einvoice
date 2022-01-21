@@ -86,6 +86,12 @@
             <version>3.4.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.posadskiy</groupId>
+            <artifactId>currency-converter</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+
     </dependencies>
         <!--
         <mongo:db-factory id="mongoDbFactory" host="localhost" port="27017" dbname="test" />
