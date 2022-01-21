@@ -40,6 +40,7 @@ public class DebitInvoiceHelper {
             logsHelper.save(new Logs("adding Invoice Debit No "+ debitInvoice.getInvoiceNumber(), "Invoice "+debitInvoice.getInvoiceName()+" is Debited with Debit No "+ debitInvoice.getInvoiceNumber()));
             return "Debit Invoice saved";
         }catch (Exception ex){
+            logger.info("Exception in Debit save "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -80,14 +81,17 @@ public class DebitInvoiceHelper {
         if(debitInvoice !=null) {
             repository.delete(debitInvoice);
             logger.info(debitInvoice.getInvoiceName()+":"+debitInvoice.getInvoiceNumber()+" has deleted");
-            return gson.toJson("Deleted successfully");
+            //return gson.toJson("Deleted successfully");
+            return "Invoice deleted";
         }
         else
-            return gson.toJson("Sorry no record found");
+            //return gson.toJson("Sorry no record found");
+            return "Sorry record not found";
     }
 
     public String updateDebitInvoice(DebitInvoice debitInvoice){
         deleteDebitInvoice(debitInvoice.getId());
+        logger.info("Debit Invoice update "+debitInvoice.getInvoiceName());
         return save(debitInvoice);
     }
 

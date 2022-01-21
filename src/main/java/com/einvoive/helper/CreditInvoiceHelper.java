@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -41,6 +39,7 @@ public class CreditInvoiceHelper {
             logsHelper.save(new Logs("adding Invoice Credit No "+ creditInvoice.getInvoiceNumber(), "Invoice "+creditInvoice.getInvoiceName()+" has credited with Credit No "+ creditInvoice.getInvoiceNumber()));
             return "Credit Invoice saved";
         }catch (Exception ex){
+            logger.info("Adding Credit Invoice "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -73,14 +72,17 @@ public class CreditInvoiceHelper {
         if(creditInvoice !=null) {
             repository.delete(creditInvoice);
             logger.info(creditInvoice.getInvoiceName()+":"+creditInvoice.getInvoiceNumber()+" has deleted");
-            return gson.toJson("Deleted successfully");
+            //return gson.toJson("Deleted successfully");
+            return ("Deleted successfully");
         }
         else
-            return gson.toJson("Sorry no record found");
+            //return gson.toJson("Sorry no record found");
+            return ("Sorry no record found");
     }
 
     public String updateCreditInvoice(CreditInvoice creditInvoice){
         deleteCreditInvoice(creditInvoice.getId());
+        logger.info("Update Credit Invoice "+creditInvoice.getInvoiceName());
         return save(creditInvoice);
     }
 
@@ -135,13 +137,5 @@ public class CreditInvoiceHelper {
             return gson.toJson("Error in getNextCreditNo:"+ ex.getMessage());
         }
     }
-
-//    private int getAttachedNo(String invoiceNo, String format) {
-//        int num = 1;
-//        String[] inv = StringUtils.split(invoiceNo, format);
-//        num = Integer.parseInt(inv[inv.length - 1]);
-//        return num;
-//    }
-
 
 }

@@ -91,12 +91,14 @@ public class InvoiceHelper {
                 logsHelper.save(new Logs("InvoiceBEB "+invoice.getInvoiceName()+" added by User "+Utility.getUserName(invoice.getUserId(), mongoOperation), Utility.getUserName(invoice.getUserId(), mongoOperation)+ " has added a new Invoice "+ invoice.getInvoiceName()+", Invoice No: "+invoice.getInvoiceNumber()+", Bill to: "+invoice.getBillTo()+", Total amount due "+ invoice.getTotalAmountDue()+", saved items "+items));
                 return "Invoice saved";
             }else{
+                logger.info("Sorry Company has a limit of generating "+company.getLimitInvoices()+" Invoices");
                 error.setErrorStatus("Error");
                 error.setError("Sorry Company has a limit of generating "+company.getLimitInvoices()+" Invoices");
                 jsonError = gson.toJson(error);
                 return jsonError;
             }
         }catch(Exception ex){
+            logger.info("Exception in saving invoice "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -390,7 +392,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -407,7 +410,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -423,7 +427,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -446,7 +451,8 @@ public class InvoiceHelper {
 //                invoice.setLineItemList(lineItemHelper.getLineItems());
 //            }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return invoices;
     }
@@ -462,7 +468,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -496,7 +503,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         for(Invoice invoice:invoices)
             numList.add(invoice.getInvoiceNumber());
@@ -526,7 +534,8 @@ public class InvoiceHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItems());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -544,8 +553,9 @@ public class InvoiceHelper {
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceByCompany:"+ ex);
-            return "";
+            System.out.println("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            logger.info("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            return "Error in getLastInvoiceByCompany:"+ ex.getMessage();
         }
         return "";
     }
@@ -570,8 +580,9 @@ public class InvoiceHelper {
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceByCompany:"+ ex);
-            return "";
+            System.out.println("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            logger.info("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            return "Error in getLastInvoiceByCompany:"+ ex.getMessage();
         }
         return "";
     }
@@ -579,7 +590,7 @@ public class InvoiceHelper {
     public String deleteInvoice(String invoiceID){
         Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
         repository.delete(invoice);
-//        deleteInvoiceAttachment(invoice.getInvoiceNumber());
+        logger.info("Invoice deleted "+invoice.getInvoiceName());
         return "Invoice deleted";
     }
 
@@ -590,6 +601,7 @@ public class InvoiceHelper {
 
     public String update(Invoice invoice) {
         deleteInvoice(invoice.getId());
+        logger.info("Invoice updated "+invoice.getInvoiceName());
         return save(invoice);
     }
 
@@ -649,6 +661,7 @@ public class InvoiceHelper {
             Files.copy(file.getInputStream(), path.resolve(file.getOriginalFilename()));
             return gson.toJson("Uploaded the file successfully: " + file.getOriginalFilename());
           }catch (Exception exception){
+            logger.info(exception.getMessage());
             return gson.toJson(exception.getMessage());
         }
     }
@@ -705,7 +718,8 @@ public class InvoiceHelper {
             else
                 gson.toJson("No Invoice found");
         }catch(Exception ex){
-            System.out.println("Error in get invoices By ID :"+ ex);
+            logger.info("Error in get invoices By ID :"+ ex.getMessage());
+            System.out.println("Error in get invoices By ID :"+ ex.getMessage());
         }
         return gson.toJson(invoice);
     }
@@ -717,7 +731,8 @@ public class InvoiceHelper {
             query.addCriteria(Criteria.where("id").is(id));
             invoicesList = mongoOperation.find(query, Invoice.class);
         }catch(Exception ex){
-            System.out.println("Error in get invoices By ID :"+ ex);
+            logger.info("Error in get invoices By ID :"+ ex.getMessage());
+            System.out.println("Error in get invoices By ID :"+ ex.getMessage());
         }
         return gson.toJson(invoicesList);
     }
@@ -733,6 +748,7 @@ public class InvoiceHelper {
                 return "Invoice Status Updated";
             }
             else{
+                logger.info("No Invoice against this ID "+invoiceID);
                 error.setErrorStatus("Error");
                 error.setError("No Invoice against this ID");
                 jsonError = gson.toJson(error);
@@ -740,6 +756,7 @@ public class InvoiceHelper {
             }
         }
         catch (Exception ex){
+            logger.info("Invoice Status has Exception "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -756,6 +773,7 @@ public class InvoiceHelper {
             endDateFinal = df.parse(endDate);
         } catch (ParseException e) {
             e.printStackTrace();
+            logger.info("Date parse exception in getInvoicesByDurationLocation "+e.getMessage());
         }
         List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
                 .and("invoiceDate").gte(startDateFinal).lte(endDateFinal).and("location").is(location)), Invoice.class);

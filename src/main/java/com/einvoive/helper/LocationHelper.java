@@ -8,6 +8,8 @@ import com.einvoive.repository.LocationRepository;
 import com.einvoive.repository.VatRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -27,6 +29,7 @@ public class LocationHelper {
     @Autowired
     LogsHelper logsHelper;
     Gson gson = new Gson();
+    private Logger logger = LoggerFactory.getLogger(LocationHelper.class);
 
     public String save(Location location) {
             ErrorCustom error = new ErrorCustom();
@@ -39,12 +42,14 @@ public class LocationHelper {
                     logsHelper.save(new Logs("Saving Location Under "+ Utility.getCompanyName(location.getCompanyID(), mongoOperation), "Location "+location.getLocationName()+" has been saved under "+Utility.getCompanyName(location.getCompanyID(), mongoOperation)));
                     return "Location saved";
                 } catch (Exception ex) {
+                    logger.info("Exception in save Location "+ex.getMessage());
                     error.setErrorStatus("Error");
                     error.setError(ex.getMessage());
                     jsonError = gson.toJson(error);
                     return jsonError;
                 }
             } else {
+                logger.info("Location Name Already Exists");
                 error.setErrorStatus("Error");
                 error.setError("Location Name Already Exists");
                 jsonError = gson.toJson(error);
@@ -53,6 +58,7 @@ public class LocationHelper {
         }
 
     public String update(Location location){
+        logger.info("Location update "+location.getLocationName());
         deleteLocation(location.getId());
         return save(location);
     }
@@ -60,6 +66,7 @@ public class LocationHelper {
     public String deleteLocation(String id){
         List<Location> locationList = mongoOperation.find(new Query(Criteria.where("id").is(id)), Location.class);
         repository.deleteAll(locationList);
+        logger.info("Location deleted "+locationList.get(0).getLocationName());
         return "Location deleted";
     }
 
@@ -68,7 +75,8 @@ public class LocationHelper {
         try {
             locations = mongoOperation.find(new Query(Criteria.where("companyID").is(companyId)), Location.class);
         }catch(Exception ex){
-            System.out.println("Error in get locations:"+ ex);
+            logger.info("Error in get locations:"+ ex.getMessage());
+            System.out.println("Error in get locations:"+ ex.getMessage());
         }
         return gson.toJson(locations);
     }

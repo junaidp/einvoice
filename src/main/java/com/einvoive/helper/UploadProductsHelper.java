@@ -13,6 +13,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.einvoive.model.ProductMain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class UploadProductsHelper {
     private static LoginHelper loginHelper;
+    private Logger logger = LoggerFactory.getLogger(UploadProductsHelper.class);
     @Autowired
     ProductMainHelper productMainHelper;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";

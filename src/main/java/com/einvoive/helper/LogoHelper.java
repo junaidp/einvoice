@@ -11,6 +11,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.compress.utils.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
@@ -43,6 +45,8 @@ public class LogoHelper {
     @Autowired
     CompanyHelper companyHelper;
 
+    private Logger logger = LoggerFactory.getLogger(LogoHelper.class);
+
     public String uploadLogo(MultipartFile upload, String companyID) throws IOException {
         Logo logo = getLogo(companyID);
         if(logo.getFilename() != null)
@@ -52,10 +56,12 @@ public class LogoHelper {
         metadata.put("fileSize", upload.getSize());
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
         logsHelper.save(new Logs("Logo uploaded for "+ Utility.getCompanyName(companyID, mongoOperation),"A new Logo uploaded for "+Utility.getCompanyName(companyID, mongoOperation)));
+        logger.info("Logo uploaded for "+ Utility.getCompanyName(companyID, mongoOperation));
         return new Gson().toJson("Logo Uploaded with file ID: "+fileID.toString());
     }
 
     private void deleteLogo(String filename){
+        logger.info(filename+" Logo deleted");
         template.delete(new Query(Criteria.where("filename").is(filename)));
     }
 

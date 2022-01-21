@@ -8,6 +8,8 @@ import com.einvoive.util.Translator;
 
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,7 +26,7 @@ import org.springframework.http.MediaType;
 
 @Component
 public class ProductMainHelper {
-
+    private Logger logger = LoggerFactory.getLogger(ProductMainHelper.class);
     @Autowired
     ProductMainRepository repository;
     @Autowired
@@ -45,6 +47,7 @@ public class ProductMainHelper {
         ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(productEnglish.getProductName())
                 .and("companyID").is(productEnglish.getCompanyID())), ProductMain.class);
         if(productMain != null){
+            logger.info("Product Name: "+ productEnglish.getProductName()+" is already exists");
             error.setErrorStatus("Error");
             error.setError("Product Name: "+ productEnglish.getProductName()+" is already exists");
             jsonError = gson.toJson(error);
@@ -58,6 +61,7 @@ public class ProductMainHelper {
                     saveProductArabic(productEnglish, productArabic);
                 return "product saved";
             } catch (Exception ex) {
+                logger.info("Exception in product saved "+ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -140,7 +144,8 @@ public class ProductMainHelper {
             query.addCriteria(Criteria.where("productName").regex(productName));
             products = mongoOperation.find(query, ProductMain.class);
         }catch(Exception ex){
-            System.out.println("Error in get Products:"+ ex);
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
         }
         return gson.toJson(products);
     }
@@ -153,7 +158,8 @@ public class ProductMainHelper {
                 query.limit(10).addCriteria(Criteria.where("companyID").is(companyId));
             products = mongoOperation.find(query, ProductMain.class);
         }catch(Exception ex){
-            System.out.println("Error in get Products:"+ ex);
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
         }
         return gson.toJson(products);
     }
@@ -174,7 +180,8 @@ public class ProductMainHelper {
                 productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
             }
         }catch(Exception ex){
-            System.out.println("Error in get Products Names:"+ ex);
+            logger.info("Error in get Products Names:"+ ex.getMessage());
+            System.out.println("Error in get Products Names:"+ ex.getMessage());
         }
         return gson.toJson(productsEnglish);
     }
@@ -196,7 +203,8 @@ public class ProductMainHelper {
             }
 //            productsMain.add(productsEnglish); //Only English to test
         }catch(Exception ex){
-            System.out.println("Error in get Products:"+ ex);
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
         }
         return gson.toJson(productsMain);
     }
@@ -206,10 +214,13 @@ public class ProductMainHelper {
         repository.delete(product);
         translationHelper.deleteTranslation(product.getProductName());
         translationHelper.deleteTranslation(product.getDescription());
+        logger.info("Product deleted:"+productID);
         return "product deleted";
     }
 
     public String update(ProductMain productEnglish, ProductMain productArabic) {
+        logger.info("Product updation "+productEnglish.getProductName());
+        deleteProduct(productEnglish.getId());
         repository.save(productEnglish);
         saveProductArabic(productEnglish, productArabic);
         return "product updated";

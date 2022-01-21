@@ -5,6 +5,8 @@ import com.einvoive.model.*;
 import com.einvoive.repository.InvoiceB2CRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -40,6 +42,8 @@ public class InvoiceB2CHelper {
 
     private  List<InvoiceB2C>invoiceListMain = null;
 
+    private Logger logger = LoggerFactory.getLogger(InvoiceB2CHelper.class);
+
     public String save(InvoiceB2C invoice){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -57,6 +61,7 @@ public class InvoiceB2CHelper {
             logsHelper.save(new Logs("InvoiceB2C "+invoice.getInvoiceName()+" added by User "+Utility.getUserName(invoice.getUserId(), mongoOperation), Utility.getUserName(invoice.getUserId(), mongoOperation)+ " has added a new Invoice "+ invoice.getInvoiceName()+", Invoice No: "+invoice.getInvoiceNumber()+", Bill to: "+invoice.getBillToEnglish()+", Total amount due "+ invoice.getTotalAmountDue()+", saved items "+items));
             return "Invoice B2C saved";
         }catch(Exception ex){
+            logger.info("Exception in InvoiceB2C save "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -101,7 +106,6 @@ public class InvoiceB2CHelper {
             previousHash = invoiceList.get(invoiceList.size()-1).getHash();
         else
             previousHash = "";
-
         return previousHash;
     }
 
@@ -116,7 +120,8 @@ public class InvoiceB2CHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -132,7 +137,8 @@ public class InvoiceB2CHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -148,7 +154,8 @@ public class InvoiceB2CHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -164,7 +171,8 @@ public class InvoiceB2CHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }
@@ -179,16 +187,23 @@ public class InvoiceB2CHelper {
             invoices = mongoOperation.find(query, Invoice.class);
             return invoices.get(0).getInvoiceNumber();
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceByCompany:"+ ex);
-            return "";
+            System.out.println("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            logger.info("Error in getLastInvoiceByCompany:"+ ex.getMessage());
+            return "Error in getLastInvoiceByCompany:"+ ex.getMessage();
         }
 
     }
 
     public String deleteInvoice(String invoiceID){
-        List<InvoiceB2C> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), InvoiceB2C.class);
-        repository.deleteAll(invoices);
-        return "Invoice deleted";
+        try {
+            List<InvoiceB2C> invoices = mongoOperation.find(new Query(Criteria.where("id").is(invoiceID)), InvoiceB2C.class);
+            repository.deleteAll(invoices);
+            logger.info("Invoice deletion request " + invoiceID);
+            return "Invoice deleted";
+        }catch (Exception ex){
+            logger.info("Exception in deleting Line Item B2C "+ex.getMessage());
+            return "Exception in deleting Line Item B2C "+ex.getMessage();
+        }
     }
 
     public String getAvaiablaeId(String companyID) {
@@ -198,6 +213,7 @@ public class InvoiceB2CHelper {
 
     public String update(InvoiceB2C invoice) {
         deleteInvoice(invoice.getId());
+        logger.info("Invoice updation request "+invoice.getInvoiceName());
         return save(invoice);
     }
 
@@ -217,6 +233,7 @@ public class InvoiceB2CHelper {
                 return "Invoice Status Updated";
             }
             else{
+                logger.info("No Invoice against this ID "+id);
                 error.setErrorStatus("Error");
                 error.setError("No Invoice against this ID");
                 jsonError = gson.toJson(error);
@@ -224,6 +241,7 @@ public class InvoiceB2CHelper {
             }
         }
         catch (Exception ex){
+            logger.info("No InvoiceB2C found to set status "+ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -238,7 +256,8 @@ public class InvoiceB2CHelper {
             query.addCriteria(Criteria.where("id").is(id));
             invoicesList = mongoOperation.find(query, InvoiceB2C.class);
         }catch(Exception ex){
-            System.out.println("Error in get invoices By ID :"+ ex);
+            logger.info("Error in get invoices By ID :"+ ex.getMessage());
+            System.out.println("Error in get invoices By ID :"+ ex.getMessage());
         }
         return gson.toJson(invoicesList);
     }
@@ -372,8 +391,9 @@ public class InvoiceB2CHelper {
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceLocation:"+ ex);
-            return "";
+            logger.info("Error in getLastInvoiceLocation:"+ ex.getMessage());
+            System.out.println("Error in getLastInvoiceLocation:"+ ex.getMessage());
+            return "Error in getLastInvoiceLocation:"+ ex.getMessage();
         }
         return "";
     }
@@ -393,7 +413,8 @@ public class InvoiceB2CHelper {
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceLocationFygro:"+ ex.getMessage());
+            System.out.println("Error in getLastInvoiceLocationFugro:"+ ex.getMessage());
+            logger.info("Error in getLastInvoiceLocationFugro:"+ ex.getMessage());
             return "Error in getLastInvoiceLocationFugro:"+ ex.getMessage();
         }
         return "";
@@ -419,8 +440,9 @@ public class InvoiceB2CHelper {
                     return invoice.getInvoiceNumber();
             }
         }catch(Exception ex){
-            System.out.println("Error in getLastInvoiceNoB2C:"+ ex);
-            return "";
+            System.out.println("Error in getLastInvoiceNoB2C:"+ ex.getMessage());
+            logger.info("Error in getLastInvoiceNoB2C:"+ ex.getMessage());
+            return "Error in getLastInvoiceNoB2C:"+ ex.getMessage();
         }
         return "";
     }
@@ -436,7 +458,8 @@ public class InvoiceB2CHelper {
                 invoice.setLineItemList(lineItemHelper.getLineItemsB2C());
             }
         }catch(Exception ex){
-            System.out.println("Error in get invoices:"+ ex);
+            logger.info("Error in get invoices:"+ ex.getMessage());
+            System.out.println("Error in get invoices:"+ ex.getMessage());
         }
         return gson.toJson(invoices);
     }

@@ -49,8 +49,10 @@ public class CompanyHelper {
                 companyRepository.save(companyEnglish);
                 Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
                 logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
+                logger.info(companyEnglish.getCompanyName()+" saved");
                 return gson.toJson(companySaved);
             } catch (Exception ex) {
+                logger.info(ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -59,7 +61,8 @@ public class CompanyHelper {
         }
         else{
             error.setErrorStatus("Error");
-            error.setError(msg+"--Already Exists");
+            error.setError(msg+" already exists");
+            logger.info(msg+" already exists");
             jsonError = gson.toJson(error);
             return jsonError;
          }
@@ -74,8 +77,9 @@ public class CompanyHelper {
             company = mongoOperation.find(query, Company.class).get(0).getCompanyID();
             return company;
         }catch(Exception ex){
-            System.out.println("Error in getLastCompanyId:"+ ex);
-            return "";
+            System.out.println("Error in getLastCompanyId:"+ ex.getMessage());
+            logger.info("Error in getLastCompanyId:"+ ex.getMessage());
+            return "Error in getLastCompanyId:"+ ex.getMessage();
         }
     }
 
@@ -157,6 +161,7 @@ public class CompanyHelper {
         companyRepository.delete(company);
         saveCompany(companyEnglish);
         saveCompanyArabic(companyEnglish, comapnyArabic);
+        logger.info(companyEnglish.getCompanyName()+" record updated");
         return gson.toJson("Company Updated");
     }
 
@@ -173,6 +178,7 @@ public class CompanyHelper {
             update.set("password", Utility.encrypt(login.getPassword()));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            logger.info("No Hashing Algorithm Exception "+e.getMessage());
         }
         mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, Company.class);
         logger.info(" Password updated for Company : " + login.getEmail());
@@ -206,7 +212,8 @@ public class CompanyHelper {
             return gson.toJson(companyList);
         }
         catch (Exception ex){
-            System.out.println("Error in getting Company:"+ ex);
+            System.out.println("Error in getting Company:"+ ex.getMessage());
+            logger.info("Error in getting Company:"+ ex.getMessage());
             return gson.toJson(ex.getMessage());
         }
     }

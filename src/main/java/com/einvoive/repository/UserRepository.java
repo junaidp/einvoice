@@ -9,5 +9,4 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{ 'companyID' : ?0'}")
     User findUserBycompanyID(String companyID);
 
-
 }

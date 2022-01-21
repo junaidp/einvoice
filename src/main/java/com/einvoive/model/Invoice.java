@@ -54,8 +54,16 @@ public class Invoice {
     private String projectCode;
     private String location;
     private List<LineItem> lineItemList;
+    private String amountSAR;
 
-    //private MultipartFile file;
+    public String getAmountSAR() {
+        return amountSAR;
+    }
+
+    public void setAmountSAR(String amountSAR) {
+        this.amountSAR = amountSAR;
+    }
+//private MultipartFile file;
 //
 //    public MultipartFile getFile() {
 //        return file;

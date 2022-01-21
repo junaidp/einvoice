@@ -61,7 +61,8 @@ public class AllInvoicesHelper {
             else
                 gson.toJson("No Invoice found");
         }catch(Exception ex){
-            System.out.println("Error in get invoices By ID :"+ ex);
+            System.out.println("Error in get invoices By ID :"+ ex.getMessage());
+            logger.info("Error in get invoices By ID :"+ ex.getMessage());
         }
         return gson.toJson(invoice);
     }
@@ -191,9 +192,10 @@ public class AllInvoicesHelper {
         try {
             startDateFinal = df.parse(startDate);
             endDateFinal = df.parse(endDate);
-        } catch (
-                ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
+            logger.info("Date parse exception "+e.getMessage());
+            System.out.println("Date parse exception "+e.getMessage());
         }
         try {
             invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
@@ -230,9 +232,10 @@ public class AllInvoicesHelper {
         try {
             startDateFinal = df.parse(startDate);
             endDateFinal = df.parse(endDate);
-        } catch (
-                ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
+            logger.info("Date parse exception "+e.getMessage());
+            System.out.println("Date parse exception "+e.getMessage());
         }
         try {
             invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
@@ -277,11 +280,13 @@ public class AllInvoicesHelper {
             else{
                 error.setErrorStatus("Error");
                 error.setError("No Invoice against this ID");
+                logger.info("No Invoice against this ID");
                 jsonError = gson.toJson(error);
                 return jsonError;
             }
         }
         catch (Exception ex){
+            logger.info(ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);

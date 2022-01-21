@@ -44,6 +44,7 @@ public class CustomerHelper {
                 logsHelper.save(new Logs("Customer added for "+ Utility.getCompanyName(customerEnglish.getCompanyID(), mongoOperation), " A new Customer "+customerEnglish.getCustomer()+" has been added for company "+Utility.getCompanyName(customerEnglish.getCompanyID(), mongoOperation)));
                 return "Customer Saved";
             } catch (Exception ex) {
+                logger.info("Exception in saving Customer "+ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -51,6 +52,7 @@ public class CustomerHelper {
             }
         }
         else{
+            logger.info(msg+" already exists");
             error.setErrorStatus("Error");
             error.setError(msg+"--Already Exists");
             jsonError = gson.toJson(error);
@@ -86,7 +88,7 @@ public class CustomerHelper {
 
     public String update(Customer customerEnglish, Customer customerArabic){
         deleteCustomers(customerEnglish.getId());
-//        saveCustomerArabic(customerEnglish, customerArabic);
+        logger.info("Updating Customer "+customerEnglish.getCustomer());
         return save(customerEnglish, customerArabic);
     }
 
@@ -131,7 +133,8 @@ public class CustomerHelper {
             List<Customer>customers = mongoOperation.find(query, Customer.class);
             listCustomers = getCustomersInLanguages(customers);
         }catch(Exception ex){
-            System.out.println("Error in get Customers:"+ ex);
+            logger.info("Error in get Customers:"+ ex.getMessage());
+            System.out.println("Error in get Customers:"+ ex.getMessage());
         }
         return gson.toJson(listCustomers);
     }
@@ -145,7 +148,8 @@ public class CustomerHelper {
             System.out.println("QUERY");
             customers = mongoOperation.find(query, Customer.class);
         }catch(Exception ex){
-            System.out.println("Error in get Customers English:"+ ex);
+            logger.info("Error in get Customers English:"+ ex.getMessage());
+            System.out.println("Error in get Customers English:"+ ex.getMessage());
         }
         return gson.toJson(customers);
     }
@@ -176,7 +180,8 @@ public class CustomerHelper {
                 listCustomers.add(customerEnglish);
             }
         }catch(Exception ex){
-            System.out.println("Error in get Customers:"+ ex);
+            logger.info("Error in get Customers:"+ ex.getMessage());
+            System.out.println("Error in get Customers:"+ ex.getMessage());
         }
         listCustomers.add(customerArabic);
         return gson.toJson(listCustomers);

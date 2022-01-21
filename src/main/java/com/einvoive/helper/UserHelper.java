@@ -69,12 +69,14 @@ public class UserHelper {
                     return "User Saved";
                 }else{
                     error.setErrorStatus("Error");
+                    logger.info("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
                     error.setError("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
                     jsonError = gson.toJson(error);
                     return jsonError;
                 }
             }
             catch (Exception ex){
+                logger.info("Exception in save User: "+ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -83,6 +85,7 @@ public class UserHelper {
         }
         else{
             error.setErrorStatus("Error");
+            logger.info(msg+"--Already Exists");
             error.setError(msg+"--Already Exists");
             jsonError = gson.toJson(error);
             return jsonError;
@@ -126,7 +129,8 @@ public class UserHelper {
             System.out.println("QUERY");
             userList = mongoOperation.find(query, User.class);
         }catch(Exception ex){
-            System.out.println("Error in getting Users:"+ ex);
+            logger.info("Error in getting Users:"+ ex.getMessage());
+            System.out.println("Error in getting Users:"+ ex.getMessage());
         }
         return gson.toJson(userList);
     }
@@ -139,7 +143,8 @@ public class UserHelper {
             System.out.println("QUERY");
             users = mongoOperation.find(query, User.class);
         }catch(Exception ex){
-            System.out.println("Error in getting Users:"+ ex);
+            logger.info("Error in getting Users:"+ ex.getMessage());
+            System.out.println("Error in getting Users:"+ ex.getMessage());
         }
         return gson.toJson(users);
     }
@@ -147,6 +152,7 @@ public class UserHelper {
     public String deleteUser(String iD){
         List<User> userList = mongoOperation.find(new Query(Criteria.where("id").is(iD)), User.class);
         userRepository.deleteAll(userList);
+        logger.info("User deleted: "+userList.get(0).getName());
         return "User deleted";
     }
 
@@ -172,6 +178,7 @@ public class UserHelper {
         User userSaved = mongoOperation.findOne(new Query(Criteria.where("id").is(userEntity.getId())), User.class);
         userEntity.setPassword(userSaved.getPassword());
         userRepository.delete(userSaved);
+        logger.info("User updation: "+userEntity.getName());
         return saveUser(userEntity, false);
     }
 
@@ -190,6 +197,7 @@ public class UserHelper {
             update.set("password", Utility.encrypt(login.getPassword()));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            logger.info("No Hashing Algorithm Exception: "+e.getMessage());
         }
         mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, User.class);
         logger.info(" Password updated for user : " + login.getEmail());

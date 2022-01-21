@@ -4,6 +4,7 @@ import com.einvoive.constants.*;
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
 import com.einvoive.util.Translator;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -487,6 +488,31 @@ public class MainController {
         return invoiceHelper.getInvoicesByDurationLocation(startDate, endDate, companyID, location);
     }
 
+    @GetMapping("/getReportFilters")
+    public String getReportFilters(@RequestParam String companyID, String id, String customer, String location, String startDate, String endDate){
+        return reportsHelper.getReportFilters(companyID, id, customer, location, startDate, endDate);
+    }
+
+    @GetMapping("/getReportFiltersCompany")
+    public String getReportFiltersCompany(@RequestParam String companyID, String id, String customer, String location, String startDate, String endDate){
+        return reportsHelper.getReportFilters(companyID,"", customer, location, startDate, endDate);
+    }
+
+//    @GetMapping ("/getCurrencyRateSAR")
+//    public String getCurrencyRateSAR(){
+//        return String.valueOf(Utility.getCurrencyRateSAR());
+//    }
+
+    @GetMapping("/getReportByCompany")
+    public String getReportByCompany(@RequestParam String companyID){
+        return reportsHelper.getReportByCompany(companyID);
+    }
+
+    @GetMapping("/getReportByUser")
+    public String getReportByUser(@RequestParam String id, String location){
+        return reportsHelper.getReportByUser(id, location);
+    }
+
     @GetMapping("/getTopSoldProductsByDate")
     public String getTopSoldProductsByDate(@RequestParam String startDate, String endDate, String companyID) throws ParseException {
         return reportsHelper.getTopSoldProductsByDate(startDate, endDate, companyID);
@@ -679,6 +705,13 @@ public class MainController {
     public String getLoginToken(@RequestParam String email,@RequestParam String token){
         return loginHelper.getLoginToken(email, token);
     }
+
+    @GetMapping(value = "/getCurrencyRateSAR")
+    public String getCurrencyRateSAR(){
+        Utility util = new Utility();
+        return util.getCurrencyRateSAR().toString();
+    }
+
 
 //    @GetMapping("/getJournalEntries")
 //    public String getJournalEntries(String invoiceNo){

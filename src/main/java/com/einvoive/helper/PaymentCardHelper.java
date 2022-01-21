@@ -7,6 +7,8 @@ import com.einvoive.model.PaymentCard;
 import com.einvoive.repository.PaymentCardRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @Component
 public class PaymentCardHelper {
-
+    private Logger logger = LoggerFactory.getLogger(PaymentCardHelper.class);
     @Autowired
     PaymentCardRepository paymentCardRepository;
 
@@ -42,6 +44,7 @@ public class PaymentCardHelper {
                 logsHelper.save(new Logs("Adding Payment card for "+ Utility.getUserName(paymentCard.getUserId(), mongoOperation),  "Payment card No "+ paymentCard.getCardNo()+", Full Name "+paymentCard.getFullName()+", Cvv Code "+paymentCard.getCvvCode()+", Expiry "+paymentCard.getExpwiryDate()));
                 return "Payment Card Saved";
             } catch (Exception ex) {
+                logger.info("Exception in savePaymentCard "+ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -50,6 +53,7 @@ public class PaymentCardHelper {
         }
         else{
             error.setErrorStatus("Error");
+            logger.info(msg+"--Already Exists");
             error.setError(msg+"--Already Exists");
             jsonError = gson.toJson(error);
             return jsonError;
@@ -73,12 +77,14 @@ public class PaymentCardHelper {
                 query.addCriteria(Criteria.where("userId").is(userId));
             paymentCardList = mongoOperation.find(query, PaymentCard.class);
         }catch(Exception ex){
-            System.out.println("Error in get paymentCard:"+ ex);
+            logger.info("Error in get paymentCard:"+ ex.getMessage());
+            System.out.println("Error in get paymentCard:"+ ex.getMessage());
         }
         return gson.toJson(paymentCardList);
     }
 
     public String updatePaymentCard(PaymentCard paymentCard) {
+        logger.info("Update Payment Card "+paymentCard.getFullName());
         return savePaymentCard(paymentCard);
     }
 

@@ -49,6 +49,15 @@ public class DebitInvoice {
     private String projectCode;
     private String location;
     private List<LineItem> lineItemList;
+    private String amountSAR;
+
+    public String getAmountSAR() {
+        return amountSAR;
+    }
+
+    public void setAmountSAR(String amountSAR) {
+        this.amountSAR = amountSAR;
+    }
 
     public String getId() {
         return id;

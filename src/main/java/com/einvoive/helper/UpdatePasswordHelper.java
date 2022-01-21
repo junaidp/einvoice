@@ -6,6 +6,8 @@ import com.einvoive.repository.CompanyRepository;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,7 +20,7 @@ import java.util.List;
 
 @Component
 public class UpdatePasswordHelper {
-
+    private Logger logger = LoggerFactory.getLogger(UpdatePasswordHelper.class);
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -38,6 +40,7 @@ public class UpdatePasswordHelper {
         if(loginCompany != null){
             loginCompany.setPassword(updatePassword.getNewPassword());
             companyRepository.save(loginCompany);
+            logger.info("Change Password request for Company "+loginCompany.getCompanyName());
             logsHelper.save(new Logs("Change Password request for Company "+loginCompany.getCompanyName()," and Email "+loginCompany.getEmail()));
             return gson.toJson("Your Company Password has been updated!");
         }
@@ -45,6 +48,7 @@ public class UpdatePasswordHelper {
         if(savedUser != null){
             savedUser.setPassword(updatePassword.getNewPassword());
             userRepository.save(savedUser);
+            logger.info("Change Password request for User "+savedUser.getName());
             logsHelper.save(new Logs("Change Password request for User "+savedUser.getName()," and Email "+loginCompany.getEmail()));
             return gson.toJson("User Password has been updated!");
         }

@@ -39,6 +39,7 @@ public class BankAccountHelper {
                 logsHelper.save(new Logs("Bank Account added for "+ Utility.getCompanyName(bankAccountSave.getCompanyID(), mongoOperation), Utility.getCompanyName(bankAccountSave.getCompanyID(), mongoOperation)+ " has added a new Bank Account "+ bankAccountSave.getBankName()+", IBAN "+bankAccountSave.getIbanNumber()+", address "+bankAccountSave.getAddress()));
                 return "Bank Account saved";
             }catch(Exception ex){
+                logger.info(ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -46,6 +47,7 @@ public class BankAccountHelper {
             }
         }
         else{
+            logger.info("Bank Account Already Exists");
             error.setError("Bank Account Already Exists");
             jsonError = gson.toJson(error);
             return jsonError;
@@ -60,7 +62,8 @@ public class BankAccountHelper {
                 query.addCriteria(Criteria.where("companyID").is(companyID));
             accountsList = mongoOperation.find(query, BankAccount.class);
         }catch(Exception ex){
-            System.out.println("Error in get Bank Account:"+ ex);
+            logger.info("Error in get Bank Account:"+ ex.getMessage());
+            System.out.println("Error in get Bank Account:"+ ex.getMessage());
         }
         return gson.toJson(accountsList);
     }
@@ -70,7 +73,8 @@ public class BankAccountHelper {
         try {
             account = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), BankAccount.class);
         } catch (Exception ex) {
-            System.out.println("Error in get Bank Account:" + ex);
+            System.out.println("Error in get Bank Account:" + ex.getMessage());
+            logger.info("Error in get Bank Account:" + ex.getMessage());
         }
         return gson.toJson(account);
     }
@@ -78,6 +82,7 @@ public class BankAccountHelper {
     public String deleteBankAccounts(String iD){
         BankAccount bankAccount = mongoOperation.findOne(new Query(Criteria.where("id").is(iD)), BankAccount.class);
         bankAccountRepository.delete(bankAccount);
+        logger.info("Account deleted "+bankAccount.getIbanNumber());
         return "Account deleted";
     }
 

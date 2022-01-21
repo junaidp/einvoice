@@ -5,6 +5,8 @@ import com.einvoive.model.Translation;
 import com.einvoive.repository.TranslationRepository;
 import com.einvoive.util.Translator;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,6 +25,8 @@ public class TranslationHelper {
 
     Gson gson = new Gson();
 
+    private Logger logger = LoggerFactory.getLogger(TranslationHelper.class);
+
     public String saveTranslation(Translation translation){
         ErrorCustom error = new ErrorCustom();
         String jsonError;
@@ -33,6 +37,7 @@ public class TranslationHelper {
             return "Translation saved";
         }
         else{
+            logger.info(translation.getEnglish()+" alreadi exists");
             error.setErrorStatus("Error");
             error.setError("English text already saved");
             jsonError = gson.toJson(error);
@@ -41,6 +46,7 @@ public class TranslationHelper {
     }
 
     public String updateTranslation(Translation translation){
+        logger.info("Update Translation: "+translation.getEnglish());
         deleteTranslation(translation.getEnglish());
         return saveTranslation(translation);
     }
@@ -77,13 +83,15 @@ public class TranslationHelper {
             if(translation.getArabic() != null)
                 return gson.toJson(translation);
             else {
+                logger.info(english+" Translation not found");
                 error.setErrorStatus("Error");
                 error.setError("Translation not found");
                 jsonError = gson.toJson(error);
                 return jsonError;
             }
         }catch(Exception ex){
-            System.out.println("Error in get Translation:"+ ex);
+            logger.info("Error in get Translation:"+ ex.getMessage());
+            System.out.println("Error in get Translation:"+ ex.getMessage());
             error.setErrorStatus("Error");
             error.setError(ex.getMessage());
             jsonError = gson.toJson(error);
@@ -103,12 +111,14 @@ public class TranslationHelper {
         try {
             translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
         }catch (Exception exception) {
+            logger.info("No Translation found for text "+ english +
+                    "having Exception: "+ exception.getMessage());
             System.out.println("No Translation found for text "+ english +
                     "having Exception: "+ exception.getMessage());
         }
         if(translation == null){
             translation = new Translation();
-            System.out.println("No Translation saved: Assigning Translation through API");
+            logger.info("No Translation saved: Assigning Translation through API");
             translation.setArabic(Translator.getTranslation(english));
             translation.setEnglish(english);
             //saveing Translation
@@ -120,6 +130,7 @@ public class TranslationHelper {
     public String deleteTranslation(String english) {
         Translation translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
         translationRepository.delete(translation);
+        logger.info(translation.getEnglish() + "deleted");
         return translation.getEnglish() + "deleted";
     }
 }

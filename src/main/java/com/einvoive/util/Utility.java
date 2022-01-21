@@ -4,17 +4,22 @@ import com.einvoive.model.Company;
 import com.einvoive.model.User;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import com.posadskiy.currencyconverter.CurrencyConverter;
+import com.posadskiy.currencyconverter.config.ConfigBuilder;
+import com.posadskiy.currencyconverter.enums.Currency;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
+
 import org.springframework.util.StringUtils;
+
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -133,6 +138,20 @@ public class Utility {
         num = Integer.parseInt(inv[inv.length - 1]);
         return num;
     }
+
+
+    public Double getCurrencyRateSAR(){
+        final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
+
+        CurrencyConverter converter = new CurrencyConverter(
+                new ConfigBuilder()
+                        .currencyConverterApiApiKey(CURRENCY_CONVERTER_API_API_KEY)
+                         .build()
+        );
+
+        Double usdToEuroRate = converter.rateFromUsd(Currency.SAR);
+        return usdToEuroRate;
+    };
 
 }
 

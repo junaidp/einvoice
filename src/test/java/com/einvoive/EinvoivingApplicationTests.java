@@ -13,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 //import com.google.cloud.translate.*;
 
@@ -28,6 +30,12 @@ class EinvoivingApplicationTests {
 
     @Autowired
     ProductMainHelper productMainHelper;
+
+    @Autowired
+    CompanyHelper companyHelper;
+
+    @Autowired
+    UserHelper userHelper;
 
     @Autowired
     LoginHelper loginHelper;
@@ -45,12 +53,9 @@ class EinvoivingApplicationTests {
     LogsHelper logsHelper;
 
     @Autowired
-    UserHelper userHelper;
-
-    @Autowired
     CustomerHelper customerHelper;
 
-    @Test
+//    @Test
     void contextLoads() {
     }
 
@@ -62,25 +67,25 @@ class EinvoivingApplicationTests {
         userHelper.updateUserForToken(userTest);
     }
 
-   // @Test
-       void login(){
+//    @Test
+       void login() throws NoSuchAlgorithmException {
         Login login = new Login();
         login.setEmail("testcase@email.com");
         loginHelper.signIn(login);
     }
 
-    @Test
+//    @Test
     void getProductsTranslation(){
         String test = productMainHelper.getProductsNames("DarAlMaysan");
         System.out.println(test);
     }
 
-    @Test
+//    @Test
     void saveLogs(){
         logsHelper.save(new Logs("Test Case", "Testing its working"));
     }
 
-    @Test
+//    @Test
     void saveProduct(){
         ProductMain productMainEnglish = new ProductMain();
         productMainEnglish.setProductName("Test12");
@@ -97,11 +102,57 @@ class EinvoivingApplicationTests {
     }
 
     @Test
+    void addingMissingLocationsInvoices(){
+        List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
+        for(Invoice invoice:invoiceList){
+            if(invoice.getLocation() == null)
+                continue;
+            if(invoice.getLocation().isEmpty()){
+                User user = mongoOperation.findById(invoice.getUserId(), User.class);
+                Update update = new Update();
+                try {
+                    update.set("location", user.getLocation());
+                    mongoOperation.updateFirst(new Query(Criteria.where("id").is(invoice.getId())), update, Invoice.class);
+                }catch (Exception exception) {
+                    System.out.println(exception.getMessage());
+                }
+            }
+        }
+    }
+
+//    @Test
+    void passwordHash() throws NoSuchAlgorithmException {
+        List<Company> companyList = companyRepository.findAll();
+        for(Company company:companyList) {
+            Company company1 = new Company();
+            company1 = company;
+            companyRepository.delete(company);
+            company1.setPassword(Utility.encrypt(company.getPassword()));
+            companyHelper.saveCompany(company);
+            List<User> userList = mongoOperation.find(new Query(Criteria.where("companyID").is(company.getCompanyID())), User.class);
+           for (User user:userList){
+              User user1 = new User();
+              user1 = user;
+               user1.setPassword(Utility.encrypt(user.getPassword()));
+              userRepository.delete(user);
+              userHelper.saveUser(user1, false);
+            }
+        }
+
+    }
+
+    @Test
+            public void getCurrency(){
+        Utility util = new Utility();
+        util.getCurrencyRateSAR();
+    }
+
+//    @Test
     void getInvoicesByUser(){
         System.out.println("Invoices: "+invoiceHelper.getInvoicesByUser("61ab4c8d95d6ba231072305e"));
     }
 
-    @Test
+//    @Test
     void getNextInvoiceNumbersForUsersUnderComapny(){
 //        Company company = companyRepository.findUserBycompanyID("FugroSuhaimiLtd.");
         Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is("FugroSuhaimiLtd.")), Company.class);
@@ -111,13 +162,13 @@ class EinvoivingApplicationTests {
             System.out.println("Next Invoice No for User: "+user.getName()+" is: "+invoiceHelper.getNextInvoiceNoByUserID(user.getId()));
     }
 
-    @Test
+//    @Test
     void getAllCustomers(){
         String test = customerHelper.getAllCustomers("FugroSuhaimiLtd.");
         System.out.println(test);
     }
 
-    @Test
+//    @Test
     void sendEmail(){
         String randomNumber = Utility.getRandomNumber();
         emailSender.sendEmail("junaidp@gmail.com", "Login Token", "email body here"+ randomNumber);
@@ -133,7 +184,7 @@ class EinvoivingApplicationTests {
 
 
     //USE THIS
-      @Test
+//      @Test
     void translate()  {
         try{
            // String translationBk = TranslatorHelper.translate("en", "ar", "Hello");
