@@ -403,7 +403,8 @@ public class ReportsHelper {
             while(count < creditInvoiceList.size()){
                 if(!df.parse(creditInvoiceList.get(count).getDateTime()).after(startDateFinal))
                     creditInvoiceList.remove(creditInvoiceList.get(count));
-                count++;
+                else
+                    count++;
             }
         }
 
@@ -412,7 +413,8 @@ public class ReportsHelper {
             while(count < creditInvoiceList.size()){
                 if(!df.parse(creditInvoiceList.get(count).getDateTime()).before(endDateFinal))
                     creditInvoiceList.remove(creditInvoiceList.get(count));
-                count++;
+                else
+                    count++;
             }
         }
 
@@ -431,7 +433,8 @@ public class ReportsHelper {
             while(count < debitInvoiceList.size()){
                 if(!df.parse(debitInvoiceList.get(count).getDateTime()).after(startDateFinal))
                     debitInvoiceList.remove(debitInvoiceList.get(count));
-                count++;
+                else
+                    count++;
             }
         }
 
@@ -440,7 +443,8 @@ public class ReportsHelper {
             while(count < debitInvoiceList.size()){
                 if(!df.parse(debitInvoiceList.get(count).getDateTime()).before(endDateFinal))
                     debitInvoiceList.remove(debitInvoiceList.get(count));
-                count++;
+                else
+                     count++;
             }
         }
 
@@ -450,7 +454,7 @@ public class ReportsHelper {
         if(invoiceList == null && invoiceList.isEmpty())
             invoiceList = mongoOperation.findAll(Invoice.class);
         DateFormat df = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        startDate = startDate+" 00:00:00";
+        startDate = startDate+" 00:00:01";
         endDate = endDate+" 23:59:59";
         Date startDateFinal = df.parse(startDate);
         Date endDateFinal = df.parse(endDate);
@@ -459,6 +463,7 @@ public class ReportsHelper {
             while(count < invoiceList.size()){
                 if(!df.parse(invoiceList.get(count).getDateTime()).after(startDateFinal))
                     invoiceList.remove(invoiceList.get(count));
+                else
                 count++;
             }
         }
@@ -468,6 +473,7 @@ public class ReportsHelper {
             while(count < invoiceList.size()){
                 if(!df.parse(invoiceList.get(count).getDateTime()).before(endDateFinal))
                     invoiceList.remove(invoiceList.get(count));
+                else
                 count++;
             }
         }
