@@ -474,8 +474,8 @@ public class ReportsHelper {
 
     }
 
-    private Query filterCriterias(String companyID, String id, String location,
-                                  String customer, String startDate, String endDate){
+    private Query filterCriterias(String companyID, String id, String customer, String location,
+                                  String startDate, String endDate){
         final List<Criteria> criteria = new ArrayList<>();
         if(companyID != null && !companyID.isEmpty())
             criteria.add(where("companyID").is(companyID));
