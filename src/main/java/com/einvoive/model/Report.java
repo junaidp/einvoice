@@ -7,9 +7,7 @@ public class Report {
     private String invoiceDate;
     private String invoiceNumber;
     private String totalExcludingVAT;
-    //private String totalTaxableAmount;
     private String totalVat;
-    //private String totalAmountDue;
     private String totalNetAmount;
     private String location;
 
@@ -52,14 +50,6 @@ public class Report {
     public void setTotalExcludingVAT(String totalExcludingVAT) {
         this.totalExcludingVAT = totalExcludingVAT;
     }
-//
-//    public String getTotalTaxableAmount() {
-//        return totalTaxableAmount;
-//    }
-//
-//    public void setTotalTaxableAmount(String totalTaxableAmount) {
-//        this.totalTaxableAmount = totalTaxableAmount;
-//    }
 
     public String getTotalVat() {
         return totalVat;
@@ -68,14 +58,6 @@ public class Report {
     public void setTotalVat(String totalVat) {
         this.totalVat = totalVat;
     }
-
-//    public String getTotalAmountDue() {
-//        return totalAmountDue;
-//    }
-//
-//    public void setTotalAmountDue(String totalAmountDue) {
-//        this.totalAmountDue = totalAmountDue;
-//    }
 
     public String getTotalNetAmount() {
         return totalNetAmount;

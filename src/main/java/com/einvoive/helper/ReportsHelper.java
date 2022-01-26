@@ -551,9 +551,7 @@ public class ReportsHelper {
         report.setInvoiceDate(creditInvoice.getDateTime());
         report.setInvoiceNumber(creditInvoice.getInvoiceNumber());
         report.setTotalExcludingVAT(creditInvoice.getTotalExcludingVAT());
-        //report.setTotalTaxableAmount(creditInvoice.getTotalTaxableAmount());
         report.setTotalVat(creditInvoice.getTotalVat());
-        //report.setTotalAmountDue(creditInvoice.getTotalAmountDue());
         report.setTotalNetAmount(creditInvoice.getTotalNetAmount());
         report.setLocation(creditInvoice.getLocation());
         return report;

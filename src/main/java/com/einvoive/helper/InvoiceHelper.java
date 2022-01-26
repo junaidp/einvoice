@@ -111,7 +111,7 @@ public class InvoiceHelper {
 //      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
-        invoice.setSupplyDate(invoice.getSupplyDate().toString());
+        invoice.setSupplyDate(invoice.getSupplyDate());
         invoice.setPreviousHash(getPreviousHash(invoice));
 //        invoice.setInvoiceNumber(getNextInvoiceNumber(invoice.getCompanyID()));
     }

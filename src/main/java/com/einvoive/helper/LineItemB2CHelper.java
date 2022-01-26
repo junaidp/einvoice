@@ -69,10 +69,15 @@ public class LineItemB2CHelper {
     }
 
     public String deleteLineItem(String id){
-        List<LineItemB2C> lineItemList = mongoOperation.find(new Query(Criteria.where("id").is(id)), LineItemB2C.class);
-        repository.deleteAll(lineItemList);
-        logger.info("Deleting LineItemB2C "+lineItemList.get(0).getProductName());
-        return "Line Item B2C deleted";
+        try{
+            List<LineItemB2C> lineItemList = mongoOperation.find(new Query(Criteria.where("id").is(id)), LineItemB2C.class);
+            repository.deleteAll(lineItemList);
+            logger.info("Deleting LineItemB2C "+lineItemList.get(0).getProductName());
+            return "Line Item B2C deleted";
+        }catch (Exception ex){
+            logger.info("Exception in deleting Line Item B2C "+ex.getMessage());
+            return "Exception in deleting Line Item B2C "+ex.getMessage();
+        }
     }
 
     public List<LineItemB2C> getLineItemsB2C() {

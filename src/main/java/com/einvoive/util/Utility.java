@@ -144,7 +144,7 @@ public class Utility {
     }
 
 
-    public String getCurrencyRateSAR(){
+    public String getCurrencyRateSAR(String currency){
         try {
             final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
 
@@ -154,7 +154,7 @@ public class Utility {
                             .build()
             );
 
-            Double usdToEuroRate = converter.rateFromUsd(Currency.SAR);
+            Double usdToEuroRate = converter.rate(currency, "SAR");
             return usdToEuroRate.toString();
         }catch(Exception ex){
             logger.warn("Error in getting currency rate:" + ex);

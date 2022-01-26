@@ -707,9 +707,9 @@ public class MainController {
     }
 
     @GetMapping(value = "/getCurrencyRateSAR")
-    public String getCurrencyRateSAR(){
+    public String getCurrencyRateSAR(@RequestParam String currency){
         Utility util = new Utility();
-        return util.getCurrencyRateSAR();
+        return util.getCurrencyRateSAR(currency);
     }
 
 
