@@ -146,7 +146,9 @@ public class Utility {
 
     public String getCurrencyRateSAR(String currency){
         try {
-            final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
+
+           // final String CURRENCY_CONVERTER_API_API_KEY = "a0aed9fcf769b85a287b";
+            final String CURRENCY_CONVERTER_API_API_KEY = "61f698eab958d16a271515be";
 
             CurrencyConverter converter = new CurrencyConverter(
                     new ConfigBuilder()
