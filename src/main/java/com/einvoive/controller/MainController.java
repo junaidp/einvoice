@@ -708,6 +708,9 @@ public class MainController {
 
     @GetMapping(value = "/getCurrencyRateSAR")
     public String getCurrencyRateSAR(@RequestParam String currency){
+       //to remove "" from currency
+        if(currency.charAt(0) == '\"' && currency.charAt(currency.length() - 1) == '\"')
+            currency = currency.replaceAll("^\"|\"$", "");
         Utility util = new Utility();
         return util.getCurrencyRateSAR(currency);
     }

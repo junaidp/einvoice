@@ -36,7 +36,7 @@ public class DebitInvoiceHelper {
         String jsonError;
         try {
             repository.save(debitInvoice);
-            logger.info("Invoice "+debitInvoice.getInvoiceName()+" has debited with Credit No "+ debitInvoice.getInvoiceNumber());
+            logger.info("Invoice "+debitInvoice.getInvoiceName()+" has debited with debit No "+ debitInvoice.getInvoiceNumber());
             logsHelper.save(new Logs("adding Invoice Debit No "+ debitInvoice.getInvoiceNumber(), "Invoice "+debitInvoice.getInvoiceName()+" is Debited with Debit No "+ debitInvoice.getInvoiceNumber()));
             return "Debit Invoice saved";
         }catch (Exception ex){
