@@ -3,13 +3,31 @@ package com.einvoive.model;
 public class Report {
 
     private String customerName;
+    private String billToEnglish;
     private String customerVatNo;
     private String invoiceDate;
     private String invoiceNumber;
     private String totalExcludingVAT;
     private String totalVat;
     private String totalNetAmount;
+    private String totalAmountDue;
     private String location;
+
+    public String getBillToEnglish() {
+        return billToEnglish;
+    }
+
+    public void setBillToEnglish(String billToEnglish) {
+        this.billToEnglish = billToEnglish;
+    }
+
+    public String getTotalAmountDue() {
+        return totalAmountDue;
+    }
+
+    public void setTotalAmountDue(String totalAmountDue) {
+        this.totalAmountDue = totalAmountDue;
+    }
 
     public String getCustomerName() {
         return customerName;

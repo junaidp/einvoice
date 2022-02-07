@@ -240,8 +240,7 @@ public class ReportsHelper {
         List<InvoiceB2C> invoicesList;
         try{
             invoicesList = mongoOperation.find(new Query(where("companyID").is(companyID)
-                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)
-                    .and("status").is(Constants.STATUS_APPROVED)), InvoiceB2C.class);
+                    .and("invoiceDate").gte(startDateFinal).lte(endDateFinal)), InvoiceB2C.class);
         } catch(Exception ex){
             logger.info("Error in get invoicesB2C:"+ ex.getMessage());
             System.out.println("Error in get invoicesB2C:"+ ex.getMessage());
@@ -351,6 +350,21 @@ public class ReportsHelper {
         return gson.toJson(topCustomersInvoice);
     }
 
+    //get Reports InvoiceB2C by All Filters
+    public String getReportFiltersInvoiceB2C(String companyID, String userID, String startDate, String endDate){
+        List<Report> reports = new ArrayList<>();
+        try{
+            Query query = filterCriterias(companyID, userID, null, null, startDate, endDate);
+            setInvoiceB2CReports(startDate, endDate, reports, query);
+            setCreditInvoiceReports(startDate, endDate, reports, query);
+            setDebitInvoiceReports(startDate, endDate, reports, query);
+        }catch (Exception ex){
+            logger.info("Exception in get Report Filters: "+ex.getMessage());
+            return gson.toJson(ex.getMessage());
+        }
+        return gson.toJson(reports);
+    }
+
     //get Reports by All Filters
     public String getReportFilters(String companyID, String id, String customer, String location, String startDate, String endDate){
         List<Report> reports = new ArrayList<>();
@@ -372,6 +386,14 @@ public class ReportsHelper {
             filterInvoiceDuration(invoiceList, startDate, endDate);
         for(Invoice invoice:invoiceList)
             reports.add(setInvoiceToReport(invoice));
+    }
+
+    private void setInvoiceB2CReports(String startDate, String endDate, List<Report> reports, Query query) throws ParseException {
+        List<InvoiceB2C> invoiceList = mongoOperation.find(query, InvoiceB2C.class);
+        if(!startDate.isEmpty() || !endDate.isEmpty())
+            filterInvoiceB2CDuration(invoiceList, startDate, endDate);
+        for(InvoiceB2C invoiceB2C:invoiceList)
+            reports.add(setInvoiceB2CToReport(invoiceB2C));
     }
 
     private void setCreditInvoiceReports(String startDate, String endDate, List<Report> reports, Query query) throws ParseException {
@@ -450,6 +472,35 @@ public class ReportsHelper {
 
     }
 
+    //Invoice B2C filter
+    private void filterInvoiceB2CDuration(List<InvoiceB2C> invoiceList, String startDate, String endDate) throws ParseException {
+        if(invoiceList == null && invoiceList.isEmpty())
+            invoiceList = mongoOperation.findAll(InvoiceB2C.class);
+        DateFormat df = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        startDate = startDate+" 00:00:01";
+        endDate = endDate+" 23:59:59";
+        Date startDateFinal = df.parse(startDate);
+        Date endDateFinal = df.parse(endDate);
+        int count = 0;
+        if(!startDate.isEmpty()){
+            while(count < invoiceList.size()){
+                if(!df.parse(invoiceList.get(count).getDateTime()).after(startDateFinal))
+                    invoiceList.remove(invoiceList.get(count));
+                else
+                    count++;
+            }
+        }
+        if(!endDate.isEmpty()){
+            count = 0;
+            while(count < invoiceList.size()){
+                if(!df.parse(invoiceList.get(count).getDateTime()).before(endDateFinal))
+                    invoiceList.remove(invoiceList.get(count));
+                else
+                    count++;
+            }
+        }
+    }
+
     private void filterInvoiceDuration(List<Invoice> invoiceList, String startDate, String endDate) throws ParseException {
         if(invoiceList == null && invoiceList.isEmpty())
             invoiceList = mongoOperation.findAll(Invoice.class);
@@ -467,7 +518,6 @@ public class ReportsHelper {
                 count++;
             }
         }
-
         if(!endDate.isEmpty()){
             count = 0;
             while(count < invoiceList.size()){
@@ -477,7 +527,6 @@ public class ReportsHelper {
                 count++;
             }
         }
-
     }
 
     private Query filterCriterias(String companyID, String id, String customer, String location,
@@ -500,6 +549,20 @@ public class ReportsHelper {
     }
 
     //get Reports by CompanyID
+    public String getReportB2CByCompany(String companyID){
+        List<Report> reports = new ArrayList<>();
+        try{
+            List<InvoiceB2C> invoiceList = mongoOperation.find(new Query(where("companyID").is(companyID)), InvoiceB2C.class);
+            for(InvoiceB2C invoiceB2C:invoiceList)
+                reports.add(setInvoiceB2CToReport(invoiceB2C));
+        }catch (Exception ex){
+            logger.info(ex.getMessage());
+            return gson.toJson("Exception in getReportB2CByCompany "+ex.getMessage());
+        }
+        return gson.toJson(reports);
+    }
+
+    //get Reports by CompanyID
     public String getReportByCompany(String companyID){
         List<Report> reports = new ArrayList<>();
         try{
@@ -509,6 +572,19 @@ public class ReportsHelper {
         }catch (Exception ex){
             logger.info(ex.getMessage());
             return gson.toJson("Exception in getReportByCompany "+ex.getMessage());
+        }
+        return gson.toJson(reports);
+    }
+
+    public String getReportB2CByUser(String id){
+        List<Report> reports = new ArrayList<>();
+        try{
+            List<InvoiceB2C> invoiceList = mongoOperation.find(new Query(where("userId").is(id)), InvoiceB2C.class);
+            for(InvoiceB2C invoiceB2C:invoiceList)
+                reports.add(setInvoiceB2CToReport(invoiceB2C));
+        }catch (Exception ex){
+            logger.info("Exception in getReportB2CByUser "+ex.getMessage());
+            return gson.toJson(ex.getMessage());
         }
         return gson.toJson(reports);
     }
@@ -540,6 +616,23 @@ public class ReportsHelper {
         //report.setTotalAmountDue(invoice.getTotalAmountDue());
         report.setTotalNetAmount(invoice.getTotalNetAmount());
         report.setLocation(invoice.getLocation());
+        return report;
+    }
+
+    //for invoice b2c
+    private Report setInvoiceB2CToReport(InvoiceB2C invoiceB2C) {
+        Report report = new Report();
+//        Customer customer = mongoOperation.findOne(new Query(where("customer").is(invoiceB2C.getBillToEnglish())), Customer.class);
+        report.setBillToEnglish(invoiceB2C.getBillToEnglish());
+        report.setCustomerVatNo("No Customer details");
+        report.setInvoiceDate(invoiceB2C.getDateTime());
+        report.setInvoiceNumber(invoiceB2C.getInvoiceNumber());
+        report.setTotalExcludingVAT(invoiceB2C.getTotalExcludingVAT());
+        //report.setTotalTaxableAmount(invoice.getTotalTaxableAmount());
+        report.setTotalVat(invoiceB2C.getTotalVat());
+       report.setTotalAmountDue(invoiceB2C.getTotalAmountDue());
+//        report.setTotalNetAmount(invoiceB2C.getTotalNetAmount());
+//        report.setLocation(invoiceB2C.getLocation());
         return report;
     }
 
