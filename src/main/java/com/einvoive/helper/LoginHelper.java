@@ -47,6 +47,30 @@ public class LoginHelper {
 
     private Logger logger = LoggerFactory.getLogger(LoginHelper.class);
 
+    public String signInOkta(String email) throws NoSuchAlgorithmException {
+        List<Company> companyList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
+        logger.info("Inside Okta SignIn for: " + email );
+        Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
+        if (loginCompany != null) {
+            saveCompanyTokenAndEmail(loginCompany);
+            companyList.add(loginCompany);
+            companyList.add(companyHelper.getCompanyArabic(loginCompany));
+            logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
+            logger.info("SingIn request for "+loginCompany.getCompanyName());
+            return gson.toJson(companyList);
+        }
+        User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+        if (savedUser != null) {
+            saveTokenAndEmail(savedUser);
+            userList.add(savedUser);
+            logsHelper.save(new Logs("SingIn request for "+savedUser.getName()," A taken has been sent to "+savedUser.getEmail()));
+            logger.info("SingIn request for "+savedUser.getName());
+            return gson.toJson(userList);
+        } else
+            return gson.toJson("Invalid Credentials");
+    }
+
     public String signIn(Login login) throws NoSuchAlgorithmException {
         List<Company> companyList = new ArrayList<>();
         List<User> userList = new ArrayList<>();

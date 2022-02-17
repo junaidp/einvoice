@@ -91,21 +91,62 @@
             <artifactId>currency-converter</artifactId>
             <version>1.1.6</version>
         </dependency>
+        <!-- OKTA-->
+        <dependency>
+            <groupId>com.okta.spring</groupId>
+            <artifactId>okta-spring-boot-starter</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+
 
     </dependencies>
-        <!--
-        <mongo:db-factory id="mongoDbFactory" host="localhost" port="27017" dbname="test" />
+    <!--
+    <mongo:db-factory id="mongoDbFactory" host="localhost" port="27017" dbname="test" />
 
-        <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-            <constructor-arg ref="mongoDbFactory" />
-        </bean>
-    -->
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref="mongoDbFactory" />
+    </bean>
+-->
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><configuration><source>8</source><target>8</target></configuration></plugin>
+            </plugin>
+            <plugin>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-webapp-maven-plugin</artifactId>
+                <version>1.14.0</version>
+                <configuration>
+                    <schemaVersion>v2</schemaVersion>
+                    <subscriptionId>6e82b5e9-7fda-417f-b26d-da3875afb49f</subscriptionId>
+                    <resourceGroup>gofatoorahGroup</resourceGroup>
+                    <appName>gofatoorahServer</appName>
+                    <pricingTier>S1</pricingTier>
+                    <region>westeurope</region>
+                    <runtime>
+                        <os>Linux</os>
+                        <javaVersion>Java 8</javaVersion>
+                        <webContainer>Java SE</webContainer>
+                    </runtime>
+                    <deployment>
+                        <resources>
+                            <resource>
+                                <directory>${project.basedir}/target</directory>
+                                <includes>
+                                    <include>*.jar</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                    </deployment>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
