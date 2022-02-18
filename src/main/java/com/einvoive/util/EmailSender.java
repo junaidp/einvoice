@@ -20,7 +20,7 @@ public class EmailSender {
            mailSender.send(msg);
            System.out.println("Email Sent to: " + toAddress);
          }catch(Exception ex){
-           System.out.println("Error " +ex);
+           System.out.println("Error " +ex.getMessage());
        }
     }
 }

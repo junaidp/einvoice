@@ -28,6 +28,8 @@ import java.util.Random;
 
 public class Utility {
 
+    @Autowired
+    EmailSender emailSender;
     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
     private Logger logger = LoggerFactory.getLogger(Utility.class);
@@ -143,6 +145,22 @@ public class Utility {
         return num;
     }
 
+    public void sendEmailToTeam(String subject, String message){
+        emailSender.sendEmail("junaidp@gmail.com", subject, message);
+        emailSender.sendEmail("amoqeet43@gmail.com", subject, message);
+        emailSender.sendEmail("mfaheempiracha@gmail.com", subject, message);
+        emailSender.sendEmail("abdurrafe7211@gmail.com", subject, message);
+        emailSender.sendEmail("adnankhokhar747@gmail.com", subject, message);
+    }
+
+    public static boolean isNumeric(String text){
+        try{
+            int num = Integer.parseInt(text);
+            return true;
+        }catch(Exception ex){
+            return false;
+        }
+    }
 
     public String getCurrencyRateSAR(String currency){
         try {

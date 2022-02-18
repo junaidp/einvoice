@@ -106,6 +106,14 @@ public class InvoiceHelper {
         }
     }
 
+//    private boolean isAlreadySaved(String invoiceNo){
+//        Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(invoiceNo)), Invoice.class);
+//        if(invoice != null)
+//            return true;
+//        else
+//            return false;
+//    }
+
     private void setInvoice(Invoice invoice) throws NoSuchAlgorithmException {
         invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
 //      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
@@ -118,7 +126,8 @@ public class InvoiceHelper {
 
 //    Company having multiple user w.r.t their locations
     public String getNextInvoiceNoByUserID(String id) {
-        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+//        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
+        User user = mongoOperation.findById(id, User.class);
         Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
         //check for Fugro Company
         if(locationEnum.isPresent())
@@ -548,6 +557,7 @@ public class InvoiceHelper {
 //            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));     //Sorting is done through collection as its not working
             invoices = mongoOperation.find(query, Invoice.class);
             Collections.reverse(invoices);
+
             for(Invoice invoice : invoices) {
                 if(invoice.getInvoiceNumber().contains(location.substring(0,2)))
                     return invoice.getInvoiceNumber();
@@ -590,6 +600,7 @@ public class InvoiceHelper {
     public String deleteInvoice(String invoiceID){
         Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
         repository.delete(invoice);
+        logsHelper.save(new Logs("Delete Invoice "+invoice.getInvoiceName(), "Invoice delection: "+invoice.getInvoiceName()+" will be deleted"));
         logger.info("Invoice deleted "+invoice.getInvoiceName());
         return "Invoice deleted";
     }
@@ -602,6 +613,7 @@ public class InvoiceHelper {
     public String update(Invoice invoice) {
         deleteInvoice(invoice.getId());
         logger.info("Invoice updated "+invoice.getInvoiceName());
+        logsHelper.save(new Logs("Invoice updated "+invoice.getInvoiceName(), "Invoice updated "+invoice.getInvoiceName()+" will be deleted and saved for updation"));
         return save(invoice);
     }
 

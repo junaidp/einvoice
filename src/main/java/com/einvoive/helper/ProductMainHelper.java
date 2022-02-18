@@ -3,6 +3,7 @@ package com.einvoive.helper;
 import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Logs;
 import com.einvoive.model.ProductMain;
+import com.einvoive.model.User;
 import com.einvoive.repository.ProductMainRepository;
 import com.einvoive.util.Translator;
 
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 
@@ -41,27 +43,53 @@ public class ProductMainHelper {
     UserHelper userHelper;
     Gson gson = new Gson();
 
-    public String save(ProductMain productEnglish, ProductMain productArabic){
+//    public String save(ProductMain productEnglish, ProductMain productArabic){
+//        ErrorCustom error = new ErrorCustom();
+//        String jsonError;
+//        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(productEnglish.getProductName())
+//                .and("companyID").is(productEnglish.getCompanyID())), ProductMain.class);
+//        if(productMain != null){
+//            logger.info("Product Name: "+ productEnglish.getProductName()+" is already exists");
+//            error.setErrorStatus("Error");
+//            error.setError("Product Name: "+ productEnglish.getProductName()+" is already exists");
+//            jsonError = gson.toJson(error);
+//            return jsonError;
+//        }
+//        else {
+//            try {
+//                repository.save(productEnglish);
+//                logsHelper.save(new Logs(productEnglish.getProductName()+" product saved", "Added product for company "+Utility.getCompanyName(productEnglish.getCompanyID(), mongoOperation)+" User "+ Utility.getUserName(productEnglish.getUserId(), mongoOperation)+" Price "+productEnglish.getPrice()+" Assigned charts of account "+productEnglish.getAssignedChartofAccounts()+" Description "+productEnglish.getDescription()+" code "+productEnglish.getCode()));
+//                if(!(productArabic == null))
+//                    saveProductArabic(productEnglish, productArabic);
+//                return "product saved";
+//            } catch (Exception ex) {
+//                logger.info("Exception in product saved "+ex.getMessage());
+//                error.setErrorStatus("Error");
+//                error.setError(ex.getMessage());
+//                jsonError = gson.toJson(error);
+//                return jsonError;
+//            }
+//        }
+//    }
+
+    public String save(ProductMain productMain) {
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        ProductMain productMain = mongoOperation.findOne(new Query(Criteria.where("productName").is(productEnglish.getProductName())
-                .and("companyID").is(productEnglish.getCompanyID())), ProductMain.class);
-        if(productMain != null){
-            logger.info("Product Name: "+ productEnglish.getProductName()+" is already exists");
+        ProductMain productSaved = mongoOperation.findOne(new Query(Criteria.where("productName").is(productMain.getProductName())
+                .and("companyID").is(productMain.getCompanyID())), ProductMain.class);
+        if (productSaved != null) {
+            logger.info("Product Name: " + productMain.getProductName() + " is already exists");
             error.setErrorStatus("Error");
-            error.setError("Product Name: "+ productEnglish.getProductName()+" is already exists");
+            error.setError("Product Name: " + productMain.getProductName() + " is already exists");
             jsonError = gson.toJson(error);
             return jsonError;
-        }
-        else {
+        } else {
             try {
-                repository.save(productEnglish);
-                logsHelper.save(new Logs(productEnglish.getProductName()+" product saved", "Added product for company "+Utility.getCompanyName(productEnglish.getCompanyID(), mongoOperation)+" User "+ Utility.getUserName(productEnglish.getUserId(), mongoOperation)+" Price "+productEnglish.getPrice()+" Assigned charts of account "+productEnglish.getAssignedChartofAccounts()+" Description "+productEnglish.getDescription()+" code "+productEnglish.getCode()));
-                if(!(productArabic == null))
-                    saveProductArabic(productEnglish, productArabic);
-                return "product saved";
+                repository.save(productMain);
+                logsHelper.save(new Logs(productMain.getProductName() + " product saved", "Added product for company " + Utility.getCompanyName(productMain.getCompanyID(), mongoOperation) + " User " + Utility.getUserName(productMain.getUserId(), mongoOperation) + " Price " + productMain.getPrice() + " Assigned charts of account " + productMain.getAssignedChartofAccounts() + " Description " + productMain.getDescription() + " code " + productMain.getCode()));
+                return "Product "+productMain.getProductName()+" has been added successfully";
             } catch (Exception ex) {
-                logger.info("Exception in product saved "+ex.getMessage());
+                logger.info("Exception in product saved " + ex.getMessage());
                 error.setErrorStatus("Error");
                 error.setError(ex.getMessage());
                 jsonError = gson.toJson(error);
@@ -69,7 +97,6 @@ public class ProductMainHelper {
             }
         }
     }
-
     private void saveProductArabic(ProductMain productEnglish, ProductMain productArabic){
         translationHelper.mergeAndSave(productEnglish.getProductName(), productArabic.getProductName());
         translationHelper.mergeAndSave(productEnglish.getDescription(), productArabic.getDescription());
@@ -163,43 +190,82 @@ public class ProductMainHelper {
         }
         return gson.toJson(products);
     }
+//test
+    public String getProductsNamesTest(String companyId){
+        List<ProductMain> productsLanguagesList = new ArrayList<>();
+//        List<ProductMain> productsEnglish = new ArrayList<>();
+//        List<ProductMain> productsArabic = new ArrayList<>();
+        try {
+            Query query = new Query(Criteria.where("companyID").is(companyId));
+            productsLanguagesList = mongoOperation.find(query, ProductMain.class);
+            for(ProductMain productMainEnglish : productsLanguagesList) {
+                if (productMainEnglish.getNameArabic() == null && !Utility.isNumeric(productMainEnglish.getProductName())) {
+                    productMainEnglish.setNameArabic(translationHelper.getTranslationTest(productMainEnglish.getProductName()));
+//                    if(!productMainEnglish.getProductName().equalsIgnoreCase(productMainEnglish.getNameArabic()))
+//                        updateProductNameArabic(productMainEnglish);
+                    if(productMainEnglish.getDescription() != null)
+                        productMainEnglish.setDescriptionArabic(translationHelper.getTranslationTest(productMainEnglish.getDescription()));
+//                    if(!productMainEnglish.getDescription().equalsIgnoreCase(productMainEnglish.getDescriptionArabic())
+//                    &&!productMainEnglish.getProductName().equalsIgnoreCase(productMainEnglish.getNameArabic()))
+                    updateProductDescriptionArabic(productMainEnglish);
+                }
+            }
+            setProductNameWithArabic(productsLanguagesList);
+        }catch(Exception ex){
+            logger.info("Error in get Products Names Test:"+ ex.getMessage());
+            System.out.println("Error in get Products Names Test:"+ ex.getMessage());
+        }
+        return gson.toJson(productsLanguagesList);
+    }
+
+    private void setProductNameWithArabic(List<ProductMain> productsLanguagesList) {
+        for(ProductMain productMain: productsLanguagesList){
+            if(!productMain.getNameArabic().isEmpty())
+               productMain.setProductName(productMain.getProductName()+" - "+productMain.getNameArabic());
+        }
+    }
 
     //Product Name in both languages
     public String getProductsNames(String companyId){
-        List<ProductMain> productsLanguagesList = new ArrayList<>();
-        List<ProductMain> productsEnglish = null;
-        List<ProductMain> productsArabic = new ArrayList<>();
+        List<ProductMain> productMainList = new ArrayList<>();
         try {
-            Query query = new Query(Criteria.where("companyID").is(companyId));
-            productsEnglish = mongoOperation.find(query, ProductMain.class);
-            for(ProductMain productMainEnglish : productsEnglish)
-                productsArabic.add(getProductArabic(productMainEnglish));
-            for(int i=0; i<productsEnglish.size(); i++){
-                productsLanguagesList.add(productsEnglish.get(i));
-                productsLanguagesList.get(i).setProductName(productsLanguagesList.get(i).getProductName()+" - "+productsArabic.get(i).getProductName());
-                productsLanguagesList.get(i).setDescription(productsLanguagesList.get(i).getDescription()+" - "+productsArabic.get(i).getDescription());
-            }
+            productMainList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyId)), ProductMain.class);
+            setProductNameWithArabic(productMainList);
+            return gson.toJson(productMainList);
         }catch(Exception ex){
-            logger.info("Error in get Products Names:"+ ex.getMessage());
-            System.out.println("Error in get Products Names:"+ ex.getMessage());
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
         }
-        return gson.toJson(productsEnglish);
+        return "Sorry! No Product found";
     }
 
     public String getProducts(String companyId){
+        List<ProductMain> productMainList = new ArrayList<>();
+        try {
+            Query query = new Query(Criteria.where("companyID").is(companyId));
+            productMainList = mongoOperation.find(query, ProductMain.class);
+            return gson.toJson(productMainList);
+        }catch(Exception ex){
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
+        }
+        return "Sorry! No Product found";
+    }
+
+    //search products
+    public String searchAllProducts(String companyId, String name){
         List<List<ProductMain>> productsMain = new ArrayList<>();
         List<ProductMain> productsEnglish = null;
         List<ProductMain> productsArabic = new ArrayList<>();
         try {
             Query query = new Query();
-            if(!companyId.isEmpty())
-             query.addCriteria(Criteria.where("companyID").is(companyId));
+            query.addCriteria(Criteria.where("productName").regex("^"+name).and("companyID").is(companyId));
             productsEnglish = mongoOperation.find(query, ProductMain.class);
-            for(ProductMain productMainEnglish : productsEnglish)
-                productsArabic.add(getProductArabic(productMainEnglish));
-            if(productsEnglish != null && productsArabic != null){
+            //for(ProductMain productMainEnglish : productsEnglish)
+               // productsArabic.add(getProductArabic(productMainEnglish));
+            if(productsEnglish != null ){
                 productsMain.add(productsEnglish);
-                productsMain.add(productsArabic);
+               // productsMain.add(productsArabic);//
             }
 //            productsMain.add(productsEnglish); //Only English to test
         }catch(Exception ex){
@@ -212,18 +278,44 @@ public class ProductMainHelper {
     public String deleteProduct(String productID){
         ProductMain product = mongoOperation.findOne(new Query(Criteria.where("id").is(productID)), ProductMain.class);
         repository.delete(product);
-        translationHelper.deleteTranslation(product.getProductName());
-        translationHelper.deleteTranslation(product.getDescription());
-        logger.info("Product deleted:"+productID);
+//        translationHelper.deleteTranslation(product.getProductName());
+//        translationHelper.deleteTranslation(product.getDescription());
+        logger.info("Product deleted:"+product.getProductName());
         return "product deleted";
     }
 
-    public String update(ProductMain productEnglish, ProductMain productArabic) {
-        logger.info("Product updation "+productEnglish.getProductName());
+    public String deleteProductTest(String companyID){
+        List<ProductMain> product = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)
+                .and("assignedChartofAccounts").is(null)), ProductMain.class);
+        repository.deleteAll(product);
+        return "products deleted";
+    }
+
+    public String updateProductNameArabic(ProductMain productEnglish) {
         deleteProduct(productEnglish.getId());
         repository.save(productEnglish);
-        saveProductArabic(productEnglish, productArabic);
-        return "product updated";
+//        Update update = new Update();
+//        update.set("nameArabic", productEnglish.getNameArabic());
+//        mongoOperation.updateFirst(new Query(Criteria.where("nameArabic").is(productEnglish.getNameArabic())), update, ProductMain.class);
+        System.out.println("Name: "+productEnglish.getProductName()+" has Arabic: "+productEnglish.getNameArabic());
+        return "Arabic Name of Product has been Updated";
+    }
+
+    private String updateProductDescriptionArabic(ProductMain productEnglish) {
+        deleteProduct(productEnglish.getId());
+        repository.save(productEnglish);
+//        Update update = new Update();
+//        update.set("descriptionArabic", productEnglish.getNameArabic());
+//        mongoOperation.updateFirst(new Query(Criteria.where("descriptionArabic").is(productEnglish.getDescriptionArabic())), update, ProductMain.class);
+//        System.out.println("Name: "+productEnglish.getDescription()+" has Arabic: "+productEnglish.getDescriptionArabic());
+        return "Arabic Description of Product has been Updated";
+    }
+
+    public String update(ProductMain productMain) {
+        logger.info("Product updation "+productMain.getProductName());
+        deleteProduct(productMain.getId());
+        repository.save(productMain);
+        return "Product "+ productMain.getProductName()+" has been updated";
     }
 
 }

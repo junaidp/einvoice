@@ -15,6 +15,24 @@ public class ProductMain {
     private String assignedChartofAccounts;
     private String userId;
     private String companyID;
+    private String nameArabic;
+    private String descriptionArabic;
+
+    public String getDescriptionArabic() {
+        return descriptionArabic;
+    }
+
+    public void setDescriptionArabic(String descriptionArabic) {
+        this.descriptionArabic = descriptionArabic;
+    }
+
+    public String getNameArabic() {
+        return nameArabic;
+    }
+
+    public void setNameArabic(String nameArabic) {
+        this.nameArabic = nameArabic;
+    }
 
     public ProductMain(String id, String productName, String description, String price, String code, String assignedChartofAccounts, String userId, String companyID) {
         this.id = id;

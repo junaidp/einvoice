@@ -171,8 +171,13 @@ public class MainController {
     }
 
     @PostMapping("/saveProductMain")
-    public String saveProductMain(@RequestBody List<ProductMain> products) {
-        return productMainHelper.save(products.get(0), products.get(1));
+    public String saveProductMain(@RequestBody ProductMain productMain) {
+        return productMainHelper.save(productMain);
+    }
+//test save product added by moqeet
+    @PostMapping("/updateProductNameArabic")
+    public String updateProductNameArabic(@RequestBody ProductMain products) {
+        return productMainHelper.updateProductNameArabic(products);
     }
 
     @PostMapping("/saveVat")
@@ -268,8 +273,8 @@ public class MainController {
     }
 
     @PostMapping("/updateProductMain")
-    public String updateProductMain(@RequestBody List<ProductMain> products) {
-        return productMainHelper.update(products.get(0), products.get(1));
+    public String updateProductMain(@RequestBody ProductMain productMain) {
+        return productMainHelper.update(productMain);
     }
 
     @PostMapping("/updateVat")
@@ -657,6 +662,19 @@ public class MainController {
     @GetMapping("/getProducts")
     public String getProducts(@RequestParam String companyId) {
         return productMainHelper.getProducts(companyId);
+    }
+
+//    @GetMapping("/getProductsNamesTest")
+//    public String getProductsNamesTest(@RequestParam String companyId) {
+//        return productMainHelper.getProductsNamesTest(companyId);
+//    }
+
+    @GetMapping("/searchAllProducts")
+    public String searchAllProducts(@RequestParam String companyId, String name) {
+        if(name.length() > 2)
+            return productMainHelper.searchAllProducts(companyId, name);
+        else
+            return gson.toJson("Minimum length should be 3");
     }
 
     @GetMapping("/getAccounts")

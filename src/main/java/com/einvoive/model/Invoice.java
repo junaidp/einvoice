@@ -55,6 +55,12 @@ public class Invoice {
     private String location;
     private List<LineItem> lineItemList;
     private String amountSAR;
+//    private String totalExcludingVATOthercurrency;
+//    private String totalDiscountOthercurrency;
+//    private String totaltaxableAmountOthercurrency;
+//    private String totalVATOthercurrency;
+//    private String totalAmountDueOthercurrency;
+//    private String totalNetAmountOthrcurrency;
 
     public String getAmountSAR() {
         return amountSAR;
@@ -63,6 +69,13 @@ public class Invoice {
     public void setAmountSAR(String amountSAR) {
         this.amountSAR = amountSAR;
     }
+//    public String getTotalVATOthercurrency() {
+//        return totalVATOthercurrency;
+//    }
+//
+//    public void setTotalVATOthercurrency(String totalVATOthercurrency) {
+//        this.totalVATOthercurrency = totalVATOthercurrency;
+//    }
 //private MultipartFile file;
 //
 //    public MultipartFile getFile() {
@@ -88,6 +101,45 @@ public class Invoice {
 //
 //    public void setDebitNote(String debitNote) {
 //        this.debitNote = debitNote;
+//    }
+//public String getTotalExcludingVATOthercurrency() {
+//    return totalExcludingVATOthercurrency;
+//}
+//
+//    public void setTotalExcludingVATOthercurrency(String totalExcludingVATOthercurrency) {
+//        this.totalExcludingVATOthercurrency = totalExcludingVATOthercurrency;
+//    }
+//
+//    public String getTotalDiscountOthercurrency() {
+//        return totalDiscountOthercurrency;
+//    }
+//
+//    public void setTotalDiscountOthercurrency(String totalDiscountOthercurrency) {
+//        this.totalDiscountOthercurrency = totalDiscountOthercurrency;
+//    }
+//
+//    public String getTotaltaxableAmountOthercurrency() {
+//        return totaltaxableAmountOthercurrency;
+//    }
+//
+//    public void setTotaltaxableAmountOthercurrency(String totaltaxableAmountOthercurrency) {
+//        this.totaltaxableAmountOthercurrency = totaltaxableAmountOthercurrency;
+//    }
+//
+//    public String getTotalAmountDueOthercurrency() {
+//        return totalAmountDueOthercurrency;
+//    }
+//
+//    public void setTotalAmountDueOthercurrency(String totalAmountDueOthercurrency) {
+//        this.totalAmountDueOthercurrency = totalAmountDueOthercurrency;
+//    }
+//
+//    public String getTotalNetAmountOthrcurrency() {
+//        return totalNetAmountOthrcurrency;
+//    }
+//
+//    public void setTotalNetAmountOthrcurrency(String totalNetAmountOthrcurrency) {
+//        this.totalNetAmountOthrcurrency = totalNetAmountOthrcurrency;
 //    }
 
     public String getLocation() {

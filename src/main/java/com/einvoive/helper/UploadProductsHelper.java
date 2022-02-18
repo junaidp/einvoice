@@ -128,8 +128,8 @@ public class UploadProductsHelper {
             List<ProductMain> productMainList = excelToProductList(file.getInputStream(), companyID, loggedInUserID);
 //            productMainHelper.repository.saveAll(productMainList);
             for (ProductMain productEnglish : productMainList ) {
-                ProductMain productArabic = productMainHelper.getProductArabicOnline(productEnglish);
-                msg = productMainHelper.save(productEnglish, productArabic);
+//                ProductMain productArabic = productMainHelper.getProductArabicOnline(productEnglish);
+                msg = productMainHelper.save(productEnglish);
             }
         } catch (IOException e) {
             msg = e.getMessage();

@@ -4,6 +4,7 @@ import com.einvoive.model.ErrorCustom;
 import com.einvoive.model.Translation;
 import com.einvoive.repository.TranslationRepository;
 import com.einvoive.util.Translator;
+import com.einvoive.util.Utility;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,24 +108,28 @@ public class TranslationHelper {
     }
 
     public String getTranslationMain(String english) {
-        Translation translation = null;
-        try {
-            translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
-        }catch (Exception exception) {
-            logger.info("No Translation found for text "+ english +
-                    "having Exception: "+ exception.getMessage());
-            System.out.println("No Translation found for text "+ english +
-                    "having Exception: "+ exception.getMessage());
+      if(Utility.isNumeric(english))
+          return english;
+       else{
+            Translation translation = null;
+            try {
+                translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+            } catch (Exception exception) {
+                logger.info("No Translation found for text " + english +
+                        "having Exception: " + exception.getMessage());
+                System.out.println("No Translation found for text " + english +
+                        "having Exception: " + exception.getMessage());
+            }
+            if (translation == null) {
+                translation = new Translation();
+                logger.info("No Translation saved: Assigning Translation through API");
+                translation.setArabic(Translator.getTranslation(english));
+                translation.setEnglish(english);
+                //saveing Translation
+                translationRepository.save(translation);
+            }
+            return translation.getArabic();
         }
-        if(translation == null){
-            translation = new Translation();
-            logger.info("No Translation saved: Assigning Translation through API");
-            translation.setArabic(Translator.getTranslation(english));
-            translation.setEnglish(english);
-            //saveing Translation
-            translationRepository.save(translation);
-        }
-        return translation.getArabic();
     }
 
     public String deleteTranslation(String english) {
@@ -132,5 +137,24 @@ public class TranslationHelper {
         translationRepository.delete(translation);
         logger.info(translation.getEnglish() + "deleted");
         return translation.getEnglish() + "deleted";
+    }
+
+    public String getTranslationTest(String english) {
+        Translation translation = null;
+        try {
+            translation = mongoOperation.findOne(new Query(Criteria.where("english").is(english)), Translation.class);
+        } catch (Exception exception) {
+            logger.info("No Translation found for text " + english +
+                    "having Exception: " + exception.getMessage());
+            System.out.println("No Translation found for text " + english +
+                    "having Exception: " + exception.getMessage());
+        }
+        if (translation == null) {
+            translation = new Translation();
+            System.out.println("No Translation saved: Assigning Translation through API");
+            translation.setArabic(Translator.getTranslation(english));
+            translation.setEnglish(english);
+        }
+        return translation.getArabic();
     }
 }
