@@ -220,7 +220,7 @@ public class ProductMainHelper {
 
     private void setProductNameWithArabic(List<ProductMain> productsLanguagesList) {
         for(ProductMain productMain: productsLanguagesList){
-            if(!productMain.getNameArabic().isEmpty())
+            if(productMain.getNameArabic() != null && !productMain.getNameArabic().isEmpty())
                productMain.setProductName(productMain.getProductName()+" - "+productMain.getNameArabic());
         }
     }
@@ -317,5 +317,20 @@ public class ProductMainHelper {
         repository.save(productMain);
         return "Product "+ productMain.getProductName()+" has been updated";
     }
+
+    public String updateCompanyID(String companyId){
+        List<ProductMain> productMainList = new ArrayList<>();
+        try {
+            productMainList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyId)), ProductMain.class);
+           Update update = new Update();
+            return gson.toJson(productMainList);
+        }catch(Exception ex){
+            logger.info("Error in get Products:"+ ex.getMessage());
+            System.out.println("Error in get Products:"+ ex.getMessage());
+        }
+        return "Sorry! No Product found";
+    }
+
+
 
 }
