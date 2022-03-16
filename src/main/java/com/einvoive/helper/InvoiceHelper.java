@@ -380,7 +380,7 @@ public class InvoiceHelper {
     }
 
     private String getPreviousHash(Invoice invoice) {
-        List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
+        List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").regex(invoice.getCompanyID())), Invoice.class);
         String previousHash = "";
         if(invoiceList.size() > 0)
             previousHash = invoiceList.get(invoiceList.size()-1).getHash();
