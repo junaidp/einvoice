@@ -622,7 +622,20 @@ public class MainController {
     }
 
     @PostMapping("/signIn")
-    public String signIn(@RequestBody Login login) throws NoSuchAlgorithmException { return loginHelper.signIn(login); }
+    public String signIn(@RequestBody Login login)
+    {
+        return loginHelper.signIn(login); }
+
+    @PostMapping("/signInOkta")
+    public String signInOkta(@RequestBody Login login)
+    {
+        try {
+            return loginHelper.signInOkta(login.getEmail());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "Okta signIn failed:" + e.getMessage();
+        }
+    }
 
     @PostMapping("/forgetPassword")
     public String forgetPassword(@RequestBody Login login) { return loginHelper.forgetPassword(login); }
