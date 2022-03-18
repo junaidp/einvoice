@@ -12,6 +12,8 @@ public class Constants {
     public static final String VAT_PAYABLE = "VAT Payable";
     public static String PROJECT_PATH = Paths.get("").toAbsolutePath().normalize().toString();
     public static String INVOICES_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\Invoices\\";
+    public static String INVOICE_XML_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\InvoiceXML\\";
+    public static String CUSTOMER_XML_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\CustomerXML\\";
 //    public static String COMPANY_ID;
 //    public static String LOGGED_IN_USER_ID;
     public static String STATUS_APPROVED = "APPROVED";
