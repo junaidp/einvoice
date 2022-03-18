@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -380,7 +381,7 @@ public class InvoiceHelper {
     }
 
     private String getPreviousHash(Invoice invoice) {
-        List<Invoice> invoiceList = mongoOperation.find(new Query(Criteria.where("companyID").regex(invoice.getCompanyID())), Invoice.class);
+        List<Invoice> invoiceList = mongoOperation.findAll(Invoice.class);
         String previousHash = "";
         if(invoiceList.size() > 0)
             previousHash = invoiceList.get(invoiceList.size()-1).getHash();
