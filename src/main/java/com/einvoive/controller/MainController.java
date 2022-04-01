@@ -1,14 +1,28 @@
 package com.einvoive.controller;
 
+import com.einvoive.authenticator.CredentialRepository;
+import com.einvoive.authenticator.ValidateCodeDto;
+import com.einvoive.authenticator.Validation;
 import com.einvoive.constants.*;
 import com.einvoive.helper.*;
 import com.einvoive.model.*;
 import com.einvoive.util.Translator;
 import com.einvoive.util.Utility;
 import com.google.gson.Gson;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -17,6 +31,7 @@ import java.util.List;
 @RequestMapping("control")
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
+@RequiredArgsConstructor
 public class MainController {
 
     @Autowired
@@ -89,6 +104,30 @@ public class MainController {
 //    JournalEntriesHelper journalEntriesHelper;
 
     private Gson gson = new Gson();
+
+    private final GoogleAuthenticator gAuth;
+    private final CredentialRepository credentialRepository ;
+
+    @SneakyThrows
+    @GetMapping("/generate/{username}")
+    public void generate(@PathVariable String username, HttpServletResponse response) {
+        final GoogleAuthenticatorKey key = gAuth.createCredentials(username);
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+        String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("my-demo", username, key);
+
+        BitMatrix bitMatrix = qrCodeWriter.encode(otpAuthURL, BarcodeFormat.QR_CODE, 200, 200);
+
+        ServletOutputStream outputStream = response.getOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+        outputStream.close();
+    }
+
+    @PostMapping("/validate/key")
+    public Validation validateKey(@RequestBody ValidateCodeDto body) {
+        return new Validation(gAuth.authorizeUser(body.getUsername(), body.getCode()));
+    }
 
 //    @PostMapping("/saveJournalEntries")
 //    public String saveJournalEntries(@RequestBody List<JournalEntries> journalEntriesList) {
@@ -624,7 +663,14 @@ public class MainController {
     @PostMapping("/signIn")
     public String signIn(@RequestBody Login login)
     {
-        return loginHelper.signIn(login); }
+        try {
+            return loginHelper.signIn(login);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "Error signing In " + e.getMessage();
+        }
+
+    }
 
     @PostMapping("/signInOkta")
     public String signInOkta(@RequestBody Login login)
