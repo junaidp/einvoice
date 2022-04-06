@@ -1,5 +1,7 @@
 package com.einvoive.helper;
 
+import com.einvoive.authenticator.CredentialRepository;
+import com.einvoive.authenticator.UserTOTP;
 import com.einvoive.model.*;
 import com.einvoive.repository.UserRepository;
 import com.einvoive.util.EmailSender;
@@ -213,5 +215,17 @@ public class UserHelper {
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
         user.setTwoFactorAuthentication(true);
         mongoOperation.save(user);
+    }
+
+
+    public void saveAuthenticatorInfo(UserTOTP userTOTP) {
+        User user = mongoOperation.findOne(new Query(Criteria.where("email").is(userTOTP.getUsername())), User.class);
+        user.setUserTOTP(userTOTP);
+        mongoOperation.save(user);
+    }
+
+    public UserTOTP getUserAuthenticatorInfo(String email){
+        User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+        return user.getUserTOTP();
     }
 }

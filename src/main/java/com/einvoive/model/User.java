@@ -1,5 +1,6 @@
 package com.einvoive.model;
 
+import com.einvoive.authenticator.UserTOTP;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -24,6 +25,15 @@ import java.util.List;
         private boolean addCustomer;
         private String loginToken;
         private boolean twoFactorAuthentication;
+        private UserTOTP userTOTP;
+
+    public UserTOTP getUserTOTP() {
+        return userTOTP;
+    }
+
+    public void setUserTOTP(UserTOTP userTOTP) {
+        this.userTOTP = userTOTP;
+    }
 
     public boolean isTwoFactorAuthentication() {
         return twoFactorAuthentication;
