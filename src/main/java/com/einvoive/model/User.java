@@ -23,6 +23,15 @@ import java.util.List;
         private boolean paymentReceipt;
         private boolean addCustomer;
         private String loginToken;
+        private boolean twoFactorAuthentication;
+
+    public boolean isTwoFactorAuthentication() {
+        return twoFactorAuthentication;
+    }
+
+    public void setTwoFactorAuthentication(boolean twoFactorAuthentication) {
+        this.twoFactorAuthentication = twoFactorAuthentication;
+    }
 
     public boolean isAddCustomer() {
         return addCustomer;

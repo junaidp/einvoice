@@ -108,20 +108,23 @@ public class MainController {
     private final GoogleAuthenticator gAuth;
     private final CredentialRepository credentialRepository ;
 
+
     @SneakyThrows
     @GetMapping("/generate/{username}")
+    //For generating
     public void generate(@PathVariable String username, HttpServletResponse response) {
         final GoogleAuthenticatorKey key = gAuth.createCredentials(username);
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
-        String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("my-demo", username, key);
+        String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("goFatoorah", username, key);
 
         BitMatrix bitMatrix = qrCodeWriter.encode(otpAuthURL, BarcodeFormat.QR_CODE, 200, 200);
 
         ServletOutputStream outputStream = response.getOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
         outputStream.close();
+        userHelper.add2FactorAuthentication(username);
     }
 
     @PostMapping("/validate/key")

@@ -209,4 +209,11 @@ public class UserHelper {
       //  mongoDatabase.getCollection("user").updateOne(user)
     }
 
+    public void add2FactorAuthentication(String email) {
+        Update update = new Update();
+        update.set("twoFactorAuthentication", true);
+        mongoOperation.updateFirst(new Query(Criteria.where("email").is(email)), update, User.class);
+        logger.info("TwoFactor Authentication added for user: " + email);
+
+    }
 }
