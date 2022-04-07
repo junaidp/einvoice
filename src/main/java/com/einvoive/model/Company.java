@@ -1,5 +1,6 @@
 package com.einvoive.model;
 
+import com.einvoive.authenticator.UserTOTP;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -35,6 +36,15 @@ public class Company {
     private String limitUsers;
     private String limitInvoices;
     private Date creationDate;
+    private UserTOTP userTOTP;
+
+    public UserTOTP getUserTOTP() {
+        return userTOTP;
+    }
+
+    public void setUserTOTP(UserTOTP userTOTP) {
+        this.userTOTP = userTOTP;
+    }
 
     public Date getCreationDate() {
         return creationDate;

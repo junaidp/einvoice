@@ -220,8 +220,16 @@ public class UserHelper {
 
     public void saveAuthenticatorInfo(UserTOTP userTOTP) {
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(userTOTP.getUsername())), User.class);
-        user.setUserTOTP(userTOTP);
-        mongoOperation.save(user);
+       if(user != null) {
+           user.setUserTOTP(userTOTP);
+           mongoOperation.save(user);
+           return;
+       }
+        Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(userTOTP.getUsername())), Company.class);
+        company.setUserTOTP(userTOTP);
+        mongoOperation.save(company);
+
+
     }
 
     public UserTOTP getUserAuthenticatorInfo(String email){
