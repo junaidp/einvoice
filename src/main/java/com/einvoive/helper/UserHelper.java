@@ -242,6 +242,11 @@ public class UserHelper {
 
     public UserTOTP getUserAuthenticatorInfo(String email){
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+        if(user !=null)
         return user.getUserTOTP();
+
+        Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
+         return company.getUserTOTP();
+
     }
 }
