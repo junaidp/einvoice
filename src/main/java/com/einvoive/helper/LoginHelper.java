@@ -108,6 +108,8 @@ public class LoginHelper {
 
     //Company
     private void saveCompanyTokenAndEmail(Company company) {
+        // Do not send Token to user's email if two factor authentication is activated.
+        if(company.isTwoFactorAuthentication()) return;
         String randomNumber = Utility.getRandomNumber();
         company.setLoginToken(randomNumber);
         companyHelper.updateCompanyForToken(company);

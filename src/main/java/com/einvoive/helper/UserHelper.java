@@ -213,8 +213,16 @@ public class UserHelper {
 
     public void add2FactorAuthentication(String email) {
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
-        user.setTwoFactorAuthentication(true);
-        mongoOperation.save(user);
+        if(user != null) {
+            user.setTwoFactorAuthentication(true);
+            mongoOperation.save(user);
+            return;
+        }
+        Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
+        if(company != null) {
+            company.setTwoFactorAuthentication(true);
+            mongoOperation.save(company);
+        }
     }
 
 

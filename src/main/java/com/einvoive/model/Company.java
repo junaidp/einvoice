@@ -37,6 +37,15 @@ public class Company {
     private String limitInvoices;
     private Date creationDate;
     private UserTOTP userTOTP;
+    private boolean twoFactorAuthentication;
+
+    public boolean isTwoFactorAuthentication() {
+        return twoFactorAuthentication;
+    }
+
+    public void setTwoFactorAuthentication(boolean twoFactorAuthentication) {
+        this.twoFactorAuthentication = twoFactorAuthentication;
+    }
 
     public UserTOTP getUserTOTP() {
         return userTOTP;
