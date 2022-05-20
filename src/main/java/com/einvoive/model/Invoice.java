@@ -3,13 +3,11 @@ package com.einvoive.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Document
+//@XmlRootElement
 public class Invoice {
 
     @Id

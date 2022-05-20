@@ -37,37 +37,45 @@ public class CompanyHelper {
 
     Gson gson = new Gson();
 
-    private Logger logger = LoggerFactory.getLogger(CompanyHelper.class);
+    private final Logger logger = LoggerFactory.getLogger(CompanyHelper.class);
 
     public String saveCompany(Company companyEnglish){
         String msg = validationBeforeSave(companyEnglish);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        if(msg == null || msg.isEmpty()) {
-            try {
-                if(companyEnglish.getPassword().length() != 64)
-                    companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
-                companyEnglish.setCreationDate(new Date());
-                companyRepository.save(companyEnglish);
-                Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
-                logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
-                logger.info(companyEnglish.getCompanyName()+" saved");
-                return gson.toJson(companySaved);
-            } catch (Exception ex) {
-                logger.info(ex.getMessage());
+        if(!Utility.emailExists(companyEnglish.getEmail())){
+            if(msg == null || msg.isEmpty()) {
+                try {
+                    if(companyEnglish.getPassword().length() != 64)
+                        companyEnglish.setPassword(Utility.encrypt(companyEnglish.getPassword()));
+                    companyEnglish.setCreationDate(new Date());
+                    companyRepository.save(companyEnglish);
+                    Company companySaved = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), Company.class);
+                    logsHelper.save(new Logs("Comapny added "+companyEnglish.getCompanyName(), companyEnglish.getCompanyName()+ " has been added with companyID "+ companyEnglish.getCompanyID()+", users limit "+companyEnglish.getLimitUsers()+", Invoices limit "+companyEnglish.getLimitInvoices()));
+                    logger.info(companyEnglish.getCompanyName()+" saved");
+                    return gson.toJson(companySaved);
+                } catch (Exception ex) {
+                    logger.info(ex.getMessage());
+                    error.setErrorStatus("Error");
+                    error.setError(ex.getMessage());
+                    jsonError = gson.toJson(error);
+                    return jsonError;
+                }
+            }
+            else{
                 error.setErrorStatus("Error");
-                error.setError(ex.getMessage());
+                error.setError(msg+" already exists");
+                logger.info(msg+" already exists");
                 jsonError = gson.toJson(error);
                 return jsonError;
-            }
-        }
-        else{
+             }
+        }else {
             error.setErrorStatus("Error");
-            error.setError(msg+" already exists");
-            logger.info(msg+" already exists");
+            error.setError(companyEnglish.getEmail()+" is already exists");
+            logger.info(companyEnglish.getEmail()+" is already exists");
             jsonError = gson.toJson(error);
             return jsonError;
-         }
+        }
     }
 
     public String getLastCompanyId() {
@@ -120,7 +128,7 @@ public class CompanyHelper {
 
     //Email Verification token
 //    public void updateUserForToken(String companyID, String randomNumber) {
-//        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)), Company.class);
+//        CompanyXML company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyID)), CompanyXML.class);
 //        company.setLoginToken(randomNumber);
 //        updateCompanyEnglish(company);
 //    }
@@ -131,12 +139,12 @@ public class CompanyHelper {
         return count+1+"";
     }
 
-//    public String singIn(Company company) {
+//    public String singIn(CompanyXML company) {
 //        System.out.println(company.getCompanyID() + "," + company.getPassword());
 //        Query query = new Query();
 //        query.addCriteria(Criteria.where("email").is(company.getEmail()).and("password").is(company.getPassword()));
-//        Company companyEnglish = mongoOperation.findOne(query, Company.class);
-//        Company companyArabic = getCompanyArabic(companyEnglish);
+//        CompanyXML companyEnglish = mongoOperation.findOne(query, CompanyXML.class);
+//        CompanyXML companyArabic = getCompanyArabic(companyEnglish);
 //        return gson.toJson(companyEnglish);
 //    }
 
@@ -194,8 +202,8 @@ public class CompanyHelper {
 
 //    public String uploadCompanyLogo(String filePath, String companyID){
 //        String msg = "Unsuccessfull";
-//        List<Company> companyList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), Company.class);
-//        for(Company company : companyList)    {
+//        List<CompanyXML> companyList = mongoOperation.find(new Query(Criteria.where("companyID").is(companyID)), CompanyXML.class);
+//        for(CompanyXML company : companyList)    {
 //            company.setLogo(filePath);
 //            msg = "Successfully Uploaded LOGO";
 //        }

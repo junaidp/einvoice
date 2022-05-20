@@ -1,13 +1,10 @@
 package com.einvoive.util;
 
-import com.einvoive.helper.VatHelper;
+import com.einvoive.constants.Constants;
 import com.einvoive.model.Company;
 import com.einvoive.model.User;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
 import com.posadskiy.currencyconverter.CurrencyConverter;
 import com.posadskiy.currencyconverter.config.ConfigBuilder;
-import com.posadskiy.currencyconverter.enums.Currency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +15,29 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Locale;
-import java.util.Random;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class Utility {
-
+    @Autowired
+    static
+    MongoOperations mongoOperation;
     @Autowired
     EmailSender emailSender;
     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
-    private Logger logger = LoggerFactory.getLogger(Utility.class);
+    private final Logger logger = LoggerFactory.getLogger(Utility.class);
 
     private static byte[] getSHA(String text) throws NoSuchAlgorithmException
     {
@@ -61,7 +66,7 @@ public class Utility {
             {
                 // get the inet address
                 localInetAddress = java.net.InetAddress.getLocalHost();
-                byte serverIP[] = localInetAddress.getAddress();
+                byte[] serverIP = localInetAddress.getAddress();
                 hexIP = hexFormat(getInt(serverIP), 8);
             }
             catch (java.net.UnknownHostException uhe)
@@ -78,11 +83,11 @@ public class Utility {
         int node = SEEDER.nextInt();
         StringBuffer guid = new StringBuffer(32);
         guid.append(hexFormat(timeLow, 8));
-        guid.append(tmpBuffer.toString());
+        guid.append(tmpBuffer);
         guid.append(hexFormat(node, 8));
         return guid.toString();
     }
-    private static int getInt(byte bytes[])
+    private static int getInt(byte[] bytes)
     {
         int i = 0;
         int j = 24;
@@ -145,6 +150,11 @@ public class Utility {
         return num;
     }
 
+    public static String[] getSplitString(String value) {
+        String[] inv = StringUtils.split(value, " ");
+        return inv;
+    }
+
     public void sendEmailToTeam(String subject, String message){
         emailSender.sendEmail("junaidp@gmail.com", subject, message);
         emailSender.sendEmail("amoqeet43@gmail.com", subject, message);
@@ -180,7 +190,32 @@ public class Utility {
             logger.warn("Error in getting currency rate:" + ex.getMessage());
             return "";
         }
-    };
+    }
+
+    public static String getDateHH(String date) throws ParseException {
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        return f.parse(date).toString();
+    }
+
+    public static void updateInvoiceXML() throws IOException {
+        Path path = Paths.get(Constants.INVOICE_XML_PATH);
+        List<String> fileContent = new ArrayList<>(Files.readAllLines(path, StandardCharsets.UTF_8));
+        for (int i = 0; i < fileContent.size(); i++) {
+            if (fileContent.get(i).equals("<Invoice>")) {
+                fileContent.set(i, Constants.INVOICE_XML_ATTRIBUTES);
+                break;
+            }
+        }
+        Files.write(path, fileContent, StandardCharsets.UTF_8);
+    }
+
+    public static boolean emailExists(String email){
+        Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
+        if(company != null)
+            return true;
+        User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
+        return user != null;
+    }
 
 }
 

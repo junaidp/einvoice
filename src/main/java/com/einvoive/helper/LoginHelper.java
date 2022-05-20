@@ -71,28 +71,33 @@ public class LoginHelper {
             return gson.toJson("Invalid Credentials");
     }
 
-    public String signIn(Login login) throws NoSuchAlgorithmException {
-        List<Company> companyList = new ArrayList<>();
-        List<User> userList = new ArrayList<>();
-        logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
-        Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), Company.class);
-        if (loginCompany != null) {
-            saveCompanyTokenAndEmail(loginCompany);
-            companyList.add(loginCompany);
-            companyList.add(companyHelper.getCompanyArabic(loginCompany));
-            logsHelper.save(new Logs("SingIn request for "+loginCompany.getCompanyName(),"A taken has been sent to "+loginCompany.getEmail()));
-            logger.info("SingIn request for "+loginCompany.getCompanyName());
-            return gson.toJson(companyList);
+    public String signIn(Login login)  {
+        try {
+            List<Company> companyList = new ArrayList<>();
+            List<User> userList = new ArrayList<>();
+            logger.info("Inside SignIn for: " + login.getEmail() + "," + login.getPassword());
+            Company loginCompany = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), Company.class);
+            if (loginCompany != null) {
+                saveCompanyTokenAndEmail(loginCompany);
+                companyList.add(loginCompany);
+                companyList.add(companyHelper.getCompanyArabic(loginCompany));
+                logsHelper.save(new Logs("SingIn request for " + loginCompany.getCompanyName(), "A taken has been sent to " + loginCompany.getEmail()));
+                logger.info("SingIn request for " + loginCompany.getCompanyName());
+                return gson.toJson(companyList);
+            }
+            User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), User.class);
+            if (savedUser != null) {
+                saveTokenAndEmail(savedUser);
+                userList.add(savedUser);
+                logsHelper.save(new Logs("SingIn request for " + savedUser.getName(), " A taken has been sent to " + savedUser.getEmail()));
+                logger.info("SingIn request for " + savedUser.getName());
+                return gson.toJson(userList);
+            } else
+                return gson.toJson("Invalid Credentials");
+        }catch(Exception ex)
+        {
+            return gson.toJson("Erros in signIn: " + ex );
         }
-        User savedUser = mongoOperation.findOne(new Query(Criteria.where("email").is(login.getEmail()).and("password").is(Utility.encrypt(login.getPassword()))), User.class);
-        if (savedUser != null) {
-            saveTokenAndEmail(savedUser);
-            userList.add(savedUser);
-            logsHelper.save(new Logs("SingIn request for "+savedUser.getName()," A taken has been sent to "+savedUser.getEmail()));
-            logger.info("SingIn request for "+savedUser.getName());
-            return gson.toJson(userList);
-        } else
-            return gson.toJson("Invalid Credentials");
     }
 
     //User
@@ -106,7 +111,7 @@ public class LoginHelper {
 
     }
 
-    //Company
+    //CompanyXML
     private void saveCompanyTokenAndEmail(Company company) {
         // Do not send Token to user's email if two factor authentication is activated.
         if(company.isTwoFactorAuthentication()) return;

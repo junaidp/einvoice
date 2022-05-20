@@ -1,6 +1,5 @@
 package com.einvoive.controller;
 
-import com.einvoive.authenticator.CredentialRepository;
 import com.einvoive.authenticator.ValidateCodeDto;
 import com.einvoive.authenticator.Validation;
 import com.einvoive.constants.*;
@@ -19,10 +18,18 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,6 +46,12 @@ public class MainController {
 
     @Autowired
     LoginHelper loginHelper;
+
+    @Autowired
+    ContractHelper contractHelper;
+
+    @Autowired
+    ContractItemHelper contractItemHelper;
 
     @Autowired
     UpdatePasswordHelper updatePasswordHelper;
@@ -103,10 +116,10 @@ public class MainController {
 //    @Autowired
 //    JournalEntriesHelper journalEntriesHelper;
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     private final GoogleAuthenticator gAuth;
-    private final CredentialRepository credentialRepository ;
+    //private final CredentialRepository credentialRepository ;
 
 
     @SneakyThrows
@@ -666,13 +679,7 @@ public class MainController {
     @PostMapping("/signIn")
     public String signIn(@RequestBody Login login)
     {
-        try {
             return loginHelper.signIn(login);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return "Error signing In " + e.getMessage();
-        }
-
     }
 
     @PostMapping("/signInOkta")
@@ -704,7 +711,7 @@ public class MainController {
 //    }
 //
 //    @PostMapping("/signInCompany")
-//    public String signInCompany(@RequestBody Company company){
+//    public String signInCompany(@RequestBody CompanyXML company){
 //        return companyHelper.singIn(company);
 //    }
 
@@ -810,6 +817,45 @@ public class MainController {
         return util.getCurrencyRateSAR(currency);
     }
 
+    //Contract
+    @GetMapping("/getContractByID")
+    public String getContractByID(@RequestParam String id){
+        return contractHelper.getContractByID(id);
+    }
+
+    @GetMapping("/getContractsByCompanyID")
+    public String getContractsByCompanyID(@RequestParam String companyID){ return contractHelper.getContractsByCompanyID(companyID);}
+
+    @GetMapping("/deleteContract")
+    public String deleteContract(@RequestParam String id){
+        return contractHelper.deleteContract(id);
+    }
+
+    @PostMapping("/saveContract")
+    public String saveContract(@RequestBody Contract contract){
+        return contractHelper.save(contract);
+    }
+
+    @PostMapping("/updateContract")
+    public String updateContract(@RequestParam Contract contract){
+        return contractHelper.updateContract(contract);
+    }
+
+    @GetMapping(value="/getInvoiceXML")
+    public ResponseEntity<Object> getInvoiceXML(@RequestParam String invoiceID) throws Exception {
+        invoiceHelper.getInvoiceXML(invoiceID);
+        //replaces Invoice tag with multiple values
+        Utility.updateInvoiceXML();
+        File file = new File(Constants.INVOICE_XML_PATH);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(
+                MediaType.parseMediaType("application/txt")).body(resource);
+    }
 
 //    @GetMapping("/getJournalEntries")
 //    public String getJournalEntries(String invoiceNo){

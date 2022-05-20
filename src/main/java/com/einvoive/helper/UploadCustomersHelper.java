@@ -36,11 +36,7 @@ public class UploadCustomersHelper {
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-
-        return true;
+        return TYPE.equals(file.getContentType());
     }
 
     public static List<Customer> excelToProductList(InputStream is, String companyID) {

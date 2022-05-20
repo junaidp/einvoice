@@ -78,6 +78,18 @@ public class LineItemHelper {
         }
     }
 
+    public String deleteAllLineItemByInvoiceId(String invoiceID){
+        try{
+            List<LineItem> lineItemList = mongoOperation.find(new Query(Criteria.where("invoiceId").is(invoiceID)), LineItem.class);
+            repository.deleteAll(lineItemList);
+            logger.info("Deleting All LineItems related to Invoice ID"+invoiceID+" Name "+lineItemList.get(0).getProductName());
+            return "Line Item deleted";
+        }catch (Exception ex){
+            logger.info("Exception in deleting All Line Items By InvoiceID "+ex.getMessage());
+            return "Exception in deleting All Line Items By InvoiceID "+ex.getMessage();
+        }
+    }
+
     public List<LineItem> getLineItems() {
         return lineItems;
     }

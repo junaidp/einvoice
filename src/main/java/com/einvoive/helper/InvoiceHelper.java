@@ -6,6 +6,7 @@ import com.einvoive.model.*;
 import com.einvoive.util.EmailSender;
 import com.einvoive.util.Utility;
 import com.einvoive.repository.InvoiceRepository;
+import com.einvoive.zatcaxml.*;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,16 +38,13 @@ import org.springframework.core.io.UrlResource;
 public class InvoiceHelper {
 
     @Autowired
-    InvoiceRepository repository;
-
-    @Autowired
     LineItemHelper lineItemHelper;
 
     @Autowired
     MongoOperations mongoOperation;
 
     @Autowired
-     InvoiceRepository invoiceRepository;
+    InvoiceRepository invoiceRepository;
 
     @Autowired
     JournalEntriesHelper journalEntriesHelper;
@@ -55,9 +54,9 @@ public class InvoiceHelper {
 
     private Gson gson = new Gson();
 
-    private String INVOICE_SEPARATOR = "-";
+    private  String INVOICE_SEPARATOR = "-";
 
-    private  List<Invoice> invoiceListMain = null;
+    private List<Invoice> invoiceListMain = null;
 
     private Logger logger = LoggerFactory.getLogger(InvoiceHelper.class);
 
@@ -80,7 +79,7 @@ public class InvoiceHelper {
             Company company = companyHelper.getCompanyObject(invoice.getCompanyID());
             if(company.getLimitInvoices() == null || Integer.parseInt(company.getLimitInvoices()) > getCompanyTotalInvoices(invoice.getCompanyID())) {
                 setInvoice(invoice);
-                repository.save(invoice);
+                invoiceRepository.save(invoice);
                 String items = "";
                 for (LineItem lineItem : invoice.getLineItemList()) {
                     items = items + ", " + lineItem.getProductName();
@@ -127,35 +126,18 @@ public class InvoiceHelper {
 
 //    Company having multiple user w.r.t their locations
     public String getNextInvoiceNoByUserID(String id) {
-//        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
-        User user = mongoOperation.findById(id, User.class);
+       User user = mongoOperation.findById(id, User.class);
         Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
         //check for Fugro Company
         if(locationEnum.isPresent())
             return getNextInvoiceNoLocationCode(user.getCompanyID(), locationEnum.get().getCode());
-        else{
-            String lastCompanyInvoiceNumber = getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
-            String invoiceNumber = "";
-            if (lastCompanyInvoiceNumber.isEmpty()) {
-                invoiceNumber = user.getCompanyID().substring(0, 2) + INVOICE_SEPARATOR + user.getLocation().substring(0, 2) + INVOICE_SEPARATOR + "1";
-            } else {
-                String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
-                int invoiceNum = 0;
-                inv = StringUtils.split(String.valueOf(inv[1]), INVOICE_SEPARATOR);
-                if (inv != null && !(inv.length <= 0)) {
-                    invoiceNum = Integer.parseInt(inv[1]) + 1;
-                } else {
-                    invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
-                }
-                invoiceNumber = user.getCompanyID().substring(0, 2) + INVOICE_SEPARATOR + user.getLocation().substring(0, 2) + INVOICE_SEPARATOR + invoiceNum;
-            }
-            return invoiceNumber;
-        }
+        else
+            return getLastInvoiceLocation(user.getCompanyID(), user.getLocation());
     }
 
 //    //getting next credit or debit no
 //    public String getCompanyNextCreditDebitNo(String id, String type) {
-//        Company company = mongoOperation.findById(id, Company.class);
+//        CompanyXML company = mongoOperation.findById(id, CompanyXML.class);
 //         if(type.equals(Constants.CREDIT_NOTE))
 //            return getNextCreditNo(company);
 //        else if(type.equals(Constants.DEBIT_NOTE))
@@ -168,7 +150,7 @@ public class InvoiceHelper {
 //    public String getNextCreditDebitNo(String id, String type) {
 //        User user = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), User.class);
 //        Optional<Locations> locationEnum = Locations.getLocationsByCode(user.getLocation());
-//        //check for Fugro Company
+//        //check for Fugro CompanyXML
 //        if(locationEnum.isPresent() && type.equals(Constants.CREDIT_NOTE))
 //            return getNextCreditNoWithCode(user.getCompanyID(), locationEnum.get().getCode());
 //        else if(locationEnum.isPresent() && type.equals(Constants.DEBIT_NOTE))
@@ -221,8 +203,8 @@ public class InvoiceHelper {
             return "Error in getNextInvoiceNoLocationCode:"+ ex.getMessage();
         }
     }
-//    // Company based creditNo
-//    private String getNextCreditNo(Company company) {
+//    // CompanyXML based creditNo
+//    private String getNextCreditNo(CompanyXML company) {
 //        List<Invoice> invoices = null;
 //        String format = company.getCompanyName().substring(0,2).toUpperCase(Locale.ROOT)+INVOICE_SEPARATOR+Constants.CREDIT_NOTE+INVOICE_SEPARATOR;
 //        try {
@@ -249,7 +231,7 @@ public class InvoiceHelper {
 //    }
 
 //    //next DenitNo
-//    private String getNextDebitNo(Company company) {
+//    private String getNextDebitNo(CompanyXML company) {
 //        List<Invoice> invoices = null;
 //        String format = company.getCompanyName().substring(0,2).toUpperCase()+INVOICE_SEPARATOR+Constants.DEBIT_NOTE+INVOICE_SEPARATOR;
 //        try {
@@ -336,7 +318,7 @@ public class InvoiceHelper {
 //        }
 //    }
 
-    //    When single user Company request
+    //    When single user CompanyXML request
     public String getNextInvoiceNoIndividual(String id){
         Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
         String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
@@ -552,23 +534,27 @@ public class InvoiceHelper {
 
     public String getLastInvoiceLocation(String companyID, String location) {
         List<Invoice> invoices = null;
+        String format = companyID.substring(0, 2) + INVOICE_SEPARATOR + location.substring(0, 2) + INVOICE_SEPARATOR;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("companyID").is(companyID));
-//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));     //Sorting is done through collection as its not working
-            invoices = mongoOperation.find(query, Invoice.class);
-            Collections.reverse(invoices);
-
-            for(Invoice invoice : invoices) {
-                if(invoice.getInvoiceNumber().contains(location.substring(0,2)))
-                    return invoice.getInvoiceNumber();
-            }
+            query.addCriteria(Criteria.where("invoiceNumber").regex(format));
+           invoices = mongoOperation.find(query, Invoice.class);
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = Utility.getAttachedNo(invoice.getInvoiceNumber(), format);
+                    if (max < num)
+                        max = num;
+                }
+                max++;
+                return format + max;
+            }else
+                return format + "1";
         }catch(Exception ex){
             System.out.println("Error in getLastInvoiceByCompany:"+ ex.getMessage());
             logger.info("Error in getLastInvoiceByCompany:"+ ex.getMessage());
             return "Error in getLastInvoiceByCompany:"+ ex.getMessage();
         }
-        return "";
     }
 
     public String getLastInvoiceNo(String companyID) {
@@ -600,7 +586,12 @@ public class InvoiceHelper {
 
     public String deleteInvoice(String invoiceID){
         Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
-        repository.delete(invoice);
+        invoiceRepository.delete(invoice);
+        try {
+            lineItemHelper.deleteAllLineItemByInvoiceId(invoiceID);
+        }catch (Exception exception){
+           logger.info("Exception in delete All Line Items by Invoice ID in deleteInvoice "+exception.getMessage());
+        }
         logsHelper.save(new Logs("Delete Invoice "+invoice.getInvoiceName(), "Invoice delection: "+invoice.getInvoiceName()+" will be deleted"));
         logger.info("Invoice deleted "+invoice.getInvoiceName());
         return "Invoice deleted";
@@ -757,7 +748,7 @@ public class InvoiceHelper {
             Invoice invoice = mongoOperation.findOne(new Query(Criteria.where("invoiceNumber").is(invoiceID)), Invoice.class);
             if(invoice != null){
                 invoice.setStatus(status);
-                repository.save(invoice);
+                invoiceRepository.save(invoice);
                 return "Invoice Status Updated";
             }
             else{
@@ -794,6 +785,68 @@ public class InvoiceHelper {
             return gson.toJson("No Record found");
         else
             return gson.toJson(invoiceListMain);
+    }
+
+    public void updateCustomerName(String customerNameNew, String customerNameOld) {
+        Update update = new Update();
+        try {
+            update.set("customerName", customerNameNew);
+            mongoOperation.updateMulti(new Query(Criteria.where("customerName").is(customerNameOld)), update, Invoice.class);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    public File getInvoiceXML(String invoiceID) throws Exception {
+        ConvertToXML convertToXML = new ConvertToXML();
+        Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
+        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(invoice.getCompanyID())), Company.class);
+        User user = mongoOperation.findById(invoice.getUserId(), User.class);
+        Customer customer = mongoOperation.findById(invoice.getBillTo(), Customer.class);
+        InvoiceXML invoiceXML = new InvoiceXML(2.1, invoice.getInvoiceNumber(), Utility.getDateHH(invoice.getDateTime()),new InvoiceTypeCode("UN/ECE 1001 Subset", "6", "380"), new Note("en", "Ordered in our booth at the convention."), "2009-12-15", new InvoiceXML.DocumentCurrencyCode("ISO 4217 Alpha", "6", "SAR"), "Project cost code 123");
+        invoiceXML.setInvoicePeriod(new InvoicePeriod(Utility.getDateHH(invoice.getSupplyDate()), Utility.getDateHH(invoice.getPaymentDue())));
+        invoiceXML.setOrderReference(new com.einvoive.zatcaxml.OrderReference(invoice.getReferenceField()));
+        invoiceXML.setContractDocumentReference(new ContractDocumentReference("Contract Dummy", "Framework agreement dummy"));
+        invoiceXML.setAdditionalDocumentReference(new AdditionalDocumentReference("Doc1", "Timesheet", new Attachment(new Attachment.ExternalReference("http://www.suppliersite.eu/sheet001.html"))));
+        //Supplier Party
+        EndpointID endpointID = new EndpointID("GLN", "9", "1234567890123");
+        Country country = new Country(new IdentificationCode("ISO3166-1", "6", company.getCountry()));
+        PostalAddress postalAddress = new PostalAddress(new PostalAddress.ID("GLN", "9", company.getCompanyID()), company.getPostalCode(), company.getAddress2(), "nill", company.getAddress1(), "nill", company.getCity(), company.getPostalCode(), company.getCountry(), country);
+        PartyTaxScheme partyTaxScheme = new PartyTaxScheme(new CompanyXML("DKVAT", "ZZZ", invoice.getCompanyID()), new TaxScheme(new Scheme("UN/ECE 5153", "6", company.getVatNumber_Company())));
+        PartyLegalEntity partyLegalEntity = new PartyLegalEntity(company.getCompanyName(), new CompanyXML("CVR", "ZZZ", company.getCompanyID()), new RegistrationAddress(company.getCity(), company.getCountry(), new RegistrationAddress.Country1(company.getState())));
+        Contact contact = new Contact(company.getCellNo(), "nill", company.getEmail());
+        Person person = new Person(Utility.getSplitString(user.getName())[0], "M", Utility.getSplitString(user.getName())[1], "User");
+        Party partySupplier = new Party(endpointID, new PartyIdentification(new ID("ZZZ", "Supp123")), new Party.PartyName(company.getCompanyName()), postalAddress, partyTaxScheme, partyLegalEntity, contact, person);
+        invoiceXML.setAccountingSupplierParty(new AccountingSupplierParty(partySupplier));
+        //customer party
+        EndpointID endpointID1 = new EndpointID("GLN", "9", "1234567890123");
+        Country country1 = new Country(new IdentificationCode("ISO3166-1", "6", customer.getShippingCountry()));
+        PostalAddress postalAddress1 = new PostalAddress(new PostalAddress.ID("GLN", "9", customer.getCompanyID()), customer.getShippingPostal(), customer.getShippingAddress2(), "nill", customer.getShippingAddress2(), "nill", customer.getShippingCity(), customer.getShippingPostal(), customer.getShippingCountry(), country1);
+        PartyTaxScheme partyTaxScheme1 = new PartyTaxScheme(new CompanyXML("DKVAT", "ZZZ", customer.getId()), new TaxScheme(new Scheme("UN/ECE 5153", "6", customer.getVatNumber_Customer())));
+        PartyLegalEntity partyLegalEntity1 = new PartyLegalEntity(customer.getCustomer(), new CompanyXML("CVR", "ZZZ", customer.getCompanyID()), new RegistrationAddress(customer.getShippingCity(), customer.getShippingCountry(), new RegistrationAddress.Country1(customer.getShippingProvince())));
+        Contact contact1 = new Contact(customer.getPhone(), "nill", customer.getEmail());
+        Person person1 = new Person(customer.getFirstName(), "M", customer.getLastName(), "Customer");
+        Party partyCustomer = new Party(endpointID1, new PartyIdentification(new ID("ZZZ", customer.getId())), new Party.PartyName(customer.getCustomer()), postalAddress1, partyTaxScheme1, partyLegalEntity1, contact1, person1);
+        invoiceXML.setAccountingCustomerParty(new AccountingCustomerParty(partyCustomer));
+        PartyLegalEntity partyLegalEntity2 = new PartyLegalEntity();
+        partyLegalEntity2.setCompany(new CompanyXML("UK:CH", "ZZZ", "6411982340"));
+        invoiceXML.setPayeeParty(new PayeeParty(new PartyIdentification(new ID("GLN", "9", "098740918237")), new Party.PartyName("Ebeneser Scrooge Inc."), partyLegalEntity2));
+        invoiceXML.setDelivery(new Delivery("2009-12-15", new Delivery.DeliveryLocation(new Scheme("GLN", "9", "6754238987648"), new Address("Deliverystreet", "Side door", "12", "DeliveryCity", "523427", "RegionC", new Country(new IdentificationCode("BE"))))));
+        PayeeFinancialAccount payeeFinancialAccount = new PayeeFinancialAccount("DK1212341234123412", new PayeeFinancialAccount.FinancialInstitutionBranch(new PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution("DKDKABCD")) ,"Address");
+        invoiceXML.setPaymentMeans(new PaymentMeans(new PaymentMeans.PaymentMeansCode("UN/ECE 4461", "31"), "2009-12-31", "IBAN", "Payref1", payeeFinancialAccount));
+        invoiceXML.setPaymentTerms(new PaymentTerms("Penalty percentage 10% from due date"));
+        invoiceXML.setAllowanceCharge(new AllowanceCharge(false, "Promotion Discount", new Amount("SAR", "100")) );
+        TaxScheme taxScheme = new TaxScheme(new Scheme("UN/ECE 5153", "6", "VAT"));
+        invoiceXML.setTaxTotal(new TaxTotal(new Amount("SAR", "293.20"), new TaxSubtotal(new Amount("SAR", "140.20"), new Amount("SAR", "292.1"), new TaxCategory(new ID("UN/ECE 5305", "6", "S"), "20", new EndpointID("UN/ECE 5153", "6", "VAT"), "Exempt New Means of Transport", taxScheme))));
+        Amount amount = new Amount("SAR", "293.20");
+        invoiceXML.setLegalMonetaryTotal(new LegalMonetaryTotal(amount, amount, amount, amount, amount, amount, amount, amount));
+        AllowanceCharge allowanceCharge = new AllowanceCharge(false, "Damage", new Amount("SAR", "100"));
+        Item item = new Item(new Item.Description("EN", "Processor: Intel Core 2 Duo SU9400 LV (1.4GHz)"), "Laptop", new ItemIdentification(new EndpointID("1234567890124")), new ItemIdentification(new EndpointID("GTIN", "9", "3356")), new CommodityClassification(new IdentificationCode("113", "UNSPSC", "41246")), new TaxCategory(new ID("UN/ECE 5153", "3"), "20", new EndpointID("UN/ECE 5153", "6", "VAT"), "Exempt New Means of Transport", taxScheme) );
+        InvoiceLine invoiceLine = new InvoiceLine("1", "Scratch on box", new InvoicedQuantity("C62", "1"), new Amount("SAR", "1273"), "BookingCode001", new InvoiceLine.OrderLineReference("1"), new AllowanceCharge(false,"Damage", new Amount("SAR", "1253")), new InvoiceLine.TaxTotal1(new Amount("SAR", "1253")), item, new Price(new Amount("SAR", "1253"), new InvoicedQuantity("C62", "1"), allowanceCharge));
+//        List<InvoiceLine> invoiceLines = new ArrayList<>();
+//        invoiceLines.add(invoiceLine);
+        invoiceXML.setInvoiceLine(invoiceLine);
+        return convertToXML.ConvertInvoiceToXML(invoiceXML);
     }
 
 }

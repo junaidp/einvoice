@@ -139,7 +139,7 @@ public class UploadController {
     public ResponseEntity<String> uploadProducts(@RequestParam("file") MultipartFile file, @RequestParam String companyID, @RequestParam String userID) {
         if (file.isEmpty())
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attached file is empty");
-        if (uploadProductsHelper.hasExcelFormat(file))
+        if (UploadProductsHelper.hasExcelFormat(file))
             try {
                 return ResponseEntity.status(HttpStatus.OK).body(uploadProductsHelper.saveAll(file, companyID, userID));
             } catch (Exception e) {
@@ -154,7 +154,7 @@ public class UploadController {
     public ResponseEntity<String> uploadCustomers(@RequestParam("file") MultipartFile file, @RequestParam String companyID) {
         if (file.isEmpty())
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Attached file is empty");
-        if (uploadProductsHelper.hasExcelFormat(file))
+        if (UploadProductsHelper.hasExcelFormat(file))
             try {
                 return ResponseEntity.status(HttpStatus.OK).body(uploadCustomersHelper.saveAll(file, companyID));
             } catch (Exception e) {

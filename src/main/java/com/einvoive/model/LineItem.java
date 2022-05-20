@@ -20,6 +20,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
         private String invoiceId;
         private String amountBeforeTax;
         private String description;
+        private String vatchange;
+
+        public String getVatchange() {
+            return vatchange;
+        }
+
+        public void setVatchange(String vatchange) {
+            this.vatchange = vatchange;
+        }
+
+
 
         public String getDescription() {
             return description;

@@ -3,7 +3,10 @@ package com.einvoive.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 @Document
+//@XmlRootElement
 public class Customer {
 
     @Id

@@ -12,8 +12,9 @@ public class Constants {
     public static final String VAT_PAYABLE = "VAT Payable";
     public static String PROJECT_PATH = Paths.get("").toAbsolutePath().normalize().toString();
     public static String INVOICES_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\Invoices\\";
-    public static String INVOICE_XML_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\InvoiceXML\\";
+    public static String INVOICE_XML_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\invoiceZATCA.xml";
     public static String CUSTOMER_XML_PATH = Constants.PROJECT_PATH+"\\src\\main\\resources\\CustomerXML\\";
+    public static String INVOICE_XML_ATTRIBUTES = "<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\">";
 //    public static String COMPANY_ID;
 //    public static String LOGGED_IN_USER_ID;
     public static String STATUS_APPROVED = "APPROVED";

@@ -40,7 +40,7 @@ public class InvoiceB2CHelper {
 
     private String INVOICE_SEPARATOR = "-";
 
-    private  List<InvoiceB2C>invoiceListMain = null;
+    private List<InvoiceB2C>invoiceListMain = null;
 
     private Logger logger = LoggerFactory.getLogger(InvoiceB2CHelper.class);
 

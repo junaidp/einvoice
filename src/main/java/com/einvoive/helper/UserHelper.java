@@ -58,37 +58,45 @@ public class UserHelper {
         String msg = validationBeforeSave(userEntity);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        if(msg == null || msg.isEmpty()) {
-            try {
-                Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
-                if(company.getLimitUsers() == null || Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
-                    if(userEntity.getPassword().length() != 64)
-                        userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
-                     userRepository.save(userEntity);
-                    logsHelper.save(new Logs("New user added for "+company.getCompanyName(), company.getCompanyName()+ " has added a new user "+ userEntity.getName()));
-                    if(sendEmail)
-                        emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
-                    return "User Saved";
-                }else{
+        if(!Utility.emailExists(userEntity.getEmail())){
+            if(msg == null || msg.isEmpty()) {
+                try {
+                    Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
+                    if(company.getLimitUsers() == null || Integer.parseInt(company.getLimitUsers()) > getCompanyTotalUsers(userEntity.getCompanyID())) {
+                        if(userEntity.getPassword().length() != 64)
+                            userEntity.setPassword(Utility.encrypt(userEntity.getPassword()));
+                         userRepository.save(userEntity);
+                        logsHelper.save(new Logs("New user added for "+company.getCompanyName(), company.getCompanyName()+ " has added a new user "+ userEntity.getName()));
+                        if(sendEmail)
+                            emailSender.sendEmail(userEntity.getEmail(), "Account Created", "Your account has been created successfully. Please log in using these credential.\n Email Address is: "+userEntity.getEmail()+ "\n Password is: "+userEntity.getPassword());
+                        return "User Saved";
+                    }else{
+                        error.setErrorStatus("Error");
+                        logger.info("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
+                        error.setError("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
+                        jsonError = gson.toJson(error);
+                        return jsonError;
+                    }
+                }
+                catch (Exception ex){
+                    logger.info("Exception in save User: "+ex.getMessage());
                     error.setErrorStatus("Error");
-                    logger.info("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
-                    error.setError("Sorry Company has a limit of generating "+company.getLimitUsers()+" Users");
+                    error.setError(ex.getMessage());
                     jsonError = gson.toJson(error);
                     return jsonError;
                 }
             }
-            catch (Exception ex){
-                logger.info("Exception in save User: "+ex.getMessage());
+            else{
                 error.setErrorStatus("Error");
-                error.setError(ex.getMessage());
+                logger.info(msg+"--Already Exists");
+                error.setError(msg+"--Already Exists");
                 jsonError = gson.toJson(error);
                 return jsonError;
             }
-        }
-        else{
+        }else {
             error.setErrorStatus("Error");
-            logger.info(msg+"--Already Exists");
-            error.setError(msg+"--Already Exists");
+            error.setError(userEntity.getEmail()+" is already exists");
+            logger.info(userEntity.getEmail()+" is already exists");
             jsonError = gson.toJson(error);
             return jsonError;
         }

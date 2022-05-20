@@ -13,7 +13,7 @@ public enum JournalEntriesEnum {
     private int value;
     private String name;
 
-    private JournalEntriesEnum(int value, String name) {
+    JournalEntriesEnum(int value, String name) {
         this.value = value;
         this.name = name;
     }

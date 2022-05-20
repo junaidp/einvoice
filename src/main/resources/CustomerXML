@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<customer>
+    <additionalNumber_Customer>P.O. BOX 24162</additionalNumber_Customer>
+    <billingAddress1>Olya</billingAddress1>
+    <companyID>FugroSuhaimiLtd.</companyID>
+    <currency>SAR</currency>
+    <customer>MURBA ALSAHARA TRADING CO.(UNIQUE GROUP).</customer>
+    <id>61d546929d390d3d886ebb4c</id>
+    <otherSellerid_Customer>123456789</otherSellerid_Customer>
+    <shippingAddress1>14-C</shippingAddress1>
+    <shippingAddress2>23-N</shippingAddress2>
+    <shippingCity>ALKHOBAR</shippingCity>
+    <shippingCountry>Saudi Arabia</shippingCountry>
+    <shippingPostal>34632</shippingPostal>
+    <shippingProvince>Eastern Province</shippingProvince>
+    <vatNumber_Customer>300067513000003</vatNumber_Customer>
+</customer>

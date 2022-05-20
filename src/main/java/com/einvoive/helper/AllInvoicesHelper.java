@@ -213,10 +213,10 @@ public class AllInvoicesHelper {
             if (list != null && !list.isEmpty())
                 return gson.toJson(list);
             else
-                return gson.toJson("No Invoice found"+startDateFinal.toString()+":"+endDateFinal);
+                return gson.toJson("No Invoice found"+ startDateFinal +":"+endDateFinal);
         }catch(Exception ex){
             logger.info("Error in get invoices By Duration :"+startDateFinal.toString()+":"+endDateFinal+"Errors is: "+ex.getMessage());
-            return "Error in get invoices By Duration :"+startDateFinal.toString()+":"+endDateFinal;
+            return "Error in get invoices By Duration :"+ startDateFinal +":"+endDateFinal;
         }
 //        return gson.toJson(list);
     }
@@ -253,10 +253,10 @@ public class AllInvoicesHelper {
             if (list != null && !list.isEmpty())
                 return gson.toJson(list);
             else
-                return gson.toJson("No Invoice found"+startDateFinal.toString()+":"+endDateFinal);
+                return gson.toJson("No Invoice found"+ startDateFinal +":"+endDateFinal);
         }catch(Exception ex){
             logger.info("Error in get invoices By Duration :"+startDateFinal.toString()+":"+endDateFinal+"Errors is: "+ex.getMessage());
-            return "Error in get invoices By Duration :"+startDateFinal.toString()+":"+endDateFinal;
+            return "Error in get invoices By Duration :"+ startDateFinal +":"+endDateFinal;
         }
 //        return gson.toJson(list);
     }

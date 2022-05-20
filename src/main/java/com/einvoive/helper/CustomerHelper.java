@@ -30,6 +30,8 @@ public class CustomerHelper {
     LogsHelper logsHelper;
     @Autowired
     CompanyHelper companyHelper;
+    @Autowired
+    InvoiceHelper invoiceHelper;
     Gson gson = new Gson();
     private Logger logger = LoggerFactory.getLogger(Customer.class);
 
@@ -87,9 +89,22 @@ public class CustomerHelper {
     }
 
     public String update(Customer customerEnglish, Customer customerArabic){
-        deleteCustomers(customerEnglish.getId());
-        logger.info("Updating Customer "+customerEnglish.getCustomer());
-        return save(customerEnglish, customerArabic);
+        String customerOldName = mongoOperation.findById(customerEnglish.getId(), Customer.class).getCustomer();
+        ErrorCustom error = new ErrorCustom();
+        String jsonError;
+        try{
+            deleteCustomers(customerEnglish.getId());
+            save(customerEnglish, customerArabic);
+            invoiceHelper.updateCustomerName(customerEnglish.getCustomer(), customerOldName);
+            logger.info("Updating Customer "+customerEnglish.getCustomer());
+            return "Customer Updated";
+        }catch (Exception ex){
+            logger.info("Exception in updating Customer information in Invoices "+ex.getMessage());
+            error.setErrorStatus("Error");
+            error.setError("Exception in updating Customer information in Invoices "+ex.getMessage());
+            jsonError = gson.toJson(error);
+            return jsonError;
+        }
     }
 
     private void saveCustomerArabic(Customer customerEnglish, Customer customerArabic){

@@ -57,7 +57,7 @@ public class LogoHelper {
         Object fileID = template.store(upload.getInputStream(), logoName, upload.getContentType(), metadata);
         logsHelper.save(new Logs("Logo uploaded for "+ Utility.getCompanyName(companyID, mongoOperation),"A new Logo uploaded for "+Utility.getCompanyName(companyID, mongoOperation)));
         logger.info("Logo uploaded for "+ Utility.getCompanyName(companyID, mongoOperation));
-        return new Gson().toJson("Logo Uploaded with file ID: "+fileID.toString());
+        return new Gson().toJson("Logo Uploaded with file ID: "+ fileID);
     }
 
     private void deleteLogo(String filename){

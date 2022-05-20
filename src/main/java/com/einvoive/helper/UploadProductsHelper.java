@@ -32,11 +32,7 @@ public class UploadProductsHelper {
 
     public static boolean hasExcelFormat(MultipartFile file) {
 
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-
-        return true;
+        return TYPE.equals(file.getContentType());
     }
 
     public static List<ProductMain> excelToProductList(InputStream is, String companyID, String loggedInUserID) {
@@ -79,7 +75,7 @@ public class UploadProductsHelper {
                             break;
 
                         case 2:
-                            double value = (double) currentCell.getNumericCellValue();
+                            double value = currentCell.getNumericCellValue();
                             productMain.setPrice(String.valueOf(value));
                             break;
 
