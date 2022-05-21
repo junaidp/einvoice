@@ -214,7 +214,10 @@ public class Utility {
         if(company != null)
             return true;
         User user = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), User.class);
-        return user != null;
+       if(user != null)
+           return true;
+       else
+            return false;
     }
 
 }
