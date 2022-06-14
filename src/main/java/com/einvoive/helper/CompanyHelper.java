@@ -27,6 +27,9 @@ public class CompanyHelper {
     CompanyRepository companyRepository;
 
     @Autowired
+    Utility utility;
+
+    @Autowired
     TranslationHelper translationHelper;
 
     @Autowired
@@ -43,7 +46,7 @@ public class CompanyHelper {
         String msg = validationBeforeSave(companyEnglish);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        if(!Utility.emailExists(companyEnglish.getEmail())){
+        if(!utility.emailExists(companyEnglish.getEmail())){
             if(msg == null || msg.isEmpty()) {
                 try {
                     if(companyEnglish.getPassword().length() != 64)
@@ -164,14 +167,15 @@ public class CompanyHelper {
         return companyArabic;
     }
 
-    public String updateCompany(Company companyEnglish , Company comapnyArabic) {
+    public String updateCompany(Company companyEnglish, Company comapnyArabic) {
         Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())),Company.class);
         companyEnglish.setLimitUsers(company.getLimitUsers());
         companyEnglish.setLimitInvoices(company.getLimitInvoices());
         companyRepository.delete(company);
         saveCompany(companyEnglish);
         saveCompanyArabic(companyEnglish, comapnyArabic);
-        logger.info(companyEnglish.getCompanyName()+" record updated");
+        logger.info(companyEnglish.getCompanyName()+" has been record updated");
+        logsHelper.save(new Logs("Update Company", companyEnglish.getCompanyName()+" record updated"));
         return gson.toJson("Company Updated");
     }
 
@@ -179,6 +183,7 @@ public class CompanyHelper {
         Update update = new Update();
         update.set("loginToken", companyEnglish.getLoginToken());
         mongoOperation.updateFirst(new Query(Criteria.where("companyID").is(companyEnglish.getCompanyID())), update, Company.class);
+        logsHelper.save(new Logs("update Company For Token: " + companyEnglish.getLoginToken() +" saved for Comapny: ", "update Company For Token: " + companyEnglish.getLoginToken() +" saved for Comapny: " + companyEnglish.getCompanyName()));
         logger.info("Token: " + companyEnglish.getLoginToken() +" saved for Comapny: "+ companyEnglish.getCompanyName());
     }
 
@@ -192,6 +197,7 @@ public class CompanyHelper {
         }
         mongoOperation.updateFirst(new Query(Criteria.where("email").is(login.getEmail())), update, Company.class);
         logger.info(" Password updated for Company : " + login.getEmail());
+        logsHelper.save(new Logs("Reset Company Password", "Password updated for Company : " + login.getEmail()));
         return gson.toJson("Password updated successfully : " + login.getEmail());
     }
 

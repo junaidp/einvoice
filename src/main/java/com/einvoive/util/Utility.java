@@ -1,8 +1,10 @@
 package com.einvoive.util;
 
 import com.einvoive.constants.Constants;
+import com.einvoive.helper.InvoiceXMLHelper;
 import com.einvoive.model.Company;
 import com.einvoive.model.User;
+import com.einvoive.zatcaxml.InvoiceXML;
 import com.posadskiy.currencyconverter.CurrencyConverter;
 import com.posadskiy.currencyconverter.config.ConfigBuilder;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 
@@ -28,16 +31,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
+@Component
 public class Utility {
     @Autowired
-    static
     MongoOperations mongoOperation;
     @Autowired
     EmailSender emailSender;
     private static String hexIP = null;
     private static final java.security.SecureRandom SEEDER = new java.security.SecureRandom();
     private final Logger logger = LoggerFactory.getLogger(Utility.class);
+
+    private static String encryptBase64(InvoiceXML invoiceXML){
+        // Getting encoder
+        Base64.Encoder encoder = Base64.getUrlEncoder();
+        return encoder.encodeToString(invoiceXML.toString().getBytes());
+    }
 
     private static byte[] getSHA(String text) throws NoSuchAlgorithmException
     {
@@ -193,8 +201,9 @@ public class Utility {
     }
 
     public static String getDateHH(String date) throws ParseException {
-        DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        return f.parse(date).toString();
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+//        return dateFormat.parse(date).toString();
+        return date;
     }
 
     public static void updateInvoiceXML() throws IOException {
@@ -209,7 +218,7 @@ public class Utility {
         Files.write(path, fileContent, StandardCharsets.UTF_8);
     }
 
-    public static boolean emailExists(String email){
+    public boolean emailExists(String email){
         Company company = mongoOperation.findOne(new Query(Criteria.where("email").is(email)), Company.class);
         if(company != null)
             return true;

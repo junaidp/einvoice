@@ -48,6 +48,9 @@ public class UserHelper {
     @Autowired
     LogsHelper logsHelper;
 
+    @Autowired
+    Utility utility;
+
     Gson gson = new Gson();
 
     private Logger logger = LoggerFactory.getLogger(UserHelper.class);
@@ -58,7 +61,7 @@ public class UserHelper {
         String msg = validationBeforeSave(userEntity);
         ErrorCustom error = new ErrorCustom();
         String jsonError;
-        if(!Utility.emailExists(userEntity.getEmail())){
+        if(!utility.emailExists(userEntity.getEmail())){
             if(msg == null || msg.isEmpty()) {
                 try {
                     Company company = companyHelper.getCompanyObject(userEntity.getCompanyID());
