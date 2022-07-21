@@ -116,7 +116,7 @@ public class InvoiceHelper {
 
     private void setInvoice(Invoice invoice) throws NoSuchAlgorithmException {
         invoice.setSerialNo(getAvaiablaeId(invoice.getCompanyID()));
-//      UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
+//        UUID uuid = UUID.fromString("00809e66-36d5-436f-93c4-e4e2c76cce0d");
         invoice.setId(invoice.setId(String.valueOf(UUID.randomUUID())));
         invoice.setHash(Utility.encrypt(invoice.getId()));
         invoice.setSupplyDate(invoice.getSupplyDate());
@@ -343,23 +343,24 @@ public class InvoiceHelper {
     //for Multiple User under a company But CompanyID is generating
     public String getNextInvoiceNoByCompanyID(String id) {
         Company company = mongoOperation.findOne(new Query(Criteria.where("id").is(id)), Company.class);
-        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
-        String invoiceNumber = "";
-        if (lastCompanyInvoiceNumber.isEmpty()) {
-            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + "1";
-        }
-        else{
-            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
-            int invoiceNum = 0 ;
-            if(inv!=null && !(inv.length <=0)) {
-                invoiceNum = Integer.parseInt(inv[1]) + 1;
-            }
-            else{
-                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
-            }
-            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
-        }
-         return invoiceNumber;
+        return getLastInvoiceNo(company.getCompanyID());
+//        String lastCompanyInvoiceNumber = getLastInvoiceNo(company.getCompanyID());
+//        String invoiceNumber = "";
+//        if (lastCompanyInvoiceNumber.isEmpty()) {
+//            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + "1";
+//        }
+//        else{
+//            String[] inv = StringUtils.split(lastCompanyInvoiceNumber, INVOICE_SEPARATOR);
+//            int invoiceNum = 0 ;
+//            if(inv!=null && !(inv.length <=0)) {
+//                invoiceNum = Integer.parseInt(inv[1]) + 1;
+//            }
+//            else{
+//                invoiceNum = Integer.parseInt(lastCompanyInvoiceNumber) + 1;
+//            }
+//            invoiceNumber = company.getCompanyID().substring(0,2) + INVOICE_SEPARATOR + invoiceNum;
+//        }
+//         return invoiceNumber;
     }
 
     private String getPreviousHash(Invoice invoice) {
@@ -432,22 +433,22 @@ public class InvoiceHelper {
         return invoices.size();
     }
 
-    public Invoice getInvoiceByInvoiceNoQR(String invoiceNumber){
-        Invoice invoices = null;
-        try {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("invoiceNumber").is(invoiceNumber));
-            invoices = mongoOperation.findOne(query, Invoice.class);
+//    public Invoice getInvoiceByInvoiceNoQR(String invoiceNumber){
+//        Invoice invoices = null;
+//        try {
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("invoiceNumber").is(invoiceNumber));
+//            invoices = mongoOperation.findOne(query, Invoice.class);
 //            for(Invoice invoice : invoices) {
 //                lineItemHelper.getLineItems(invoice.getId());
 //                invoice.setLineItemList(lineItemHelper.getLineItems());
 //            }
-        }catch(Exception ex){
-            logger.info("Error in get invoices:"+ ex.getMessage());
-            System.out.println("Error in get invoices:"+ ex.getMessage());
-        }
-        return invoices;
-    }
+//        }catch(Exception ex){
+//            logger.info("Error in get invoices:"+ ex.getMessage());
+//            System.out.println("Error in get invoices:"+ ex.getMessage());
+//        }
+//        return invoices;
+//    }
 
     public String getInvoicesByStatus(String status){
         List<Invoice> invoices = null;
@@ -559,29 +560,27 @@ public class InvoiceHelper {
 
     public String getLastInvoiceNo(String companyID) {
         List<Invoice> invoices = null;
+        String format = companyID.substring(0, 2) + INVOICE_SEPARATOR;
         try {
             Query query = new Query();
-            query.addCriteria(Criteria.where("companyID").is(companyID));
-//            query.with(Sort.by(Sort.Direction.DESC, "invoiceNumber"));
+            query.addCriteria(Criteria.where("invoiceNumber").regex(format));
             invoices = mongoOperation.find(query, Invoice.class);
-            Collections.reverse(invoices);
-            char someChar = '-';
-            for(Invoice invoice : invoices){
-                int count = 0;
-                for (int i = 0; i < invoice.getInvoiceNumber().length(); i++) {
-                    if (invoice.getInvoiceNumber().charAt(i) == someChar) {
-                        count++;
-                    }
+            if (!invoices.isEmpty()) {
+                int num, max = 0;
+                for (Invoice invoice : invoices) {
+                    num = Utility.getAttachedNo(invoice.getInvoiceNumber(), format);
+                    if (max < num)
+                        max = num;
                 }
-                if(count == 1)
-                    return invoice.getInvoiceNumber();
-            }
+                max++;
+                return format + max;
+            }else
+                return format + "1";
         }catch(Exception ex){
             System.out.println("Error in getLastInvoiceByCompany:"+ ex.getMessage());
             logger.info("Error in getLastInvoiceByCompany:"+ ex.getMessage());
             return "Error in getLastInvoiceByCompany:"+ ex.getMessage();
         }
-        return "";
     }
 
     public String deleteInvoice(String invoiceID){
@@ -796,57 +795,4 @@ public class InvoiceHelper {
             System.out.println(exception.getMessage());
         }
     }
-
-    public File getInvoiceXML(String invoiceID) throws Exception {
-        ConvertToXML convertToXML = new ConvertToXML();
-        Invoice invoice = mongoOperation.findById(invoiceID, Invoice.class);
-        Company company = mongoOperation.findOne(new Query(Criteria.where("companyID").is(invoice.getCompanyID())), Company.class);
-        User user = mongoOperation.findById(invoice.getUserId(), User.class);
-        Customer customer = mongoOperation.findById(invoice.getBillTo(), Customer.class);
-        InvoiceXML invoiceXML = new InvoiceXML(2.1, invoice.getInvoiceNumber(), Utility.getDateHH(invoice.getDateTime()),new InvoiceTypeCode("UN/ECE 1001 Subset", "6", "380"), new Note("en", "Ordered in our booth at the convention."), "2009-12-15", new InvoiceXML.DocumentCurrencyCode("ISO 4217 Alpha", "6", "SAR"), "Project cost code 123");
-        invoiceXML.setInvoicePeriod(new InvoicePeriod(Utility.getDateHH(invoice.getSupplyDate()), Utility.getDateHH(invoice.getPaymentDue())));
-        invoiceXML.setOrderReference(new com.einvoive.zatcaxml.OrderReference(invoice.getReferenceField()));
-        invoiceXML.setContractDocumentReference(new ContractDocumentReference("Contract Dummy", "Framework agreement dummy"));
-        invoiceXML.setAdditionalDocumentReference(new AdditionalDocumentReference("Doc1", "Timesheet", new Attachment(new Attachment.ExternalReference("http://www.suppliersite.eu/sheet001.html"))));
-        //Supplier Party
-        EndpointID endpointID = new EndpointID("GLN", "9", "1234567890123");
-        Country country = new Country(new IdentificationCode("ISO3166-1", "6", company.getCountry()));
-        PostalAddress postalAddress = new PostalAddress(new PostalAddress.ID("GLN", "9", company.getCompanyID()), company.getPostalCode(), company.getAddress2(), "nill", company.getAddress1(), "nill", company.getCity(), company.getPostalCode(), company.getCountry(), country);
-        PartyTaxScheme partyTaxScheme = new PartyTaxScheme(new CompanyXML("DKVAT", "ZZZ", invoice.getCompanyID()), new TaxScheme(new Scheme("UN/ECE 5153", "6", company.getVatNumber_Company())));
-        PartyLegalEntity partyLegalEntity = new PartyLegalEntity(company.getCompanyName(), new CompanyXML("CVR", "ZZZ", company.getCompanyID()), new RegistrationAddress(company.getCity(), company.getCountry(), new RegistrationAddress.Country1(company.getState())));
-        Contact contact = new Contact(company.getCellNo(), "nill", company.getEmail());
-        Person person = new Person(Utility.getSplitString(user.getName())[0], "M", Utility.getSplitString(user.getName())[1], "User");
-        Party partySupplier = new Party(endpointID, new PartyIdentification(new ID("ZZZ", "Supp123")), new Party.PartyName(company.getCompanyName()), postalAddress, partyTaxScheme, partyLegalEntity, contact, person);
-        invoiceXML.setAccountingSupplierParty(new AccountingSupplierParty(partySupplier));
-        //customer party
-        EndpointID endpointID1 = new EndpointID("GLN", "9", "1234567890123");
-        Country country1 = new Country(new IdentificationCode("ISO3166-1", "6", customer.getShippingCountry()));
-        PostalAddress postalAddress1 = new PostalAddress(new PostalAddress.ID("GLN", "9", customer.getCompanyID()), customer.getShippingPostal(), customer.getShippingAddress2(), "nill", customer.getShippingAddress2(), "nill", customer.getShippingCity(), customer.getShippingPostal(), customer.getShippingCountry(), country1);
-        PartyTaxScheme partyTaxScheme1 = new PartyTaxScheme(new CompanyXML("DKVAT", "ZZZ", customer.getId()), new TaxScheme(new Scheme("UN/ECE 5153", "6", customer.getVatNumber_Customer())));
-        PartyLegalEntity partyLegalEntity1 = new PartyLegalEntity(customer.getCustomer(), new CompanyXML("CVR", "ZZZ", customer.getCompanyID()), new RegistrationAddress(customer.getShippingCity(), customer.getShippingCountry(), new RegistrationAddress.Country1(customer.getShippingProvince())));
-        Contact contact1 = new Contact(customer.getPhone(), "nill", customer.getEmail());
-        Person person1 = new Person(customer.getFirstName(), "M", customer.getLastName(), "Customer");
-        Party partyCustomer = new Party(endpointID1, new PartyIdentification(new ID("ZZZ", customer.getId())), new Party.PartyName(customer.getCustomer()), postalAddress1, partyTaxScheme1, partyLegalEntity1, contact1, person1);
-        invoiceXML.setAccountingCustomerParty(new AccountingCustomerParty(partyCustomer));
-        PartyLegalEntity partyLegalEntity2 = new PartyLegalEntity();
-        partyLegalEntity2.setCompany(new CompanyXML("UK:CH", "ZZZ", "6411982340"));
-        invoiceXML.setPayeeParty(new PayeeParty(new PartyIdentification(new ID("GLN", "9", "098740918237")), new Party.PartyName("Ebeneser Scrooge Inc."), partyLegalEntity2));
-        invoiceXML.setDelivery(new Delivery("2009-12-15", new Delivery.DeliveryLocation(new Scheme("GLN", "9", "6754238987648"), new Address("Deliverystreet", "Side door", "12", "DeliveryCity", "523427", "RegionC", new Country(new IdentificationCode("BE"))))));
-        PayeeFinancialAccount payeeFinancialAccount = new PayeeFinancialAccount("DK1212341234123412", new PayeeFinancialAccount.FinancialInstitutionBranch(new PayeeFinancialAccount.FinancialInstitutionBranch.FinancialInstitution("DKDKABCD")) ,"Address");
-        invoiceXML.setPaymentMeans(new PaymentMeans(new PaymentMeans.PaymentMeansCode("UN/ECE 4461", "31"), "2009-12-31", "IBAN", "Payref1", payeeFinancialAccount));
-        invoiceXML.setPaymentTerms(new PaymentTerms("Penalty percentage 10% from due date"));
-        invoiceXML.setAllowanceCharge(new AllowanceCharge(false, "Promotion Discount", new Amount("SAR", "100")) );
-        TaxScheme taxScheme = new TaxScheme(new Scheme("UN/ECE 5153", "6", "VAT"));
-        invoiceXML.setTaxTotal(new TaxTotal(new Amount("SAR", "293.20"), new TaxSubtotal(new Amount("SAR", "140.20"), new Amount("SAR", "292.1"), new TaxCategory(new ID("UN/ECE 5305", "6", "S"), "20", new EndpointID("UN/ECE 5153", "6", "VAT"), "Exempt New Means of Transport", taxScheme))));
-        Amount amount = new Amount("SAR", "293.20");
-        invoiceXML.setLegalMonetaryTotal(new LegalMonetaryTotal(amount, amount, amount, amount, amount, amount, amount, amount));
-        AllowanceCharge allowanceCharge = new AllowanceCharge(false, "Damage", new Amount("SAR", "100"));
-        Item item = new Item(new Item.Description("EN", "Processor: Intel Core 2 Duo SU9400 LV (1.4GHz)"), "Laptop", new ItemIdentification(new EndpointID("1234567890124")), new ItemIdentification(new EndpointID("GTIN", "9", "3356")), new CommodityClassification(new IdentificationCode("113", "UNSPSC", "41246")), new TaxCategory(new ID("UN/ECE 5153", "3"), "20", new EndpointID("UN/ECE 5153", "6", "VAT"), "Exempt New Means of Transport", taxScheme) );
-        InvoiceLine invoiceLine = new InvoiceLine("1", "Scratch on box", new InvoicedQuantity("C62", "1"), new Amount("SAR", "1273"), "BookingCode001", new InvoiceLine.OrderLineReference("1"), new AllowanceCharge(false,"Damage", new Amount("SAR", "1253")), new InvoiceLine.TaxTotal1(new Amount("SAR", "1253")), item, new Price(new Amount("SAR", "1253"), new InvoicedQuantity("C62", "1"), allowanceCharge));
-//        List<InvoiceLine> invoiceLines = new ArrayList<>();
-//        invoiceLines.add(invoiceLine);
-        invoiceXML.setInvoiceLine(invoiceLine);
-        return convertToXML.ConvertInvoiceToXML(invoiceXML);
-    }
-
 }
